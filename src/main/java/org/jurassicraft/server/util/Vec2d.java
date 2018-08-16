@@ -12,7 +12,7 @@ public class Vec2d {
     }
 
 	public static double distance(int x1, int z1, float x2, float z2) {
-		return Math.sqrt((z1 - z2) * (x1 - x2) + (x1 - x2) * (x1 - x2));
+		return Math.sqrt((z1 - z2) * (z1 - z2) + (x1 - x2) * (x1 - x2));
 	}
 
 }
