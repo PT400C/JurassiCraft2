@@ -2,10 +2,12 @@ package org.jurassicraft.server.entity;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.item.Dart;
+import org.jurassicraft.server.item.TrackingDart;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,14 +22,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TranquilizerDartEntity extends EntityThrowable implements IEntityAdditionalSpawnData {
 
     private ItemStack stack;
+    private EntityPlayer shooter;
+    private String id;
     
     public TranquilizerDartEntity(World worldIn) {
 	super(worldIn);
     }
     
-    public TranquilizerDartEntity(World worldIn, EntityLivingBase throwerIn, ItemStack stack) {
+    public TranquilizerDartEntity(World worldIn, EntityLivingBase throwerIn, ItemStack stack, String id) {
 	super(worldIn, throwerIn);
 	this.stack = stack.copy();
+	if(throwerIn instanceof EntityPlayer) 
+	this.shooter = (EntityPlayer) throwerIn;
+	this.id = id;
+
     }
     
     @Override
@@ -52,10 +60,22 @@ public class TranquilizerDartEntity extends EntityThrowable implements IEntityAd
 
     @Override
     protected void onImpact(RayTraceResult result) {
+if(stack == null)
+	return;
 	Item item = stack.getItem();
+	
 	if(result.entityHit instanceof DinosaurEntity) {
-	    if(item instanceof Dart) {
+	    if(item != null && item instanceof Dart) {
+	    	if(result.entityHit == null)
+	    		System.out.println("HIT!");
+	    	if(stack == null)
+	    		System.out.println("HIT2!");
 			((Dart)item).getConsumer().accept((DinosaurEntity)result.entityHit, stack);
+			if(item instanceof TrackingDart && this.shooter != null) {
+			((Dart)item).getData().accept((DinosaurEntity)result.entityHit, this.shooter, this.id);
+			//((Dart)item).getShooter().accept((DinosaurEntity)result.entityHit, this.shooter);
+			//((Dart)item).getID().accept((DinosaurEntity)result.entityHit, this.id);
+			}
 	    } else {
 			JurassiCraft.getLogger().error("Expected Dart Item, got {} ", item.getRegistryName());
 	    }
@@ -64,10 +84,12 @@ public class TranquilizerDartEntity extends EntityThrowable implements IEntityAd
             this.world.setEntityState(this, (byte)3);
             this.setDead();
         }
+    
     }
 
     @Override
     public void writeSpawnData(ByteBuf buffer) {
+    	if(stack != null)
 	ByteBufUtils.writeItemStack(buffer, stack);
     }
 

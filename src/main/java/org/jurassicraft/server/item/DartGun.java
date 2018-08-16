@@ -9,6 +9,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.*;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import org.jurassicraft.server.entity.TranquilizerDartEntity;
 
@@ -37,17 +41,20 @@ public class DartGun extends Item {
         	    .map(Slot::getStack)
         	    .filter(stack -> stack.getItem() instanceof Dart)
         	    .findFirst()
-        	    .orElse(ItemStack.EMPTY))) {
+        	    .orElse(ItemStack.EMPTY), playerIn)) {
         	event = SoundEvents.ENTITY_ITEM_PICKUP;
             } else {
         	event = SoundEvents.BLOCK_COMPARATOR_CLICK;
             }
         } else if (!worldIn.isRemote) {
-            TranquilizerDartEntity dart = new TranquilizerDartEntity(worldIn, playerIn, dartItem);
+        	TranquilizerDartEntity dart = null;
+                dart = new TranquilizerDartEntity(worldIn, playerIn, dartItem, null);
+        	if(dartItem.getItem() instanceof TrackingDart)
+             dart = new TranquilizerDartEntity(worldIn, playerIn, dartItem, ((TrackingDart)dartItem.getItem()).getID(dartItem));
             dart.shoot(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, 2.5F, 0.5F);
             worldIn.spawnEntity(dart);
             dartItem.shrink(1);
-            setDartItem(itemstack, dartItem);
+            setDartItem(itemstack, dartItem, playerIn);
             event = SoundEvents.ENTITY_SNOWBALL_THROW;
         }
         
@@ -67,10 +74,21 @@ public class DartGun extends Item {
         return stack;
     }
     
-    private static boolean setDartItem(ItemStack dartGun, ItemStack dartItem) {
+    private static boolean setDartItem(ItemStack dartGun, ItemStack dartItem, EntityPlayer player) {
         boolean hadItem = !dartItem.isEmpty();
-        ItemStack dartItem2 = dartItem.splitStack(MAX_CARRY_SIZE);
-        dartGun.getOrCreateSubCompound("dart_gun").setTag("itemstack", dartItem2.serializeNBT());
-        return hadItem;
+        
+        if(!(dartItem.getItem() instanceof TrackingDart) || ((TrackingDart)dartItem.getItem()).hasID(dartItem)) {
+        	ItemStack dartItem2 = dartItem.splitStack(MAX_CARRY_SIZE);
+            dartGun.getOrCreateSubCompound("dart_gun").setTag("itemstack", dartItem2.serializeNBT());
+            return hadItem;
+        }
+        
+     
+        player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Your darts need to be tuned to a channel"), true);
+            return false;
+        
+        
+      
+        
     }
 }

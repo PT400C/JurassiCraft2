@@ -17,6 +17,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -33,7 +35,6 @@ import org.lwjgl.opengl.GL11;
 public class ClientEventHandler {
     private static final Minecraft MC = Minecraft.getMinecraft();
     private static final ResourceLocation PATREON_BADGE = new ResourceLocation(JurassiCraft.MODID, "textures/items/patreon_badge.png");
-
     private boolean isGUI;
 
     @SubscribeEvent
@@ -45,10 +46,27 @@ public class ClientEventHandler {
     public void onGUIRender(GuiScreenEvent.DrawScreenEvent.Pre event) {
         this.isGUI = true;
     }
+    
+    @SubscribeEvent
+    public void textureStitching(TextureStitchEvent.Post event) {
+    
+    		if(!(ClientProxy.getHandlerInstance() == null) && !(ClientProxy.getHandlerInstance().getMap() == null)) 
+    			ClientProxy.getHandlerInstance().getMap().refreshColors = true;
+    }
+    
+    @SubscribeEvent
+    public void setupMap(PlayerSetSpawnEvent event) {
+        ClientProxy.getHandlerInstance().initDraft();
+    }
 
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
+        	if(!ClientProxy.getHandlerInstance().getMap().wipingTextures.isEmpty()) {
+       		 	int texture = ClientProxy.getHandlerInstance().getMap().wipingTextures.get(0);
+                GL11.glDeleteTextures(texture);
+                ClientProxy.getHandlerInstance().getMap().wipingTextures.remove(0);
+         	}
             this.isGUI = false;
         }
     }

@@ -13,6 +13,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.Item;
@@ -70,6 +71,7 @@ import org.jurassicraft.server.json.dinosaur.entity.objects.EntityJsonAttributes
 import org.jurassicraft.server.json.dinosaur.entity.objects.EntityJsonSounds;
 import org.jurassicraft.server.json.dinosaur.objects.AdultBabyValue;
 import org.jurassicraft.server.message.SetOrderMessage;
+import org.jurassicraft.server.message.TrackedAddMessage;
 import org.jurassicraft.server.registries.JurassicraftRegisteries;
 import org.jurassicraft.server.util.GameRuleHandler;
 import org.jurassicraft.server.util.LangHelper;
@@ -142,7 +144,7 @@ public class DinosaurEntity extends EntityCreature implements IEntityAdditionalS
 	private int jumpHeight;
 	private boolean isSkeleton;
     private Vec3d glidingPos;
-
+    public List<String> trackers = new ArrayList<>();
 
     private UUID inMouthEntity; //The entity of whose mouth this is inside
 	private UUID entityInMouth; //The entity inside this entities mouth
@@ -262,6 +264,14 @@ public class DinosaurEntity extends EntityCreature implements IEntityAdditionalS
 			default:
 				return null;
 		}
+	}
+	
+	public boolean addTrackingID(String id) {
+		if(!this.trackers.contains(id)) {
+			this.trackers.add(id);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -540,6 +550,11 @@ public class DinosaurEntity extends EntityCreature implements IEntityAdditionalS
 		if (cause.getTrueSource() instanceof EntityLivingBase) {
 			this.respondToAttack((EntityLivingBase) cause.getTrueSource());
 		}
+	}
+	
+	public void applyTDart(EntityPlayer player, String ID) {
+		boolean success = addTrackingID(ID);
+			sendTrackingPacket(player, success);
 	}
 
 	@Override
@@ -1493,6 +1508,15 @@ public class DinosaurEntity extends EntityCreature implements IEntityAdditionalS
 		if (inMouthEntity != null) {
 			nbt.setUniqueId("InMouthEntity", inMouthEntity);
 		}
+		
+		NBTTagList trackerList = new NBTTagList();
+
+		for (String tracker : this.trackers) {
+			NBTTagCompound compound = new NBTTagCompound();
+			compound.setString("ID", tracker);
+			trackerList.appendTag(compound);
+		}
+		nbt.setTag("Trackers", trackerList);
 		return nbt;
 	}
 
@@ -1560,6 +1584,13 @@ public class DinosaurEntity extends EntityCreature implements IEntityAdditionalS
 		this.inMouthEntity = nbt.hasUniqueId("InMouthEntity") ? nbt.getUniqueId("InMouthEntity") : null;
 
 		this.updateBounds();
+		
+		NBTTagList trackers = nbt.getTagList("Trackers", Constants.NBT.TAG_COMPOUND);
+
+		for (int i = 0; i < trackers.tagCount(); i++) {
+			NBTTagCompound compound = trackers.getCompoundTagAt(i);
+			this.trackers.add(compound.getString("ID"));
+		}
 
 		this.deserializing = false;
 	}
@@ -2000,6 +2031,12 @@ public class DinosaurEntity extends EntityCreature implements IEntityAdditionalS
 			super.handleJumpWater();
 		}
 	}
+	
+    public void sendTrackingPacket(EntityPlayer player, boolean success) {
+		
+		if(player != null && !player.world.isRemote)
+		JurassiCraft.NETWORK_WRAPPER.sendTo(new TrackedAddMessage(this, success), (EntityPlayerMP) player);  
+	}
 
 	public enum Order {
 		WANDER, FOLLOW, SIT
@@ -2079,4 +2116,6 @@ public class DinosaurEntity extends EntityCreature implements IEntityAdditionalS
 			return entity instanceof DinosaurEntity && list.contains(((DinosaurEntity) entity).dinosaur);
 		}
 	}
+	
+	
 }

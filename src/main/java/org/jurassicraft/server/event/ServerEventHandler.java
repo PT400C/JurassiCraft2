@@ -199,20 +199,6 @@ public class ServerEventHandler {
     }
 
     @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        EntityPlayer player = event.player;
-        if(!player.world.isRemote) {
-            for (int i = 0; i < player.inventory.getSizeInventory(); ++i) {
-                ItemStack itemstack = player.inventory.getStackInSlot(i);
-                if(itemstack.getItem() instanceof TrackingTablet) {
-                    TrackingTablet.TrackingInfo info = new TrackingTablet.TrackingInfo(itemstack);
-                    info.update(player.world, player.getPosition());
-                    info.putInStack(itemstack);
-                }
-            }
-        }
-    }
-    @SubscribeEvent
     public void CheckSpawnEvent(LivingDeathEvent event){
         if(event.getEntity() instanceof DinosaurEntity){
             System.out.println(((DinosaurEntity) event.getEntity()).dinosaur.babyEyeHeight);

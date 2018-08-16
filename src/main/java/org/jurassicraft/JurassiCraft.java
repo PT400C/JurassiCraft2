@@ -31,7 +31,7 @@ public class JurassiCraft {
 
     public static long timerTicks;
 
-    @NetworkWrapper({ PlacePaddockSignMessage.class, ChangeTemperatureMessage.class, HelicopterEngineMessage.class, HelicopterDirectionMessage.class, HelicopterModulesMessage.class, SwitchHybridizerCombinatorMode.class, SetOrderMessage.class, OpenFieldGuideGuiMessage.class, UpdateVehicleControlMessage.class, MicroraptorDismountMessage.class, FordExplorerChangeStateMessage.class, FordExplorerUpdatePositionStateMessage.class, DNASequenceTransferClicked.class, CultivatorSyncNutrients.class, CarEntityPlayRecord.class, AttemptMoveToSeatMessage.class, SyncTrackingTabletMap.class, StopMapSyncMessage.class})
+    @NetworkWrapper({ PlacePaddockSignMessage.class, ChangeTemperatureMessage.class, HelicopterEngineMessage.class, HelicopterDirectionMessage.class, HelicopterModulesMessage.class, SwitchHybridizerCombinatorMode.class, SetOrderMessage.class, OpenFieldGuideGuiMessage.class, UpdateVehicleControlMessage.class, MicroraptorDismountMessage.class, FordExplorerChangeStateMessage.class, FordExplorerUpdatePositionStateMessage.class, DNASequenceTransferClicked.class, CultivatorSyncNutrients.class, CarEntityPlayRecord.class, AttemptMoveToSeatMessage.class, UpdateChannelMessage.class, TabletStartListener.class, TabletSendData.class, TabletStopListener.class, TrackedAddMessage.class})
     public static SimpleNetworkWrapper NETWORK_WRAPPER;
 
     private static Logger logger;
@@ -60,5 +60,9 @@ public class JurassiCraft {
 
     public static Logger getLogger() {
         return logger;
+    }
+    
+    public static JurassiCraft getInstance() {
+    	return INSTANCE;
     }
 }

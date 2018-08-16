@@ -279,9 +279,9 @@ public class ItemHandler {
     public static final Dart DART_POISON_CYCASIN = new Dart((entity, stack) -> entity.addPotionEffect(new PotionEffect(MobEffects.POISON, 2000)), 0xE2E1B8);
     public static final Dart DART_POISON_EXECUTIONER_CONCOCTION = new Dart((entity, stack) -> entity.setDeathIn(200), 0x000000);
     public static final Dart DART_TIPPED_POTION = new PotionDart();
-    public static final Dart TRACKING_DART = new Dart((entity, stack) -> entity.setHasTracker(true));
+    public static final Dart TRACKING_DART = new TrackingDart();
 
-    static final TrackingTablet TRACKING_TABLET = new TrackingTablet();
+    public static final TrackingTablet TRACKING_TABLET = new TrackingTablet();
 
     static {
         for(AttractionSignEntity.AttractionSignType type : AttractionSignEntity.AttractionSignType.values()) {

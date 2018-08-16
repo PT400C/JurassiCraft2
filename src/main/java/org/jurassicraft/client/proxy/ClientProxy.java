@@ -25,6 +25,7 @@ import org.jurassicraft.client.gui.*;
 import org.jurassicraft.client.model.JurassicraftTabulaModelHandler;
 import org.jurassicraft.client.render.RenderingHandler;
 import org.jurassicraft.client.sound.CarSound;
+import org.jurassicraft.client.tablet.HandlerInstance;
 import org.jurassicraft.server.block.entity.*;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.VenomEntity;
@@ -41,13 +42,14 @@ import java.util.UUID;
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends ServerProxy {
     private static final Minecraft MC = Minecraft.getMinecraft();
-
+    public static HandlerInstance handler;
     public static final List<UUID> PATRONS = new ArrayList<>();
 
     @Override
     @SuppressWarnings("unchecked")
     public void onPreInit(FMLPreInitializationEvent event) {
         super.onPreInit(event);
+        ClientProxy.handler = new HandlerInstance();
 
         KeyBindingHandler.init();
 
@@ -174,5 +176,9 @@ public class ClientProxy extends ServerProxy {
         for (int i = 0; i < 16; ++i) {
             particleManager.addEffect(new VenomParticle(entity.world, size * Math.random() - size / 2, size * Math.random() - size / 2, size * Math.random() - size / 2, 0.0F, 0.0F, 0.0F, 1.0F, entity));
         }
+    }
+    
+    public static HandlerInstance getHandlerInstance() {
+    	return handler;
     }
 }

@@ -8,7 +8,6 @@ import org.lwjgl.opengl.GL11;
 public class AnimatedTexture {
 
     private final ResourceLocation location;
-    private final boolean horizontal;
     private final int frames;
 
     private final int x;
@@ -27,8 +26,7 @@ public class AnimatedTexture {
         Minecraft.getMinecraft().getTextureManager().bindTexture(location);
         float imgWidth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
         float imgHeight = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
-        this.horizontal = imgWidth > imgHeight;
-        float frames = this.horizontal ? imgWidth / imgHeight : imgHeight / imgWidth;
+        float frames = imgHeight / imgWidth;
         if((frames * 10) % 10 != 0) {
             throw new IllegalArgumentException("Uneven frames. w:" + imgWidth + " h:" + imgHeight);
         }
@@ -37,11 +35,8 @@ public class AnimatedTexture {
 
     public void render() {
         Minecraft.getMinecraft().getTextureManager().bindTexture(this.location);
-        int frame =(int)((System.currentTimeMillis() / this.frameTime) % this.frames);
-        if(this.horizontal) {
-            Gui.drawModalRectWithCustomSizedTexture(this.x, this.z, this.width * frame,0, this.width, this.height, this.width * this.frames, this.height);
-        } else {
-            Gui.drawModalRectWithCustomSizedTexture(this.x, this.z,0, this.height * frame, this.width, this.height, this.width, this.height * this.frames);
-        }
+        int frame = (int)((System.currentTimeMillis() / this.frameTime) % this.frames);
+        Gui.drawModalRectWithCustomSizedTexture(this.x, this.z - 27, 0, this.height * frame, this.width, this.height, this.width, this.height * this.frames);
+        
     }
 }

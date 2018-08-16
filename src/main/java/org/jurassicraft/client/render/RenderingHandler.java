@@ -374,6 +374,7 @@ public enum RenderingHandler {
         registerItemRenderer(DART_POISON_EXECUTIONER_CONCOCTION, "dart_colored");
         registerItemRenderer(DART_TIPPED_POTION, "dart_colored");
         registerItemRenderer(TRACKING_DART, "tracking_dart");
+        registerItemRenderer(TRACKING_TABLET, "tracking_tablet");
 
         registerItemRenderer(WEST_INDIAN_LILAC_BERRIES);
 
