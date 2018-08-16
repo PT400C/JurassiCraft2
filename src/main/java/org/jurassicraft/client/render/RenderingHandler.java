@@ -289,7 +289,7 @@ public enum RenderingHandler {
         registerItemRenderer(BASIC_CIRCUIT, "basic_circuit");
         registerItemRenderer(ADVANCED_CIRCUIT, "advanced_circuit");
         registerItemRenderer(IRON_NUGGET, "iron_nugget");
-
+        registerItemRenderer(DIAMOND_NUGGET, "diamond_nugget");
         registerItemRenderer(GYPSUM_POWDER, "gypsum_powder");
 
         registerItemRenderer(AJUGINUCULA_SMITHII_SEEDS, "ajuginucula_smithii_seeds");

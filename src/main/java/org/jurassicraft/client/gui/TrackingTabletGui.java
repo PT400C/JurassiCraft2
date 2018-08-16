@@ -1,7 +1,6 @@
 package org.jurassicraft.client.gui;
 
 import com.google.common.collect.Lists;
-import com.sun.javafx.geom.Vec2d;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -23,6 +22,7 @@ import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.item.TrackingTablet;
 import org.jurassicraft.server.message.StopMapSyncMessage;
 import org.jurassicraft.server.util.TrackingMapIterator;
+import org.jurassicraft.server.util.Vec2d;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
