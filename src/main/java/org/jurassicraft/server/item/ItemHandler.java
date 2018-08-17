@@ -281,7 +281,10 @@ public class ItemHandler {
     public static final Dart DART_TIPPED_POTION = new PotionDart();
     public static final Dart TRACKING_DART = new TrackingDart();
 
-    public static final TrackingTablet TRACKING_TABLET = new TrackingTablet();
+    public static final TrackingTablet TRACKING_TABLET = new TrackingTablet(3);
+    public static final TrackingTablet TRACKING_TABLET_ADVANCED = new TrackingTablet(2);
+    public static final TrackingTablet TRACKING_TABLET_HIGHEND = new TrackingTablet(1);
+    public static final TrackingTablet TRACKING_TABLET_FREQUENCY = new FrequencyTrackingTablet();
 
     static {
         for(AttractionSignEntity.AttractionSignType type : AttractionSignEntity.AttractionSignType.values()) {
@@ -414,6 +417,9 @@ public class ItemHandler {
         registerItem(DART_TIPPED_POTION, "Dart Tipped Potion", itemTab);
         registerItem(TRACKING_DART, "Tracking Dart", itemTab);
         registerItem(TRACKING_TABLET, "Tracking Tablet", itemTab);
+        registerItem(TRACKING_TABLET_ADVANCED, "Tracking Tablet Advanced", null);
+        registerItem(TRACKING_TABLET_HIGHEND, "Tracking Tablet Highend", null);
+        registerItem(TRACKING_TABLET_FREQUENCY, "Tracking Tablet Frequency", itemTab);
         for (JournalItem.JournalType journalType : JournalItem.JournalType.values()) {
             registerItem(INGEN_JOURNAL.get(journalType), "InGen Journal " + journalType.name(), itemTab);
 

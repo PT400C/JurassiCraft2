@@ -5,9 +5,11 @@ import com.google.common.collect.Maps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -17,6 +19,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -37,12 +40,15 @@ import org.jurassicraft.client.gui.TrackingTabletGui.PacketSend;
 import org.jurassicraft.client.gui.TuneTabletGui;
 import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.client.tablet.DinosaurInfo;
+import org.jurassicraft.server.api.DinosaurProvider;
+import org.jurassicraft.server.api.StackNBTProvider;
 import org.jurassicraft.server.entity.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.message.TabletSendData;
 import org.jurassicraft.server.registries.JurassicraftRegisteries;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,19 +62,21 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class TrackingTablet extends Item {
+public class TrackingTablet extends ItemTrackable{
+	
+	private final int maxZoom;
+	
+	public TrackingTablet(int maxZoom) {
+		this.maxZoom = maxZoom;
+	}
 
-	private final int MIN_TIER = 1;
-	private final int MAX_TIER = 3;
 	public static HashMap<EntityPlayer, QueryData> dataSet = new HashMap<>();
 	public static List<DinosaurInfo> dinosaurList = new ArrayList<>();
-
+	
 	@Override
 	public int getItemStackLimit() {
 		return 1;
 	}
-	
-	
 	public static class DataSender extends TimerTask {
 
 		private EntityPlayer player;
@@ -94,13 +102,17 @@ public class TrackingTablet extends Item {
 
 		}
 	}
-
+	
+	public Integer getMaxZoom() {
+		return this.maxZoom;
+	}
+	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (worldIn.isRemote && !playerIn.isSneaking()) {
 			 ItemStack tablet = playerIn.getHeldItem(EnumHand.values()[handIn.ordinal()]);
-		
-			ClientProxy.getHandlerInstance().zoom = 4 - ((TrackingTablet) tablet.getItem()).getTier(tablet);
+			ClientProxy.getHandlerInstance().zoom = ((TrackingTablet) tablet.getItem()).getMaxZoom();
+			System.out.println(ClientProxy.getHandlerInstance().zoom);
 			ClientProxy.getHandlerInstance().setActive(true);
 			
 			this.openGui(handIn, playerIn);
@@ -135,29 +147,7 @@ public class TrackingTablet extends Item {
 		return super.onItemRightClick(worldIn, playerIn, handIn);
 	}
 
-	@Override
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 	
-			tooltip.add("Tier: \u00A7b" + getTier(stack));
-			tooltip.add("ID: \u00A7b" + getID(stack, Minecraft.getMinecraft().player != null ? Minecraft.getMinecraft().player.getName() : "None"));
-		
-
-		
-	}
-	
-
-	public static int getTier(ItemStack stack) {
-		if(stack.hasTagCompound())
-			return stack.getTagCompound().hasKey("tier") ? stack.getTagCompound().getByte("tier") : 1;
-        return 1;
-		
-	}
-	
-	public void setTier(ItemStack stack, byte tier) {
-		if(stack.hasTagCompound())
-			stack.getTagCompound().setByte("tier", tier);
-		
-	}
 	
 	public static String getID(ItemStack stack, String name) {
 		if(stack.hasTagCompound())
@@ -166,6 +156,7 @@ public class TrackingTablet extends Item {
 		
 	}
 	
+	@Override
 	public void setID(ItemStack stack, String id) {
 		if(stack.hasTagCompound())
 			stack.getTagCompound().setString("ID", id);
@@ -183,15 +174,9 @@ public class TrackingTablet extends Item {
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		ItemStack stack = player.getHeldItem(hand);
 		
-		if (player.isSneaking() && !worldIn.isRemote && getTier(stack) < MAX_TIER) {
-	
-				setTier(stack, (byte) (getTier(stack) + 1));
-				
-			player.sendMessage(new TextComponentString("Upgraded to tier " + getTier(stack) ));
-			
-		}else if(!player.isSneaking() && worldIn.isRemote) {
+		if(!player.isSneaking() && worldIn.isRemote) {
 		
-				this.openTuneTablet(hand, stack, player);
+				this.openTuneScreen(hand, stack, player);
 			
 		}
 		return EnumActionResult.SUCCESS;
@@ -203,7 +188,7 @@ public class TrackingTablet extends Item {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public void openTuneTablet(EnumHand hand, ItemStack stack, EntityPlayer player) {
+	public void openTuneScreen(EnumHand hand, ItemStack stack, EntityPlayer player) {
 		Minecraft.getMinecraft().displayGuiScreen(new TuneTabletGui(player, this.getID(stack, player.getName()), (byte)hand.ordinal()));
 	}
 
@@ -218,9 +203,6 @@ public class TrackingTablet extends Item {
 				nbt = new NBTTagCompound();
 				stack.setTagCompound(nbt);
 	    	}
-			
-		if(!nbt.hasKey("tier"))
-			nbt.setByte("tier", (byte) 1);
 		
 		if(!nbt.hasKey("ID")) {
 			nbt.setString("ID", cap(entityIn.getName()));
@@ -238,5 +220,6 @@ public class TrackingTablet extends Item {
 	public List<DinosaurInfo> getDinosaurInfos() {
 		return dinosaurList;
 	}
+
 
 }

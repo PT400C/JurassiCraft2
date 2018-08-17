@@ -6,6 +6,7 @@ import mezz.jei.api.ingredients.IIngredientBlacklist;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferRegistry;
+import mezz.jei.plugins.vanilla.crafting.TippedArrowRecipeWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.EnumDyeColor;
@@ -54,6 +55,8 @@ import org.jurassicraft.server.plugin.jei.category.skeletonassembly.SkeletonInpu
 import org.jurassicraft.server.plugin.jei.vanilla.TippedDartRecipeWrapper;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -163,7 +166,10 @@ public class JurassiCraftJEIPlugin implements IModPlugin {
         for (Dinosaur dinosaur : JurassicraftRegisteries.DINOSAUR_REGISTRY.getValuesCollection()) {
             registry.addRecipes(Lists.newArrayList(new SkeletonInput(dinosaur, false), new SkeletonInput(dinosaur, true)), SKELETON_ASSEMBLY);
         }
-
+    //    ArrayList<TabletRecipeWrapper> wrapper = new ArrayList<>();
+    //    wrapper.add(new TabletRecipeWrapper((byte) 1));
+    //    wrapper.add(new TabletRecipeWrapper((byte) 2));
+      ///  registry.addRecipes(wrapper, VanillaRecipeCategoryUid.CRAFTING);
         registry.addRecipes(ForgeRegistries.POTION_TYPES.getValuesCollection().stream().map(TippedDartRecipeWrapper::new).collect(Collectors.toList()), VanillaRecipeCategoryUid.CRAFTING);
     }
 

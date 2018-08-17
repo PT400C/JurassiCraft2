@@ -1,4 +1,4 @@
-package org.jurassicraft.client.gui;
+package org.jurassicraft.server.util;
 
 public class Vec2d {
 	

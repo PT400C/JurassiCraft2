@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "jurassicraft:tracking_tablet_highend",
+  "pattern": [
+    "ADA",
+    " B ",
+    " C "
+  ],
+  "key": {
+    "A": {
+      "item": "jurassicraft:basic_circuit",
+      "data": 0
+    },
+    "B": {
+      "item": "jurassicraft:tracking_tablet_advanced",
+      "data": 0
+    },
+    "C": {
+      "item": "jurassicraft:diamond_nugget",
+      "data": 0
+    },
+    "D": {
+      "item": "jurassicraft:advanced_circuit",
+      "data": 0
+    }
+  },
+  "result": {
+    "item": "jurassicraft:tracking_tablet_highend",
+    "data": 0
+  }
+}

@@ -231,6 +231,9 @@ filled_map.jurassicraft.visitorcenter=Visitor Center Map
 
 item.tracking_dart.name=Tracking Dart
 item.tracking_tablet.name=Tracking Tablet
+item.tracking_tablet_advanced.name=Advanced Tracking Tablet
+item.tracking_tablet_highend.name=Highend Tracking Tablet
+item.tracking_tablet_frequency.name=Frequency Tracking Tablet
 
 // Crops ========================================
 item.ajuginucula_smithii_seeds.name=Ajuginucula Smithii Seeds

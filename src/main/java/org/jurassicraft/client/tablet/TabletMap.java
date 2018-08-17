@@ -274,6 +274,7 @@ public class TabletMap {
 		int red = 0;
 		int green = 0;
 		int blue = 0;
+		
 		if (color == null) {
 			String name = null;
 			try {
@@ -285,7 +286,6 @@ public class TabletMap {
 				if (!(textureQuads == null || textureQuads.isEmpty()))
 					texture = ((BakedQuad) textureQuads.get(0)).getSprite();
 				name = texture.getIconName() + ".png";
-				System.out.println(name);
 				String[] args = name.split(":");
 				if ((cachedColour = this.textureColors.get(name)) == null) {
 					ResourceLocation location = new ResourceLocation(args[0], "textures/" + args[1]);
@@ -317,14 +317,15 @@ public class TabletMap {
 					color = cachedColour;
 				}
 			} catch (Exception ex) {
+				
 				color = state.getMapColor((IBlockAccess) world, (BlockPos) pos).colorValue;
 				if (name != null) {
 					this.textureColors.put(name, color);
 				}
 			}
-			if (color != null) {
-				this.blockColors.put(Block.getStateId((IBlockState) state), color);
-			}
+			
+		}else if (color != null) {
+			this.blockColors.put(Block.getStateId((IBlockState) state), color);
 		}
 		int grassColor = 16777215;
 		try {

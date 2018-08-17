@@ -12,6 +12,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.jurassicraft.client.gui.TrackingTabletGui;
+import org.jurassicraft.server.item.ItemTrackable;
+import org.jurassicraft.server.item.TrackingDart;
 import org.jurassicraft.server.item.TrackingTablet;
 
 import java.util.List;
@@ -39,8 +41,7 @@ public class UpdateChannelMessage extends AbstractMessage<UpdateChannelMessage> 
 	public void onServerReceived(MinecraftServer server, UpdateChannelMessage message, EntityPlayer player, MessageContext messageContext) {
 
 		ItemStack stack = player.getHeldItem(EnumHand.values()[message.slot]);
-
-		((TrackingTablet) stack.getItem()).setID(stack, message.id);
+        ((ItemTrackable) stack.getItem()).setID(stack, message.id);
 
 	}
 

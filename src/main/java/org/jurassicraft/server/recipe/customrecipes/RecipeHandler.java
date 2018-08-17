@@ -11,6 +11,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class RecipeHandler {
     @SubscribeEvent
     public static void onRecipeReg(RegistryEvent.Register<IRecipe> event) {
-	event.getRegistry().registerAll(new RecipeDartTippedPotion().setRegistryName("dart_tipped_potion"));
+	event.getRegistry().registerAll(new RecipeDartTippedPotion().setRegistryName("dart_tipped_potion")/*, new RecipeTrackingTablet().setRegistryName("tracking_tablet")*/);
     }
 }

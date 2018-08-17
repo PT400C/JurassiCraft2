@@ -13,7 +13,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class Dart extends Item {
+public class Dart extends ItemTrackable {
+	
 	@Nonnull
     private final BiConsumer<DinosaurEntity, ItemStack> consumer;
     @Nonnull
@@ -47,4 +48,8 @@ public class Dart extends Item {
     public TriConsumer<DinosaurEntity, EntityPlayer, String> getData() {
         return data;
     }
+
+	@Override
+	public void setID(ItemStack stack, String ID) {
+	}
 }

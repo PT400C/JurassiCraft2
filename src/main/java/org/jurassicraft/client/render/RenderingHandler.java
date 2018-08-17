@@ -375,6 +375,9 @@ public enum RenderingHandler {
         registerItemRenderer(DART_TIPPED_POTION, "dart_colored");
         registerItemRenderer(TRACKING_DART, "tracking_dart");
         registerItemRenderer(TRACKING_TABLET, "tracking_tablet");
+        registerItemRenderer(TRACKING_TABLET_ADVANCED, "tracking_tablet_advanced");
+        registerItemRenderer(TRACKING_TABLET_HIGHEND, "tracking_tablet_highend");
+        registerItemRenderer(TRACKING_TABLET_FREQUENCY, "tracking_tablet_frequency");
 
         registerItemRenderer(WEST_INDIAN_LILAC_BERRIES);
 
@@ -468,7 +471,6 @@ public enum RenderingHandler {
             }
             return 0xFFFFFF;
         }, SPAWN_EGG);
-
         itemColors.registerItemColorHandler(((stack, tintIndex) -> tintIndex == 1 ? ((Dart)stack.getItem()).getDartColor(stack) : -1), DART_POISON_CYCASIN, DART_POISON_EXECUTIONER_CONCOCTION, DART_TIPPED_POTION, DART_TRANQUILIZER);
     }
 

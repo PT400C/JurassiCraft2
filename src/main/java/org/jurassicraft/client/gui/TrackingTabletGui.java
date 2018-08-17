@@ -207,9 +207,7 @@ public class TrackingTabletGui extends GuiScreen {
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		if (mouseButton == 0) {
 
-			if ((width / 2 - 110) + 8 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 8 <= mouseY
-					&& (height / 2 - 123) + 210 >= mouseY)
-				this.lastMouseClicked = new Vec2d(mouseX, mouseY);
+			if ((width / 2 - 110) + 8 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 8 <= mouseY && (height / 2 - 123) + 210 >= mouseY) this.lastMouseClicked = new Vec2d(mouseX, mouseY);
 
 		}
 		super.mouseClicked(mouseX, mouseY, mouseButton);
