@@ -1,2 +1,4 @@
 -Added Config Option to disable spawning of Carcass
 -Fixed a Cultivator issue in the lang file
++Added item renderer for the diamond nugget
+*Fixed dependency issues with Wyn's vector lib
