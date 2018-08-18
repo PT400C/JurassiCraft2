@@ -66,15 +66,9 @@ if(stack == null)
 	
 	if(result.entityHit instanceof DinosaurEntity) {
 	    if(item != null && item instanceof Dart) {
-	    	if(result.entityHit == null)
-	    		System.out.println("HIT!");
-	    	if(stack == null)
-	    		System.out.println("HIT2!");
 			((Dart)item).getConsumer().accept((DinosaurEntity)result.entityHit, stack);
 			if(item instanceof TrackingDart && this.shooter != null) {
 			((Dart)item).getData().accept((DinosaurEntity)result.entityHit, this.shooter, this.id);
-			//((Dart)item).getShooter().accept((DinosaurEntity)result.entityHit, this.shooter);
-			//((Dart)item).getID().accept((DinosaurEntity)result.entityHit, this.id);
 			}
 	    } else {
 			JurassiCraft.getLogger().error("Expected Dart Item, got {} ", item.getRegistryName());

@@ -75,5 +75,9 @@ public class FrequencyTrackingTablet extends TrackingTablet {
 			tooltip.add("ID: \u00A7b" + getID(stack, Minecraft.getMinecraft().player != null ? Minecraft.getMinecraft().player.getName() : "None"));
 
 	}
-
+	
+	@Override
+	public boolean hasFrequencyModule() {
+		return true;
+	}
 }

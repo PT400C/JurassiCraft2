@@ -378,7 +378,7 @@ public enum RenderingHandler {
         registerItemRenderer(TRACKING_TABLET_ADVANCED, "tracking_tablet_advanced");
         registerItemRenderer(TRACKING_TABLET_HIGHEND, "tracking_tablet_highend");
         registerItemRenderer(TRACKING_TABLET_FREQUENCY, "tracking_tablet_frequency");
-
+        registerItemRenderer(FREQUENCY_MODULE, "frequency_module");
         registerItemRenderer(WEST_INDIAN_LILAC_BERRIES);
 
         registerItemRenderer(ItemHandler.DISPLAY_BLOCK);

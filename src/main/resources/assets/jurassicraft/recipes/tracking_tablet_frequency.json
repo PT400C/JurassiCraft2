@@ -1,0 +1,39 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "jurassicraft:tracking_tablet_frequency",
+	"pattern": [
+		"AMA",
+		"IBI",
+		"DKD"
+	],
+	"key": {
+		"A": {
+			"item": "jurassicraft:advanced_circuit",
+			"data": 0
+		},
+		"B": {
+			"item": "jurassicraft:tracking_tablet_highend",
+			"data": 0
+		},
+		"D": {
+			"item": "jurassicraft:diamond_nugget",
+			"data": 0
+		},
+		"M": {
+			"item": "jurassicraft:frequency_module",
+			"data": 0
+		},
+		"I": {
+			"type": "forge:ore_dict",
+			"ore": "nuggetIron"
+		},
+		"K": {
+			"item": "jurassicraft:keyboard",
+			"data": 0
+		}
+	},
+	"result": {
+		"item": "jurassicraft:tracking_tablet_frequency",
+		"data": 0
+	}
+}

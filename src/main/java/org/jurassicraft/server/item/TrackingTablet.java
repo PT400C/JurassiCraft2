@@ -107,18 +107,24 @@ public class TrackingTablet extends ItemTrackable{
 		return this.maxZoom;
 	}
 	
+	public boolean hasFrequencyModule() {
+		return false;
+	}
+	
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+		
 		if (worldIn.isRemote && !playerIn.isSneaking()) {
 			 ItemStack tablet = playerIn.getHeldItem(EnumHand.values()[handIn.ordinal()]);
 			ClientProxy.getHandlerInstance().zoom = ((TrackingTablet) tablet.getItem()).getMaxZoom();
-			System.out.println(ClientProxy.getHandlerInstance().zoom);
 			ClientProxy.getHandlerInstance().setActive(true);
 			
 			this.openGui(handIn, playerIn);
 			
 		} else {
+		
 			if(playerIn.isSneaking()) {
+				if(hasFrequencyModule()) {
 				 byte handID = (byte) handIn.ordinal();
 				 byte handIDDart = (byte) (handID ^ 1);
 				 ItemStack tablet = playerIn.getHeldItem(EnumHand.values()[handID]);
@@ -138,10 +144,13 @@ public class TrackingTablet extends ItemTrackable{
 				 }else {
 					 playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Put a tracking dart in your selected slot or off-hand"), true);
 				 }
-				 
+				}else {
+					playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + "The tablet isn't capable of using frequencies"), true);
+				}
 			}else {
 				
 				dataSet.put(playerIn, new QueryData(System.currentTimeMillis(), 0));
+			
 			}
 		}
 		return super.onItemRightClick(worldIn, playerIn, handIn);

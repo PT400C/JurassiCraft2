@@ -285,6 +285,7 @@ public class ItemHandler {
     public static final TrackingTablet TRACKING_TABLET_ADVANCED = new TrackingTablet(2);
     public static final TrackingTablet TRACKING_TABLET_HIGHEND = new TrackingTablet(1);
     public static final TrackingTablet TRACKING_TABLET_FREQUENCY = new FrequencyTrackingTablet();
+    public static final Item FREQUENCY_MODULE = new Item();
 
     static {
         for(AttractionSignEntity.AttractionSignType type : AttractionSignEntity.AttractionSignType.values()) {
@@ -420,6 +421,7 @@ public class ItemHandler {
         registerItem(TRACKING_TABLET_ADVANCED, "Tracking Tablet Advanced", null);
         registerItem(TRACKING_TABLET_HIGHEND, "Tracking Tablet Highend", null);
         registerItem(TRACKING_TABLET_FREQUENCY, "Tracking Tablet Frequency", itemTab);
+        registerItem(FREQUENCY_MODULE, "Frequency Module", itemTab);
         for (JournalItem.JournalType journalType : JournalItem.JournalType.values()) {
             registerItem(INGEN_JOURNAL.get(journalType), "InGen Journal " + journalType.name(), itemTab);
 

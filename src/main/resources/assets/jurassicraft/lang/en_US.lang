@@ -234,6 +234,7 @@ item.tracking_tablet.name=Tracking Tablet
 item.tracking_tablet_advanced.name=Advanced Tracking Tablet
 item.tracking_tablet_highend.name=Highend Tracking Tablet
 item.tracking_tablet_frequency.name=Frequency Tracking Tablet
+item.frequency_module.name=Frequency Module
 
 // Crops ========================================
 item.ajuginucula_smithii_seeds.name=Ajuginucula Smithii Seeds
