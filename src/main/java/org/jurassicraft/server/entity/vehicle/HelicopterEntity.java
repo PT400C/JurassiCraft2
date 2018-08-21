@@ -128,32 +128,14 @@ public class HelicopterEntity extends CarEntity {
         super.doBlockCollisions();
 
     }
+
     
     @Override
     protected void handleControl() {
-        Entity driver = this.getControllingPassenger();
-        if (!(driver instanceof EntityPlayer) || !((EntityPlayer) driver).isUser()) {
-            return;
-        }
-        EntityPlayerSP player = (EntityPlayerSP) driver;
-        MovementInput movementInput = player.movementInput;
-        int previous = this.getControlState();
-        this.left(movementInput.leftKeyDown);
-        this.right(movementInput.rightKeyDown);
-        this.forward(movementInput.forwardKeyDown);
-        this.backward(movementInput.backKeyDown);
-        this.upward(ClientProxy.getKeyHandler().HELICOPTER_UP.isKeyDown());
+    	
+    	this.upward(ClientProxy.getKeyHandler().HELICOPTER_UP.isKeyDown());
         this.downward(ClientProxy.getKeyHandler().HELICOPTER_DOWN.isKeyDown());
-        boolean newSpeed = false;
-        for(Speed speed : Speed.values()) {
-            if(Keyboard.isKeyDown(speed.keyboardInput)) {
-                this.setSpeed(speed);
-                newSpeed = true;
-            }
-        }
-        if (this.getControlState() != previous || newSpeed) {
-            JurassiCraft.NETWORK_WRAPPER.sendToServer(new UpdateVehicleControlMessage(this));
-        }
+        super.handleControl();
     }
 
     @Override

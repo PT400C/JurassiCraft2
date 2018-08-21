@@ -32,7 +32,7 @@ public class HelicopterItem extends Item {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             HelicopterEntity helicopter = new HelicopterEntity(world);
-            helicopter.setPosition(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ);
+            helicopter.setPositionAndRotation(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, player.rotationYaw, 0.0F);
             world.spawnEntity(helicopter); //Uncomment for testing
             stack.shrink(1);
         }
