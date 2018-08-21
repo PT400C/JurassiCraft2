@@ -26,6 +26,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.animation.EntityAnimation;
+import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.client.sound.SoundHandler;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.ai.LeapingMeleeEntityAI;
@@ -33,7 +34,6 @@ import org.jurassicraft.server.entity.ai.RaptorClimbTreeAI;
 import org.jurassicraft.server.entity.ai.RaptorLeapEntityAI;
 import org.jurassicraft.server.entity.ai.animations.BirdPreenAnimationAI;
 import org.jurassicraft.server.entity.ai.animations.TailDisplayAnimationAI;
-import org.jurassicraft.server.event.KeyBindingHandler;
 import org.jurassicraft.server.message.MicroraptorDismountMessage;
 
 public class MicroraptorEntity extends DinosaurEntity {
@@ -262,7 +262,7 @@ public class MicroraptorEntity extends DinosaurEntity {
     protected void updateClientControls() {
         Minecraft mc = Minecraft.getMinecraft();
         if (this.getRidingEntity() != null && this.getRidingEntity() == mc.player) {
-            if (KeyBindingHandler.MICRORAPTOR_DISMOUNT.isKeyDown()) {
+            if (ClientProxy.getKeyHandler().MICRORAPTOR_DISMOUNT.isKeyDown()) {
                 JurassiCraft.NETWORK_WRAPPER.sendToServer(new MicroraptorDismountMessage(this.getEntityId()));
             }
         }

@@ -41,7 +41,7 @@ import java.util.UUID;
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends ServerProxy {
     private static final Minecraft MC = Minecraft.getMinecraft();
-
+    private static KeyBindingHandler keyHandler = new KeyBindingHandler();
     public static final List<UUID> PATRONS = new ArrayList<>();
 
     @Override
@@ -138,6 +138,10 @@ public class ClientProxy extends ServerProxy {
         }
         return null;
     }
+    
+    public static KeyBindingHandler getKeyHandler() {
+		return keyHandler;
+	}
 
     @Override
     public void openSelectDino(BlockPos pos, EnumFacing facing, EnumHand hand) {
@@ -174,4 +178,5 @@ public class ClientProxy extends ServerProxy {
             particleManager.addEffect(new VenomParticle(entity.world, size * Math.random() - size / 2, size * Math.random() - size / 2, size * Math.random() - size / 2, 0.0F, 0.0F, 0.0F, 1.0F, entity));
         }
     }
+
 }

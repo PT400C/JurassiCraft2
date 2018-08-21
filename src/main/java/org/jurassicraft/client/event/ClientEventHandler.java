@@ -22,7 +22,6 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.proxy.ClientProxy;
-import org.jurassicraft.server.event.KeyBindingHandler;
 import org.jurassicraft.server.entity.vehicle.MultiSeatedEntity;
 import org.jurassicraft.server.item.DartGun;
 import org.jurassicraft.server.item.ItemHandler;
@@ -84,7 +83,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public void keyInputEvent(InputEvent.KeyInputEvent event) {
         int i = 0;
-        for(KeyBinding binding : KeyBindingHandler.VEHICLE_KEY_BINDINGS) {
+        for(KeyBinding binding : ClientProxy.getKeyHandler().VEHICLE_KEY_BINDINGS) {
             if(binding.isPressed()) {
                 EntityPlayer player = Minecraft.getMinecraft().player;
                 Entity entity = player.getRidingEntity();

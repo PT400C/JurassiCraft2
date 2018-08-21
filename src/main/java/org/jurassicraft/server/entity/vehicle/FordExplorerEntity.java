@@ -146,7 +146,7 @@ public class FordExplorerEntity extends CarEntity {
         if(onRails) {
             if(this.canPassengerSteer()) {
                 if (this.getPassengers().isEmpty() || !(this.getPassengers().get(0) instanceof EntityPlayer)) {
-                    this.setControlState(0);
+                    this.setControlState((byte) 0);
                 }
                 if(this.world.isRemote) {
                     this.handleControl(); //+Z-X

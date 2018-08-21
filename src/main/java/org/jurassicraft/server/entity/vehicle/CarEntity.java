@@ -9,10 +9,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
+import net.minecraft.launchwrapper.ITweaker;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -33,6 +37,7 @@ import org.jurassicraft.client.render.entity.TyretrackRenderer;
 import org.jurassicraft.client.sound.EntitySound;
 import org.jurassicraft.server.damage.DamageSources;
 import org.jurassicraft.server.entity.ai.util.InterpValue;
+import org.jurassicraft.server.entity.vehicle.CarEntity.Seat;
 import org.jurassicraft.server.entity.vehicle.util.CarWheel;
 import org.jurassicraft.server.entity.vehicle.util.WheelParticleData;
 import org.jurassicraft.server.message.CarEntityPlayRecord;
@@ -43,6 +48,9 @@ import org.omg.CORBA.DoubleHolder;
 import javax.annotation.Nullable;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector4d;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -53,10 +61,10 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     public static final DataParameter<ItemStack> RECORD_ITEM = EntityDataManager.createKey(CarEntity.class, DataSerializers.ITEM_STACK);
 
     public static final float MAX_HEALTH = 40;
-    private static final int LEFT     = 0b0001;
-    private static final int RIGHT    = 0b0010;
-    private static final int FORWARD  = 0b0100;
-    private static final int BACKWARD = 0b1000;
+    private static final byte LEFT     = 0b000001;
+    private static final byte RIGHT    = 0b000010;
+    private static final byte FORWARD  = 0b000100;
+    private static final byte BACKWARD = 0b001000;
 
     protected final Seat[] seats = createSeats();
     protected final WheelData wheeldata = createWheels();
@@ -146,7 +154,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     public boolean backward() {
         return this.getStateBit(BACKWARD);
     }
-
+    
     public void left(boolean left) {
         this.setStateBit(LEFT, left);
     }
@@ -162,22 +170,25 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     public void backward(boolean backward) {
         this.setStateBit(BACKWARD, backward);
     }
-
-    private boolean getStateBit(int mask) {
+    
+    protected boolean getStateBit(byte mask) {
         return (this.getControlState() & mask) != 0;
     }
 
-    private void setStateBit(int mask, boolean newState) {
-        byte state = this.getControlState();
-        this.setControlState(newState ? state | mask : state & ~mask);
+    protected void setStateBit(byte mask, boolean newState) {
+    	byte state = this.getControlState();
+        this.setControlState((byte) (newState ? state | mask : state & ~mask));
     }
 
     public byte getControlState() {
+
         return this.dataManager.get(WATCHER_STATE);
+        
     }
 
-    public void setControlState(int state) {
-        this.dataManager.set(WATCHER_STATE, (byte) state);
+    public void setControlState(byte state) {
+    	
+        this.dataManager.set(WATCHER_STATE, state);
     }
     
     public void setSpeed(Speed speed) {
@@ -243,8 +254,33 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         this.interpProgress = duration;
     }
 
+    private void resetFlyTicks(EntityPlayerMP entity) {
+    	entity.fallDistance = 0F;
+		 Field field = null;
+		 try {
+			 if((Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")){
+			 field = NetHandlerPlayServer.class.getDeclaredField("vehicleFloatingTickCount");
+		 }else{
+			 field = NetHandlerPlayServer.class.getDeclaredField("field_184346_E");
+		 }
+
+            field.setAccessible(true);
+            field.set(entity.connection, -1);
+		 }catch(NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			 e.printStackTrace();
+		 }
+    }
+    
     @Override
     public void onEntityUpdate() {
+    	 if (!world.isRemote) {
+        	 for(Seat seat : this.seats){
+        		 if(seat.getOccupant() != null && seat.getOccupant() instanceof EntityPlayerMP) {
+        			 resetFlyTicks((EntityPlayerMP) seat.getOccupant());
+        		 }
+        	 }
+			
+        }
         if(this.getSpeed() == Speed.FAST) {
             this.allWheels.forEach(wheel -> this.createWheelParticles(wheel, true));
         }
@@ -324,7 +360,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         this.tickInterp();
         this.updateMotion();
         if (this.getPassengers().isEmpty() || !(this.getPassengers().get(0) instanceof EntityPlayer)) {
-            this.setControlState(0);
+            this.setControlState((byte) 0);
         }
         if (this.world.isRemote) {
             this.handleControl();
@@ -567,6 +603,9 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     @Override
     protected void addPassenger(Entity passenger) {
         super.addPassenger(passenger);
+        if(passenger instanceof EntityPlayerMP) {
+        	resetFlyTicks((EntityPlayerMP) passenger);
+        }
         if (passenger instanceof EntityPlayer && !(this.getControllingPassenger() instanceof EntityPlayer)) {
             Entity existing = this.seats[0].occupant;
             this.seats[0].occupant = passenger;

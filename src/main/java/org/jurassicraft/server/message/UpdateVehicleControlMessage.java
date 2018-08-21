@@ -27,7 +27,9 @@ public class UpdateVehicleControlMessage extends AbstractMessage<UpdateVehicleCo
 
     @Override
     public void onClientReceived(Minecraft minecraft, UpdateVehicleControlMessage message, EntityPlayer player, MessageContext context)
-    {}
+    {
+    	
+    }
 
     @Override
     public void onServerReceived(MinecraftServer server, UpdateVehicleControlMessage message, EntityPlayer player, MessageContext context)
@@ -55,5 +57,6 @@ public class UpdateVehicleControlMessage extends AbstractMessage<UpdateVehicleCo
     {
         buf.writeInt(this.entityId);
         buf.writeByte(this.state);
+
     }
 }
