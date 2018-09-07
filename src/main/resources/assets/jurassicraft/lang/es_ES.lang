@@ -187,7 +187,6 @@ item.mr_dna_keychain.name=Llavero de Mr. ADN
 item.dino_scanner.name=Escáner de Dinosaurios
 item.basic_circuit.name=Circuito Básico
 item.advanced_circuit.name=Circuito Avanzado
-item.iron_nugget.name=Pepita de Hierro
 item.gypsum_powder.name=Yeso en Polvo
 item.plant_soft_tissue.name=Tejido Suave de {plant}
 item.plant_fossil.name=Fósil Vegetal

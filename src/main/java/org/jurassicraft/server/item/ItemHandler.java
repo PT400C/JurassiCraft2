@@ -147,8 +147,6 @@ public class ItemHandler {
     public static final BasicItem BASIC_CIRCUIT = new BasicItem(TabHandler.ITEMS);
     public static final BasicItem ADVANCED_CIRCUIT = new BasicItem(TabHandler.ITEMS);
 
-    public static final BasicItem IRON_NUGGET = new BasicItem(TabHandler.ITEMS);
-
     public static final Item AJUGINUCULA_SMITHII_SEEDS = new ItemSeeds(BlockHandler.AJUGINUCULA_SMITHII, Blocks.FARMLAND).setUnlocalizedName("ajuginucula_smithii_seeds").setCreativeTab(TabHandler.PLANTS);
     public static final Item AJUGINUCULA_SMITHII_LEAVES = new ItemFood(1, 0.5F, false).setUnlocalizedName("ajuginucula_smithii_leaves").setCreativeTab(TabHandler.PLANTS);
     public static final BasicItem AJUGINUCULA_SMITHII_OIL = new BasicItem(TabHandler.PLANTS);
@@ -347,7 +345,6 @@ public class ItemHandler {
         registerItem(TRACKER, "Tracker");
         registerItem(BASIC_CIRCUIT, "Basic Circuit");
         registerItem(ADVANCED_CIRCUIT, "Advanced Circuit");
-        registerItem(IRON_NUGGET, "Iron Nugget");
         registerItem(COMPUTER_SCREEN, "Computer Screen");
         registerItem(KEYBOARD, "Keyboard");
         registerItem(DNA_ANALYZER, "DNA Analyzer");
@@ -436,7 +433,7 @@ public class ItemHandler {
 
     public static void registerOres()
     {
-        OreDictionary.registerOre("nuggetIron", IRON_NUGGET);
+    	//Kept as the diamond nugget will be implemented soon BY THIS PR
     }
 
     public static void registerTreeType(TreeType type) {

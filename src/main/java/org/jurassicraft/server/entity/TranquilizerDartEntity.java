@@ -69,12 +69,14 @@ public class TranquilizerDartEntity extends EntityThrowable implements IEntityAd
 
     @Override
     public void writeSpawnData(ByteBuf buffer) {
-	ByteBufUtils.writeItemStack(buffer, stack);
+	if(stack != null)
+		ByteBufUtils.writeItemStack(buffer, stack);
     }
 
     @Override
     public void readSpawnData(ByteBuf additionalData) {
-	stack = ByteBufUtils.readItemStack(additionalData);
+	if(stack != null)
+		stack = ByteBufUtils.readItemStack(additionalData);
     }
     
 }

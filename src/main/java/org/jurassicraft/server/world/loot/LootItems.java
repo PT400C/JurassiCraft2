@@ -13,7 +13,6 @@ public class LootItems {
             ItemHandler.PLANT_FOSSIL, 0, 48,
             ItemHandler.TWIG_FOSSIL, 0, 32,
             //ItemHandler.PLASTER_AND_BANDAGE, 0, 64,
-            ItemHandler.IRON_NUGGET, 0, 64,
             Items.IRON_INGOT, 0, 16,
             Items.GOLD_INGOT, 0, 4,
             Items.REDSTONE, 0, 64,
@@ -60,7 +59,6 @@ public class LootItems {
             ItemHandler.COMPUTER_SCREEN, 0, 1,
             ItemHandler.KEYBOARD, 0, 4,
             Blocks.STONE_BUTTON, 0, 12,
-            ItemHandler.IRON_NUGGET, 0, 32,
             Items.IRON_INGOT, 0, 7,
             ItemHandler.STORAGE_DISC, 0, 32,
             Items.REDSTONE, 0, 32,
@@ -116,7 +114,6 @@ public class LootItems {
             Items.LEATHER_CHESTPLATE, 0, 2,
             Items.LEATHER_LEGGINGS, 0, 2,
             Items.IRON_BOOTS, 0, 2,
-            ItemHandler.IRON_NUGGET, 0, 26,
             Items.BOOK, 0, 16
     };
 
@@ -136,7 +133,6 @@ public class LootItems {
             ItemHandler.CAR_CHASSIS, 0, 2,
             ItemHandler.UNFINISHED_CAR, 0, 1,
             ItemHandler.ADVANCED_CIRCUIT, 0, 4,
-            ItemHandler.IRON_NUGGET, 0, 4,
             Items.IRON_INGOT, 0, 10,
             Blocks.IRON_BARS, 0, 32,
             Items.DYE, 0, 10,
@@ -158,7 +154,6 @@ public class LootItems {
             Items.LEATHER_CHESTPLATE, 0, 2,
             Items.LEATHER_LEGGINGS, 0, 2,
             Items.IRON_BOOTS, 0, 2,
-            ItemHandler.IRON_NUGGET, 0, 26,
             Items.BOOK, 0, 16
     };
 

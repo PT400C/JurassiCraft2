@@ -72,7 +72,7 @@
         },
         {
           "type": "item",
-          "name": "jurassicraft:iron_nugget",
+          "name": "minecraft:iron_nugget",
           "weight": 5,
           "functions": [
             {"function": "set_count", "count": {"min": 0, "max": 4}}

@@ -10,7 +10,7 @@ import org.jurassicraft.JurassiCraft;
 import java.util.List;
 
 public class JurassiCraftDataFixers {
-    private static final int DATAFIXER_VERSION = 1;
+    private static final int DATAFIXER_VERSION = 2;
     private static final ModFixs modFixs = FMLCommonHandler.instance().getDataFixer().init(JurassiCraft.MODID, DATAFIXER_VERSION);
 
     public static void init() {
@@ -22,6 +22,12 @@ public class JurassiCraftDataFixers {
             if(teLoc.getResourceDomain().equals("minecraft") && tileEntityList.contains(path)) {
                 nbt.setString("id", JurassiCraft.MODID + ":" + path);
             }
+            return nbt;
+        }));
+        
+        modFixs.registerFix(FixTypes.ITEM_INSTANCE, new DataFixerFactory(2, nbt -> {
+        	if("jurassicraft:iron_nugget".equals(nbt.getString("id"))) 
+        		nbt.setString("id", "minecraft:iron_nugget");	
             return nbt;
         }));
 
