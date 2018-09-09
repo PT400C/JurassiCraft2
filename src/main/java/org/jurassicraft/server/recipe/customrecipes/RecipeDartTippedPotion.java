@@ -28,7 +28,7 @@ public class RecipeDartTippedPotion extends IForgeRegistryEntry.Impl<IRecipe> im
                         if (item != Items.POTIONITEM){
                             return false;
                         }
-                    } else if (item != ItemHandler.DART_TRANQUILIZER) {
+                    } else if (item != ItemHandler.DART_GENERIC) {
                         return false;
                     }
                 }

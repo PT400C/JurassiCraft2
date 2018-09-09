@@ -5,7 +5,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import org.jurassicraft.server.block.EncasedFossilBlock;
 import org.jurassicraft.server.dinosaur.Dinosaur;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 import java.util.Locale;
 

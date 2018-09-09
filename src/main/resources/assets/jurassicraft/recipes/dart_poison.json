@@ -3,7 +3,7 @@
   "group": "jurassicraft:poison_dart",
   "ingredients": [
     {
-      "item": "jurassicraft:dart_tranquilizer"
+      "item": "jurassicraft:dart_generic"
     },
     {
       "item": "minecraft:spider_eye"

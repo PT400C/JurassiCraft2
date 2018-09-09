@@ -1,4 +1,4 @@
-package org.jurassicraft.server.world.loot;
+/*package org.jurassicraft.server.world.loot;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -164,3 +164,4 @@ public class LootItems {
             ItemHandler.STAMP_SET, 0, 5
     };
 }
+*/

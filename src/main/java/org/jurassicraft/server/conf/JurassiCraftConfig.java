@@ -23,6 +23,9 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
     @Config.Name("structure Generation")
     public static final StructureGeneration STRUCTURE_GENERATION = new StructureGeneration();
 
+    @Config.Name("general")
+    public static final General GENERAL = new General();
+    
     @Config.Name("vehicles")
     public static final Vehicles VEHICLES = new Vehicles();
 
@@ -97,6 +100,12 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
         @Config.Name("Enable Tour Rail Blocks")
         public boolean tourRailBlockEnabled = true;
     }
+    
+    public static class General {
+        @Config.Name("[Server] Send map data to players")
+        public boolean sendMap = false;
+    }
+    
     @SubscribeEvent
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if(JurassiCraft.MODID.equals(event.getModID())) {

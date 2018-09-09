@@ -314,7 +314,7 @@ public enum RenderingHandler {
         registerItemRenderer(ADVANCED_CIRCUIT, "advanced_circuit");
 
         registerItemRenderer(GYPSUM_POWDER, "gypsum_powder");
-
+        registerItemRenderer(DIAMOND_NUGGET, "diamond_nugget");
         registerItemRenderer(AJUGINUCULA_SMITHII_SEEDS, "ajuginucula_smithii_seeds");
         registerItemRenderer(AJUGINUCULA_SMITHII_LEAVES, "ajuginucula_smithii_leaves");
         registerItemRenderer(AJUGINUCULA_SMITHII_OIL, "ajuginucula_smithii_oil");
@@ -422,10 +422,17 @@ public enum RenderingHandler {
         registerItemRenderer(GOAT_COOKED);
         
         registerItemRenderer(DART_GUN);
+        registerItemRenderer(DART_GENERIC, "dart_generic");
         registerItemRenderer(DART_TRANQUILIZER, "dart_colored");
         registerItemRenderer(DART_POISON_CYCASIN, "dart_colored");
-        registerItemRenderer(DART_POISON_EXECUTIONER_CONCOCTION, "dart_colored");
         registerItemRenderer(DART_TIPPED_POTION, "dart_colored");
+        registerItemRenderer(TRACKING_DART, "tracking_dart");
+        registerItemRenderer(TRACKING_TABLET, "tracking_tablet");
+        registerItemRenderer(TRACKING_TABLET_ADVANCED, "tracking_tablet_advanced");
+        registerItemRenderer(TRACKING_TABLET_HIGHEND, "tracking_tablet_highend");
+        registerItemRenderer(TRACKING_TABLET_FREQUENCY, "tracking_tablet_frequency");
+        registerItemRenderer(FREQUENCY_MODULE, "frequency_module");
+        registerItemRenderer(TRACKING_MODULE, "tracking_module");
 
         registerItemRenderer(WEST_INDIAN_LILAC_BERRIES);
     }
@@ -497,7 +504,7 @@ public enum RenderingHandler {
             return 0xFFFFFF;
         }, SPAWN_EGG);
 
-        itemColors.registerItemColorHandler(((stack, tintIndex) -> tintIndex == 1 ? ((Dart)stack.getItem()).getDartColor(stack) : -1), DART_POISON_CYCASIN, DART_POISON_EXECUTIONER_CONCOCTION, DART_TIPPED_POTION, DART_TRANQUILIZER);
+        itemColors.registerItemColorHandler(((stack, tintIndex) -> tintIndex == 1 ? ((Dart)stack.getItem()).getDartColor(stack) : -1), DART_POISON_CYCASIN, DART_TIPPED_POTION);
     }
 
     public void postInit() {

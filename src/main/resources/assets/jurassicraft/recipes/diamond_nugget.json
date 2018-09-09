@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "jurassicraft:diamond_nugget",
+  "pattern": [
+    "A"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:diamond",
+      "data": 0
+    }
+  },
+  "result": {
+    "item": "jurassicraft:diamond_nugget",
+    "data": 0,
+    "count": 9
+  }
+}

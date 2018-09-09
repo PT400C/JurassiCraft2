@@ -12,7 +12,7 @@ import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.EntityHandler;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 public class HatchedEggItem extends DNAContainerItem {
     public HatchedEggItem() {

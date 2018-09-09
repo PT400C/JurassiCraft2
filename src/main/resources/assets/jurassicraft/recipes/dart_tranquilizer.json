@@ -1,22 +1,15 @@
 {
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shapeless",
   "group": "jurassicraft:dart_tranquilizer",
-  "pattern": [
-    " F",
-    "N "
-  ],
-  "key": {
-    "N": {
-      "type": "forge:ore_dict",
-      "ore": "nuggetIron"
+  "ingredients": [
+    {
+      "item": "jurassicraft:dart_generic"
     },
-    "F": {
-      "item": "minecraft:flint",
-      "data": 0
+    {
+      "item": "minecraft:stick"
     }
-  },
+  ],
   "result": {
-    "item": "jurassicraft:dart_tranquilizer",
-    "count": 6
+    "item": "jurassicraft:dart_tranquilizer"
   }
 }

@@ -23,11 +23,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.proxy.ClientProxy;
+import org.jurassicraft.common.util.MutableVec3;
 import org.jurassicraft.server.entity.ai.util.InterpValue;
 import org.jurassicraft.server.entity.vehicle.CarEntity.Speed;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.message.UpdateVehicleControlMessage;
-import org.jurassicraft.server.util.MutableVec3;
 
 import javax.annotation.Nonnull;
 

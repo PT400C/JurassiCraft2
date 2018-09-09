@@ -30,7 +30,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 public class FossilItem extends Item implements GrindableItem {
     public static Map<String, List<Dinosaur>> fossilDinosaurs = new HashMap<>();

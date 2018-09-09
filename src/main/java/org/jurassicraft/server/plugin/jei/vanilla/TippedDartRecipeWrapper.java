@@ -16,7 +16,7 @@ public class TippedDartRecipeWrapper implements IShapedCraftingRecipeWrapper {
     private final ItemStack output;
 
     public TippedDartRecipeWrapper(PotionType type) {
-        ItemStack dartStack = new ItemStack(ItemHandler.DART_TRANQUILIZER);
+        ItemStack dartStack = new ItemStack(ItemHandler.DART_GENERIC);
         ItemStack lingeringPotion = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), type);
         this.inputs = Arrays.asList(
                 dartStack, dartStack, dartStack,

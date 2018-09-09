@@ -18,7 +18,7 @@ import org.jurassicraft.server.block.plant.JCBlockCropsBase;
 import org.jurassicraft.server.plant.Plant;
 import org.jurassicraft.server.plant.PlantHandler;
 import org.jurassicraft.server.tab.TabHandler;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;

@@ -146,7 +146,7 @@ public class ItemHandler {
 
     public static final BasicItem BASIC_CIRCUIT = new BasicItem(TabHandler.ITEMS);
     public static final BasicItem ADVANCED_CIRCUIT = new BasicItem(TabHandler.ITEMS);
-
+    public static final BasicItem DIAMOND_NUGGET = new BasicItem(TabHandler.ITEMS);
     public static final Item AJUGINUCULA_SMITHII_SEEDS = new ItemSeeds(BlockHandler.AJUGINUCULA_SMITHII, Blocks.FARMLAND).setUnlocalizedName("ajuginucula_smithii_seeds").setCreativeTab(TabHandler.PLANTS);
     public static final Item AJUGINUCULA_SMITHII_LEAVES = new ItemFood(1, 0.5F, false).setUnlocalizedName("ajuginucula_smithii_leaves").setCreativeTab(TabHandler.PLANTS);
     public static final BasicItem AJUGINUCULA_SMITHII_OIL = new BasicItem(TabHandler.PLANTS);
@@ -278,10 +278,17 @@ public class ItemHandler {
     public static final BasicFoodItem GOAT_COOKED = new BasicFoodItem(6, 1.0F, true, TabHandler.FOODS);
     
     public static final DartGun DART_GUN = new DartGun();
-    public static final Dart DART_TRANQUILIZER = new Dart((entity, stack) -> entity.tranquilize(2000), 0xFFFFFF);
-    public static final Dart DART_POISON_CYCASIN = new Dart((entity, stack) -> entity.addPotionEffect(new PotionEffect(MobEffects.POISON, 2000)), 0xE2E1B8);
-    public static final Dart DART_POISON_EXECUTIONER_CONCOCTION = new Dart((entity, stack) -> entity.setDeathIn(200), 0x000000);
+    public static final Item DART_GENERIC = new BasicItem(TabHandler.ITEMS);
+    public static final Dart DART_TRANQUILIZER = new Dart((entity, stack) -> ((DinosaurEntity) entity).tranquilize(2000), 0xFFFFFF, (byte) Dart.TYPES.TRANQ.ordinal(), "Tranquilizer Dart");
+    public static final Dart DART_POISON_CYCASIN = new Dart((entity, stack) -> entity.addPotionEffect(new PotionEffect(MobEffects.POISON, 2000)), 0x08AB00, (byte) Dart.TYPES.POISON.ordinal(), "Poison Dart");
     public static final Dart DART_TIPPED_POTION = new PotionDart();
+    public static final Dart TRACKING_DART = new TrackingDart();
+    public static final TrackingTablet TRACKING_TABLET = new TrackingTablet(3);
+    public static final TrackingTablet TRACKING_TABLET_ADVANCED = new TrackingTablet(2);
+    public static final TrackingTablet TRACKING_TABLET_HIGHEND = new TrackingTablet(1);
+    public static final TrackingTablet TRACKING_TABLET_FREQUENCY = new FrequencyTrackingTablet();
+    public static final Item FREQUENCY_MODULE = new BasicItem(TabHandler.ITEMS);
+    public static final Item TRACKING_MODULE = new BasicItem(TabHandler.ITEMS);
     
     public static void init() {
         registerItem(FOSSILIZED_EGG, "Fossilized Egg");
@@ -345,6 +352,7 @@ public class ItemHandler {
         registerItem(TRACKER, "Tracker");
         registerItem(BASIC_CIRCUIT, "Basic Circuit");
         registerItem(ADVANCED_CIRCUIT, "Advanced Circuit");
+        registerItem(DIAMOND_NUGGET, "Diamond Nugget");
         registerItem(COMPUTER_SCREEN, "Computer Screen");
         registerItem(KEYBOARD, "Keyboard");
         registerItem(DNA_ANALYZER, "DNA Analyzer");
@@ -422,10 +430,18 @@ public class ItemHandler {
         registerItem(INGEN_JOURNAL, "InGen Journal");
         
         registerItem(DART_GUN, "Dart Gun");
+        registerItem(DART_GENERIC, "Dart Generic");
         registerItem(DART_TRANQUILIZER, "Dart Tranquilizer");
         registerItem(DART_POISON_CYCASIN, "Dart Poison Cycasin");
-        registerItem(DART_POISON_EXECUTIONER_CONCOCTION, "Dart Poison Executioner Concoction");
         registerItem(DART_TIPPED_POTION, "Dart Tipped Potion");
+        registerItem(TRACKING_DART, "Tracking Dart");
+        registerItem(TRACKING_TABLET, "Tracking Tablet");
+        registerItem(TRACKING_TABLET_ADVANCED, "Tracking Tablet Advanced");
+        registerItem(TRACKING_TABLET_HIGHEND, "Tracking Tablet Highend");
+        registerItem(TRACKING_TABLET_FREQUENCY, "Tracking Tablet Frequency");
+        registerItem(FREQUENCY_MODULE, "Frequency Module");
+        registerItem(TRACKING_MODULE, "Tracking Module");
+        
         for (TreeType type : TreeType.values()) {
             registerTreeType(type);
         }
@@ -433,7 +449,7 @@ public class ItemHandler {
 
     public static void registerOres()
     {
-    	//Kept as the diamond nugget will be implemented soon BY THIS PR
+    	OreDictionary.registerOre("nuggetDiamond", DIAMOND_NUGGET);
     }
 
     public static void registerTreeType(TreeType type) {

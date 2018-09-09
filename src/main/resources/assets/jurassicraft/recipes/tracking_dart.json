@@ -1,0 +1,21 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "group": "jurassicraft:tracking_dart",
+    "pattern": [
+        "DT"
+    ],
+    "key": {
+        "D": {
+            "item": "jurassicraft:tracker",
+            "data": 0
+        },
+        "T": {
+            "item": "jurassicraft:dart_generic",
+            "data": 0
+        }
+    },
+    "result": {
+        "item": "jurassicraft:tracking_dart",
+        "data": 0
+    }
+}

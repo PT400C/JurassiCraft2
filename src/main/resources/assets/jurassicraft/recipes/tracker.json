@@ -1,0 +1,23 @@
+{
+  "type": "forge:ore_shaped",
+  "group": "jurassicraft:tracker",
+  "pattern": [
+    "III",
+    "IMI",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "nuggetIron"
+    },
+    "M": {
+      "item": "jurassicraft:tracking_module",
+      "data": 0
+    }
+  },
+  "result": {
+    "item": "jurassicraft:tracker",
+    "count": 4
+  }
+}

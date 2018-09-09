@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import org.jurassicraft.server.block.NestFossilBlock;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 public class NestFossilItemBlock extends ItemBlock {
     private boolean encased;

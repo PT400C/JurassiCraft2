@@ -3,9 +3,10 @@ package org.jurassicraft.server.genetics;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
-import org.jurassicraft.server.util.LangUtils;
 
 import java.util.List;
+
+import org.jurassicraft.common.util.LangUtils;
 
 public class PlantDNA {
     private int plant;

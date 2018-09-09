@@ -15,7 +15,7 @@ import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.genetics.DinoDNA;
 import org.jurassicraft.server.genetics.GeneticsHelper;
 import org.jurassicraft.server.tab.TabHandler;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;

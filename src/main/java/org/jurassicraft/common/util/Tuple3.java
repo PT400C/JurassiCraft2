@@ -1,4 +1,4 @@
-package org.jurassicraft.server.util;
+package org.jurassicraft.common.util;
 
 public class Tuple3<X, Y, Z> {
     private X x;

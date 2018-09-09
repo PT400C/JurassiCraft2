@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 public class CultivateItemBlock extends ItemBlock {
     public CultivateItemBlock(Block block) {

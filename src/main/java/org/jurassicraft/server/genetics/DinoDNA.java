@@ -3,9 +3,10 @@ package org.jurassicraft.server.genetics;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
+
+import org.jurassicraft.common.util.LangUtils;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
-import org.jurassicraft.server.util.LangUtils;
 
 import java.util.List;
 

@@ -72,6 +72,12 @@ public enum DinosaurStatus {
             return info.thirsty;
         }
     },
+    TRANQUILIZED {
+        @Override
+        public boolean apply(DinosaurEntity entity, DinosaurEntity.FieldGuideInfo info) {
+            return info.tranquilized;
+        }
+    },
     POISONED {
         @Override
         public boolean apply(DinosaurEntity entity, DinosaurEntity.FieldGuideInfo info) {

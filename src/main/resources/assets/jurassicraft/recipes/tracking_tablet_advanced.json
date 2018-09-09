@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "jurassicraft:tracking_tablet_advanced",
+  "pattern": [
+    " A ",
+    " B ",
+    " C "
+  ],
+  "key": {
+    "A": {
+      "item": "jurassicraft:basic_circuit",
+      "data": 0
+    },
+    "B": {
+      "item": "jurassicraft:tracking_tablet",
+      "data": 0
+    },
+    "C": {
+      "type": "forge:ore_dict",
+      "ore": "nuggetIron"
+    }
+  },
+  "result": {
+    "item": "jurassicraft:tracking_tablet_advanced",
+    "data": 0
+  }
+}

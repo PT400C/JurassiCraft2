@@ -112,6 +112,14 @@
         },
         {
           "type": "item",
+          "name": "jurassicraft:diamond_nugget",
+          "weight": 25,
+          "functions": [
+            {"function": "set_count", "count": {"min": 0, "max": 8}}
+          ]
+        },
+        {
+          "type": "item",
           "name": "minecraft:book",
           "weight": 5,
           "functions": [

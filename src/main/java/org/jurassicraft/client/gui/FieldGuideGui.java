@@ -21,7 +21,7 @@ import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.DinosaurStatus;
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.math.RoundingMode;
@@ -125,7 +125,7 @@ public class FieldGuideGui extends GuiScreen {
 
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
             GL11.glScissor((x + 15) * scaleFactor, (this.height - y - 140) * scaleFactor, 100 * scaleFactor, 100 * scaleFactor);
-            this.drawEntity(x + 65, y + 110, 45.0F / this.entity.height, this.entity);
+            this.drawEntity(x + 65, y + 110, 45.0F / (this.entity.height + (this.entity.getEyeHeight() > 15 ? this.entity.getEyeHeight() / 2 : 0)), this.entity);
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

@@ -26,6 +26,7 @@ import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityLookHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.Item;
@@ -59,6 +60,7 @@ import org.apache.logging.log4j.Logger;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.animation.EntityAnimation;
 import org.jurassicraft.client.model.animation.PoseHandler;
+import org.jurassicraft.common.util.LangUtils;
 import org.jurassicraft.server.api.Animatable;
 import org.jurassicraft.server.block.entity.FeederBlockEntity;
 import org.jurassicraft.server.block.machine.FeederBlock;
@@ -105,8 +107,8 @@ import org.jurassicraft.server.genetics.GeneticsHelper;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.message.BiPacketOrder;
 import org.jurassicraft.server.message.SetOrderMessage;
+import org.jurassicraft.server.message.TrackedAddMessage;
 import org.jurassicraft.server.util.GameRuleHandler;
-import org.jurassicraft.server.util.LangUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -157,6 +159,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     private boolean deserializing;
 
     private int ticksUntilDeath;
+    public List<String> trackers = new ArrayList<>();
     
     private int attackCooldown;
 
@@ -1469,6 +1472,14 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
 
         nbt.setInteger("TranquilizerTicks", tranquilizerTicks);
         nbt.setInteger("TicksUntilDeath", ticksUntilDeath);
+        
+        NBTTagList trackerList = new NBTTagList();
+		for (String tracker : this.trackers) {
+			NBTTagCompound compound = new NBTTagCompound();
+			compound.setString("ID", tracker);
+			trackerList.appendTag(compound);
+		}
+		nbt.setTag("Trackers", trackerList);
         return nbt;
     }
 
@@ -1533,6 +1544,12 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         
         this.updateAttributes();
         this.updateBounds();
+        
+        NBTTagList trackers = nbt.getTagList("Trackers", Constants.NBT.TAG_COMPOUND);
+		for (int i = 0; i < trackers.tagCount(); i++) {
+			NBTTagCompound compound = trackers.getCompoundTagAt(i);
+			this.trackers.add(compound.getString("ID"));
+		}
 
         this.deserializing = false;
     }
@@ -1546,6 +1563,30 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         buffer.writeInt(this.growthSpeedOffset);
         this.attributes.write(buffer);
     }
+    
+    public boolean addTrackingID(String id) {
+		if(!this.trackers.contains(id)) {
+			this.trackers.add(id);
+			return true;
+		}
+		return false;
+	}
+    public void applyTDart(EntityPlayer player, String ID) {
+		boolean success = addTrackingID(ID);
+			sendTrackingPacket(player, success);
+	}
+    
+    public void sendTrackingPacket(EntityPlayer player, boolean success) {
+		
+		if(player != null && !player.world.isRemote)
+		JurassiCraft.NETWORK_WRAPPER.sendTo(new TrackedAddMessage(this, success), (EntityPlayerMP) player);  
+	}
+    
+    public boolean isTranquilized() {
+		if(tranquilizerTicks == 0)
+			return false;
+		return true;
+	}
 
     @Override
     public void readSpawnData(ByteBuf additionalData) {
@@ -1964,6 +2005,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         public boolean hungry;
         public boolean thirsty;
         public boolean poisoned;
+        public boolean tranquilized;
 
         public static FieldGuideInfo deserialize(ByteBuf buf) {
             FieldGuideInfo info = new FieldGuideInfo();
@@ -1974,6 +2016,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             info.hungry = buf.readBoolean();
             info.thirsty = buf.readBoolean();
             info.poisoned = buf.readBoolean();
+            info.tranquilized = buf.readBoolean();
             return info;
         }
 
@@ -1988,6 +2031,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             info.hungry = metabolism.isHungry();
             info.thirsty = metabolism.isThirsty();
             info.poisoned = entity.isPotionActive(MobEffects.POISON);
+            info.tranquilized = entity.isTranquilized();
             buf.writeBoolean(info.flocking);
             buf.writeBoolean(info.scared);
             buf.writeInt(info.hunger);
@@ -1995,6 +2039,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             buf.writeBoolean(info.hungry);
             buf.writeBoolean(info.thirsty);
             buf.writeBoolean(info.poisoned);
+            buf.writeBoolean(info.tranquilized);
             return info;
         }
     }

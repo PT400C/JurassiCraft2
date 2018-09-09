@@ -1,6 +1,6 @@
 package org.jurassicraft.server.entity;
 
-import org.jurassicraft.server.util.LangUtils;
+import org.jurassicraft.common.util.LangUtils;
 
 public enum GrowthStage {
         ADULT, INFANT, JUVENILE, /*FLUORESCENT*/ADOLESCENT, SKELETON;

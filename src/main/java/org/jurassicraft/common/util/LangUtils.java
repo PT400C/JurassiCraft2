@@ -1,4 +1,4 @@
-package org.jurassicraft.server.util;
+package org.jurassicraft.common.util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;

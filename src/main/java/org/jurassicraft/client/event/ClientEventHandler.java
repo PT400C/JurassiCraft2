@@ -17,6 +17,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -48,12 +50,37 @@ public class ClientEventHandler {
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
+        	if (!ClientProxy.getHandlerInstance().getMap().wipingTextures.isEmpty()) {
+				int texture = ClientProxy.getHandlerInstance().getMap().wipingTextures.get(0);
+				GL11.glDeleteTextures(texture);
+				ClientProxy.getHandlerInstance().getMap().wipingTextures.remove(0);
+			}
             this.isGUI = false;
         }
     }
+    
+    @SubscribeEvent
+	public void textureStitching(TextureStitchEvent.Post event) {
+		if (!(ClientProxy.getHandlerInstance() == null) && !(ClientProxy.getHandlerInstance().getMap() == null))
+			ClientProxy.getHandlerInstance().getMap().refreshColors = true;
+	}
+    
+	@SubscribeEvent
+	public void setupMap(PlayerSetSpawnEvent event) {
+		if (!(ClientProxy.getHandlerInstance() == null) && !(ClientProxy.getHandlerInstance().getMap() == null) && ClientProxy.getHandlerInstance().getMap().isInitiated()) {
+			ClientProxy.getHandlerInstance().getMap().refreshColors = true;
+			ClientProxy.getHandlerInstance().getMap().markForReset();
+			ClientProxy.getHandlerInstance().getMap().mapFrameBuffer.deleteFramebuffer();
+			ClientProxy.getHandlerInstance().getMap().overlayFrameBuffer.deleteFramebuffer();
+			ClientProxy.getHandlerInstance().getMap().createFrameBuffers(ClientProxy.getHandlerInstance().getMapScale());
+			ClientProxy.getHandlerInstance().getMap().resetChunks();
+		}
+		ClientProxy.getHandlerInstance().initDraft();
+		ClientProxy.getHandlerInstance().getMap().resetPersistentChunks();
+	}
 
     @SubscribeEvent
-    public void onGameOverlay(RenderGameOverlayEvent.Post event) {
+    public void onGameOverlay(RenderGameOverlayEvent.Text event) {
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
 
@@ -66,10 +93,11 @@ public class ClientEventHandler {
                     FontRenderer fontRenderer = mc.fontRenderer;
                     ScaledResolution scaledResolution = new ScaledResolution(mc);
 
-                    int xPosition = scaledResolution.getScaledWidth() - 18;
+                    int xPosition = scaledResolution.getScaledWidth() / 2 + 88;
                     int yPosition = scaledResolution.getScaledHeight() - 18;
-
+                    GL11.glEnable(GL11.GL_DEPTH_TEST); 
                     renderItem.renderItemAndEffectIntoGUI(dartItem, xPosition, yPosition);
+                    GL11.glDisable(GL11.GL_LIGHTING); 
                     String s = String.valueOf(dartItem.getCount());
                     GlStateManager.disableDepth();
                     fontRenderer.drawStringWithShadow(s, xPosition + 17 - fontRenderer.getStringWidth(s), yPosition + 9, 0xFFFFFFFF);
