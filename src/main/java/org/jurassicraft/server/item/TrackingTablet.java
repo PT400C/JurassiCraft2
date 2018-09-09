@@ -35,6 +35,7 @@ import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -137,6 +138,7 @@ public class TrackingTablet extends ItemTrackable {
 		int[] biomes = new int[200704];
 		int id = 0;
 		MutableBlockPos mb = new MutableBlockPos();
+		MutableBlockPos mb2 = new MutableBlockPos();
 				for(int x = (chunkX - 14); x < (chunkX + 14); x++) {
 					for(int z = (chunkZ - 14); z < (chunkZ + 14); z++) {
 				Chunk chunk = player.getServerWorld().getChunkProvider().loadChunk(x, z);
@@ -144,7 +146,7 @@ public class TrackingTablet extends ItemTrackable {
 					for(int inChunkZ = 0; inChunkZ < 16; inChunkZ++) {
 						if(player.getServerWorld().getChunkProvider().isChunkGeneratedAt(x, z) && chunk != null) {
 							//int chunkValue = chunk.getHeightValue(inChunkX, inChunkZ) + 3;
-							int chunkValue = chunk.getPrecipitationHeight(new BlockPos(x * 16 + inChunkX, 0 , z * 16 + inChunkZ)).getY();
+							int chunkValue = chunk.getPrecipitationHeight(mb.setPos(x * 16 + inChunkX, 0 , z * 16 + inChunkZ)).getY();
                         
 						for (int i = chunkValue; i >= 0; --i) {
 							IBlockState state = chunk.getBlockState(inChunkX, i, inChunkZ);
@@ -219,18 +221,18 @@ public class TrackingTablet extends ItemTrackable {
 						ItemStack otherTablet = playerIn.getHeldItem(EnumHand.values()[handIDDart]);
 						if (((ItemTrackable) otherTablet.getItem()).getID(otherTablet, null).equals(tabletID)) {
 							playerIn.sendStatusMessage(new TextComponentString(
-									TextFormatting.YELLOW + "Both devices have the same ID"), true);
+									TextFormatting.YELLOW + I18n.format("tablet.changing.same")), true);
 						} else {
 							((ItemTrackable) otherTablet.getItem()).setID(otherTablet, tabletID);
 							playerIn.sendStatusMessage(
-									new TextComponentString(TextFormatting.GREEN + "Synchronized the IDs"), true);
+									new TextComponentString(TextFormatting.GREEN + I18n.format("tablet.changing.success.name")), true);
 						}
 					}
 					} else {
-						playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + "Put any Tracking Device in your selected slot or off-hand"),true);
+						playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + I18n.format("tablet.changing.missing.name")), true);
 					}
 				} else {
-					playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + "The tablet isn't capable of using frequencies"), true);
+					playerIn.sendStatusMessage(new TextComponentString(TextFormatting.RED + I18n.format("tablet.missingModule.name")), true);
 				}
 			} else {
 				if(handIn == EnumHand.MAIN_HAND || (handIn == EnumHand.OFF_HAND && !(playerIn.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof TrackingTablet))) {

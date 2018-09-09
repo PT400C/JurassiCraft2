@@ -235,6 +235,16 @@ item.west_indian_lilac_berries.name=West Indian Lilac Berries
 
 filled_map.jurassicraft.visitorcenter=Visitor Center Map
 
+// Tracking Tablet ========================================
+tablet.add.success.name=Tracking that dinosaur now
+tablet.add.failed.name=This dinosaur is already tracked
+tablet.changing.same.name=Both devices have the same ID
+tablet.changing.success.name=Synchronized the IDs
+tablet.changing.missing.name=Put any Tracking Device in your selected slot or off-hand
+tablet.missingModule.name=The tablet isn't capable of using frequencies
+tablet.gui.headline.name=Adjust tablet channel
+tablet.gui.channel.name=Tablet Channel
+
 // Crops ========================================
 item.ajuginucula_smithii_seeds.name=Ajuginucula Smithii Seeds
 item.ajuginucula_smithii_leaves.name=Ajuginucula Smithii Leaves

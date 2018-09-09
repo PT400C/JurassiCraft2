@@ -9,6 +9,7 @@ import org.lwjgl.input.Keyboard;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -63,7 +64,7 @@ public class TuneTabletGui extends GuiScreen
 		Keyboard.enableRepeatEvents(true);
 
 		buttonList.clear();
-		doneButton = new GuiButton(1, width / 2 - 40, height / 2, 80, 20, "Done");
+		doneButton = new GuiButton(1, width / 2 - 40, height / 2, 80, 20, I18n.format("gui.done"));
 		doneButton.enabled = false;
 		buttonList.add(doneButton);
 		guiIDField = new GuiTextField(3, fontRenderer, width / 2 - 100, height / 2 - 50, 200, 20);
@@ -137,10 +138,10 @@ public class TuneTabletGui extends GuiScreen
 	{
 		drawDefaultBackground();
 
-			drawCenteredString(fontRenderer, "Adjust tablet channel", width / 2, height / 2 - 80, 0xffffff);
+			drawCenteredString(fontRenderer, I18n.format("tablet.gui.headline.name"), width / 2, height / 2 - 80, 0xffffff);
 		
 
-		drawString(fontRenderer, "Tablet Channel", width / 2 - 100, height / 2 - 60, 0xa0a0a0);
+		drawString(fontRenderer, I18n.format("tablet.gui.channel.name"), width / 2 - 100, height / 2 - 60, 0xa0a0a0);
 
 		guiIDField.drawTextBox();
 		super.drawScreen(sizeX, sizeY, offset);

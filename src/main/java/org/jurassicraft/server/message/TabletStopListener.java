@@ -1,4 +1,4 @@
-package org.jurassicraft.server.message;
+/*package org.jurassicraft.server.message;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
@@ -42,4 +42,4 @@ public class TabletStopListener extends AbstractMessage<TabletStopListener> {
 	public void toBytes(ByteBuf buf) {
 
 	}
-}
+}*/

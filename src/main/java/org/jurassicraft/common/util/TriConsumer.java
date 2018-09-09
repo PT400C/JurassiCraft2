@@ -2,12 +2,11 @@ package org.jurassicraft.common.util;
 
 import java.util.Objects;
 
-@SuppressWarnings("hiding")
 @FunctionalInterface
-public interface TriConsumer<DinosaurEntity, EntityPlayer, Integer> {
+public interface TriConsumer<T, U, V> {
 	
-  public void accept(DinosaurEntity t, EntityPlayer u, Integer v);
-  public default TriConsumer<DinosaurEntity, EntityPlayer, Integer> andThen(TriConsumer<? super DinosaurEntity, ? super EntityPlayer, ? super Integer> after) {
+  public void accept(T t, U u, V v);
+  public default TriConsumer<T, U, V> andThen(TriConsumer<? super T, ? super U, ? super V> after) {
     Objects.requireNonNull(after);
     return (a, b, c) -> {
       accept(a, b, c);

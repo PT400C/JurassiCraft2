@@ -102,18 +102,13 @@ public class TabletMap {
 
 
 	public TabletMap() {
-		(new Thread(new Runnable() {
+		//I'm waiting for a recode to be a dynamic thread! :(
+		Thread t = new Thread(new Runnable() {
 			public void run() {
 
 				while (true) {
-				//	synchronized (ClientProxy.getHandlerInstance()) {
 					if (ClientProxy.getHandlerInstance() != null) {
-
-					//	if (ClientProxy.getHandlerInstance().getActive()) {
-					//		System.out.println("ACTIVE");
-						//}
 						if (ClientProxy.getHandlerInstance().getActive()) {
-						//	System.out.println("Wtf");
 							int maxRunTime = 860;
 							int idle = 100;
 							while (maxRunTime > 0) {
@@ -123,7 +118,6 @@ public class TabletMap {
 									if ((ClientProxy.getHandlerInstance() == null) || (player == null)
 											|| (world == null)) {
 										idle = 400;
-									//	System.out.println("BREAK");
 										break;
 									}
 									synchronized (world) {
@@ -135,8 +129,6 @@ public class TabletMap {
 											&& (refreshChunkZ == 0)) {
 
 										idle = 900;
-								
-									//	System.out.println("BREAK");
 										break;
 									}
 								} catch (ConcurrentModificationException ex) {
@@ -152,11 +144,11 @@ public class TabletMap {
 						}
 					
 					}
-				//}
 				}
-
 			}
-		})).start();
+		});
+		t.start();
+		t.setDaemon(true);
 		this.movingObjects = new TabletMovingObjects();
 	}
 
@@ -266,7 +258,7 @@ public class TabletMap {
 					this.loadedMapChunkX = this.loadingMapChunkX;
 					this.loadedMapChunkZ = this.loadingMapChunkZ;
 
-					// HERE'S THE POINT TO CHECK TWICE IF FINISHED LEVEL FIRST!!!
+					// HERE'S THE POINT TO CHECK TWICE IF FINISHED!!!
 					this.forcedRefresh = false;
 				}
 				if (this.refreshChunkZ + 1 >= 16) {
@@ -482,6 +474,7 @@ public class TabletMap {
 			
 			int indexX = x - originX;
 			int indexZ = z - originZ;
+			//This try'n catch was once important! It's currently there to prevent a crash when closing the game in the world!
 			try {
 				
 			IBlockState state = Block.getStateById(this.blockStates[indexX + 16 * diffX][indexZ + 16 * diffZ]);

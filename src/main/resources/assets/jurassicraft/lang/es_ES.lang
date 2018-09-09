@@ -235,6 +235,16 @@ item.west_indian_lilac_berries.name=Bayas Lila del Oeste de India
 
 filled_map.jurassicraft.visitorcenter=Mapa del Centro de Visita
 
+// Tracking Tablet ========================================
+tablet.add.success.name=TRANSLATION MISSING
+tablet.add.failed.name=TRANSLATION MISSING
+tablet.changing.same.name=TRANSLATION MISSING
+tablet.changing.success.name=TRANSLATION MISSING
+tablet.changing.missing.name=TRANSLATION MISSING
+tablet.missingModule.name=TRANSLATION MISSING
+tablet.gui.headline.name=TRANSLATION MISSING
+tablet.gui.channel.name=TRANSLATION MISSING
+
 // Crops ========================================
 item.ajuginucula_smithii_seeds.name=Semillas de Ajuginucula Smithii
 item.ajuginucula_smithii_leaves.name=Hojas de Ajuginucula Smithii

@@ -17,29 +17,41 @@ import org.jurassicraft.server.util.QueryData;
 import java.util.List;
 import java.util.Timer;
 
-public class TabletStartListener extends AbstractMessage<TabletStartListener> {
+public class TabletStatusMessage extends AbstractMessage<TabletStatusMessage> {
 
+	private boolean stop = false;
 	private int area;
 	private String ID;
 	private byte hand;
 
-	public TabletStartListener() {
+	public TabletStatusMessage() {
+	}
+	
+	public TabletStatusMessage(boolean stop) {
+		this.stop = stop;
 	}
 
-	public TabletStartListener(int area, String ID, byte hand) {
+	public TabletStatusMessage(int area, String ID, byte hand) {
 		this.area = area;
 		this.ID = ID;
 		this.hand = hand;
 	}
 
 	@Override
-	public void onClientReceived(Minecraft client, TabletStartListener message, EntityPlayer player, MessageContext messageContext) {
+	public void onClientReceived(Minecraft client, TabletStatusMessage message, EntityPlayer player, MessageContext messageContext) {
 
 	}
 
 	@Override
-	public void onServerReceived(MinecraftServer server, TabletStartListener message, EntityPlayer player, MessageContext messageContext) {
+	public void onServerReceived(MinecraftServer server, TabletStatusMessage message, EntityPlayer player, MessageContext messageContext) {
 
+		if(message.stop) {
+			
+			((Timer) TrackingTablet.dataSet.get(player).getTimer()).cancel();
+			TrackingTablet.dataSet.remove(player);
+			
+		}else {
+		
 		if (TrackingTablet.dataSet.containsKey(player)) {
 			QueryData dataset = TrackingTablet.dataSet.get(player);
 			dataset.setTime(System.currentTimeMillis());
@@ -51,24 +63,28 @@ public class TabletStartListener extends AbstractMessage<TabletStartListener> {
 				((QueryData) TrackingTablet.dataSet.get(player)).setTimer(timer);
 			}
 		}
-
+		}
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-
+        this.stop = buf.readBoolean();
+		if(!this.stop) {
 		this.hand = buf.readByte();
 		this.area = buf.readInt();
 		this.ID = ByteBufUtils.readUTF8String(buf);
+		}
 
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-
+        buf.writeBoolean(this.stop);
+        if(!this.stop) {
 		buf.writeByte(this.hand);
 		buf.writeInt(this.area);
 		ByteBufUtils.writeUTF8String(buf, this.ID);
+        }
 
 	}
 }

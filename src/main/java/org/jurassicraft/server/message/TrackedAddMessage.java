@@ -3,6 +3,7 @@ package org.jurassicraft.server.message;
 import io.netty.buffer.ByteBuf;
 import net.ilexiconn.llibrary.server.network.AbstractMessage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -27,12 +28,10 @@ public class TrackedAddMessage extends AbstractMessage<TrackedAddMessage> {
 	public void onClientReceived(Minecraft minecraft, TrackedAddMessage message, EntityPlayer player, MessageContext messageContext) {
 
 		if (message.success) {
-			player.sendStatusMessage(new TextComponentString(TextFormatting.GREEN + "Tracking that dinosaur now!"),
-					true);
+			player.sendStatusMessage(new TextComponentString(TextFormatting.GREEN + I18n.format("tablet.add.success.name")), true);
 			return;
 		}
-		player.sendStatusMessage(new TextComponentString(TextFormatting.RED + "This dinosaur is already tracked!"),
-				true);
+		player.sendStatusMessage(new TextComponentString(TextFormatting.RED + I18n.format("tablet.add.failed.name")), true);
 
 	}
 

@@ -28,8 +28,7 @@ import org.jurassicraft.client.tablet.RenderDinosaurInfo;
 import org.jurassicraft.common.util.Vec2d;
 import org.jurassicraft.server.item.TrackingTablet;
 import org.jurassicraft.server.message.TabletGuiMessage;
-import org.jurassicraft.server.message.TabletStartListener;
-import org.jurassicraft.server.message.TabletStopListener;
+import org.jurassicraft.server.message.TabletStatusMessage;
 import org.jurassicraft.server.util.DinosaurInfo;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -84,7 +83,7 @@ public class TrackingTabletGui extends GuiScreen {
 
 		public void run() {
 
-			JurassiCraft.NETWORK_WRAPPER.sendToServer(new TabletStartListener(TrackingTablet.getArea(), TrackingTablet.getPacketID(this.gui.player.getHeldItem(EnumHand.values()[this.gui.hand.ordinal()]), Minecraft.getMinecraft().player.getName()), (byte)this.gui.hand.ordinal()));
+			JurassiCraft.NETWORK_WRAPPER.sendToServer(new TabletStatusMessage(TrackingTablet.getArea(), TrackingTablet.getPacketID(this.gui.player.getHeldItem(EnumHand.values()[this.gui.hand.ordinal()]), Minecraft.getMinecraft().player.getName()), (byte)this.gui.hand.ordinal()));
 		}
 	}
 
@@ -119,7 +118,7 @@ public class TrackingTabletGui extends GuiScreen {
 		ClientProxy.getHandlerInstance().currentOffset = new Vec2d(0, 0);
 		TrackingTablet.dinosaurList.clear();
 		packetSend.cancel();
-		JurassiCraft.NETWORK_WRAPPER.sendToServer(new TabletStopListener());
+		JurassiCraft.NETWORK_WRAPPER.sendToServer(new TabletStatusMessage(true));
 		ClientProxy.getHandlerInstance().getMap().finished = false;
 	}
 	
