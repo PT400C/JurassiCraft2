@@ -68,6 +68,7 @@ public class TabletMap {
 	private int loadedMapChunkZ = 0;
 	private int blockColor = 0;
 	private int blockY = 0;
+	public Thread thread = null;
 	public boolean finished = false;
 	public boolean receivingUpload = false;
 	public MapChunk[][] currentBlocks = new MapChunk[16][16];
@@ -103,9 +104,20 @@ public class TabletMap {
 
 	public TabletMap() {
 		//I'm waiting for a recode to be a dynamic thread! :(
-		Thread t = new Thread(new Runnable() {
-			public void run() {
+		this.movingObjects = new TabletMovingObjects();
+	}
 
+	public void resetChunks() {
+		this.currentBlocks = new MapChunk[16][16];
+	}
+	
+	public void resetPersistentChunks() {
+		this.chunkX = this.chunkZ = null;
+	}
+	
+	public void createThread() {
+		this.thread = new Thread(new Runnable() {
+			public void run() {
 				while (true) {
 					if (ClientProxy.getHandlerInstance() != null) {
 						if (ClientProxy.getHandlerInstance().getActive()) {
@@ -147,17 +159,7 @@ public class TabletMap {
 				}
 			}
 		});
-		t.start();
-		t.setDaemon(true);
-		this.movingObjects = new TabletMovingObjects();
-	}
-
-	public void resetChunks() {
-		this.currentBlocks = new MapChunk[16][16];
-	}
-	
-	public void resetPersistentChunks() {
-		this.chunkX = this.chunkZ = null;
+		this.thread.start();
 	}
 	
 	private void refreshChunks(EntityPlayer player, World world){
@@ -452,6 +454,16 @@ public class TabletMap {
 			color = -16777215 | red << 16 | green << 8 | blue;
 		}
 		return color;
+	}
+	
+	public Thread getThread() {
+		return this.thread;
+	}
+	
+	public void eliminateThread() {
+		this.thread.interrupt();
+		this.thread.stop();
+		this.thread = null;
 	}
 
 	public Block findBlock(World world, Chunk bchunk, int chunkX, int chunkZ, int maxY, int x, int z, EntityPlayer player) {

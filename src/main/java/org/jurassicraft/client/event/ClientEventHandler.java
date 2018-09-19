@@ -18,10 +18,12 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.server.entity.vehicle.MultiSeatedEntity;
@@ -46,7 +48,25 @@ public class ClientEventHandler {
     public void onGUIRender(GuiScreenEvent.DrawScreenEvent.Pre event) {
         this.isGUI = true;
     }
+    
+    @SubscribeEvent
+   	public void joinWorld(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+    	
+    	if(ClientProxy.getHandlerInstance().getMap().getThread() == null) {
+    		ClientProxy.getHandlerInstance().getMap().createThread();
+    	}
+    	
+   	}
 
+    @SubscribeEvent
+	public void leaveWorld(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+
+    	if(ClientProxy.getHandlerInstance().getMap().getThread() != null) {
+    		ClientProxy.getHandlerInstance().getMap().eliminateThread();
+    	}
+    	
+	}
+    
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {

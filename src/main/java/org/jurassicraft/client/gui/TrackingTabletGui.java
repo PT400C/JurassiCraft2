@@ -36,6 +36,8 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -55,14 +57,14 @@ public class TrackingTabletGui extends GuiScreen {
 
 	private Point lastMouseUpPos = new Point(0, 0);
 	private Vec2d lastMouseClicked = new Vec2d(0, 0);
-	
-	private int[] allowedOff = new int[] { 0, 95, 130, 145 };
+	private ArrayList<ButtonContainer> buttons = new ArrayList<>();
 	private final Timer packetSend;
 	private EntityPlayer player;
 	private AnimatedTexture loadingTexture;
 	private ItemStack tabletItem;
 
 	public TrackingTabletGui(EnumHand hand, EntityPlayer player) {
+		
 		this.hand = hand;
 		this.player = player;
 		TrackingTablet.dinosaurList.clear();
@@ -89,9 +91,42 @@ public class TrackingTabletGui extends GuiScreen {
 
 	@Override
 	public void initGui() {
+		buttons.clear();
+		// - BUTTON
+		buttons.add(new ButtonContainer((width / 2 - 110) + 210 - 24, (height / 2 - 123) + 210 - 24, 24, 24, (byte) 0));
+		// + BUTTON
+		buttons.add(new ButtonContainer((width / 2 - 110) + 210 - 24, (height / 2 - 123) + 184 - 24, 24, 24, (byte) 1));
+		// LOCK BUTTON
+		buttons.add(new ButtonContainer((width / 2 - 110) + 210 - 24, (height / 2 - 123) + 158 - 24, 24, 24, (byte) 2));
 		Keyboard.enableRepeatEvents(true);
 		this.loadingTexture = new AnimatedTexture(
 				new ResourceLocation(JurassiCraft.MODID, "textures/gui/map_loading_" + new Random().nextInt(2) + ".png"), this.width / 2 - 50, this.height / 2 - 50, 100, 100, 100D);
+	}
+	
+	private ButtonContainer isButton(int mouseX, int mouseY) {
+		for(ButtonContainer container : this.buttons) {
+			if(container.selected(mouseX, mouseY))
+				return container;
+		}
+		return null;
+		
+	}
+	
+	private boolean inRange(int allowed, double x, double y) {
+		if (-(allowed) <= y && allowed >= y && -(allowed) <= x && allowed >= x) 
+			return true;
+		
+		return false;
+		
+	}
+	
+	private boolean isInMap(int mouseX, int mouseY) {
+		
+		if((width / 2 - 110) + 8 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 8 <= mouseY
+				&& (height / 2 - 123) + 210 >= mouseY)
+			return true;
+		return false;
+		
 	}
 
 	@Override
@@ -122,6 +157,10 @@ public class TrackingTabletGui extends GuiScreen {
 		ClientProxy.getHandlerInstance().getMap().finished = false;
 	}
 	
+	private int getRange(byte current) {
+		return ClientProxy.getHandlerInstance().getZoomFactor() == current ? 0 : 95 + 35 * (ClientProxy.getHandlerInstance().getZoomFactor() - current - 1);
+	}
+	
 	@Override
 	protected void keyTyped(char c, int i)
 	{
@@ -148,28 +187,9 @@ public class TrackingTabletGui extends GuiScreen {
 			x = 1;
 		
 			Vec2d newVector = new Vec2d(ClientProxy.getHandlerInstance().currentOffset.x + 10 * x / ClientProxy.getHandlerInstance().getZoomFactor(), ClientProxy.getHandlerInstance().currentOffset.y + 10 * y / ClientProxy.getHandlerInstance().getZoomFactor());
-			if (-(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1]) <= newVector.y
-					&& allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1] >= newVector.y
-					&& -(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1]) <= newVector.x
-					&& allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1] >= newVector.x) {
+			if (inRange(getRange((byte) 1), newVector.x, newVector.y)) {
 				ClientProxy.getHandlerInstance().currentOffset = newVector;
 			}
-		}
-		
-	}
-
-	private boolean buttons(int i, int mouseX, int mouseY) {
-		switch (i){
-		case 0:
-			return (width / 2 - 110) + 210 - 20 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 188 - 20 <= mouseY && (height / 2 - 123) + 188 >= mouseY;
-		case 1:
-			return (width / 2 - 110) + 210 - 20 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 210 - 20 <= mouseY && (height / 2 - 123) + 210 >= mouseY;
-		case 2:
-			return ((width / 2 - 110) + 210 - 20 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 188 - 20 <= mouseY && (height / 2 - 123) + 188 >= mouseY) || ((width / 2 - 110) + 210 - 20 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 210 - 20 <= mouseY && (height / 2 - 123) + 210 >= mouseY) || (width / 2 - 110) + 210 - 20 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 166 - 20 <= mouseY && (height / 2 - 123) + 166 >= mouseY;
-		case 3:
-			return (width / 2 - 110) + 210 - 20 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 166 - 20 <= mouseY && (height / 2 - 123) + 166 >= mouseY;
-		default:
-			return false;
 		}
 		
 	}
@@ -211,7 +231,7 @@ public class TrackingTabletGui extends GuiScreen {
 			int cordZ = (int) (zPos + (((TrackingTablet) this.tabletItem.getItem()).isLocked(this.tabletItem) ? ((TrackingTablet) this.tabletItem.getItem()).getCoords(this.tabletItem, player).y : this.player.posZ));
 			String xOut;
 			String zOut;
-			if ((width / 2 - 110) + 8 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 8 <= mouseY && (height / 2 - 123) + 210 >= mouseY) {
+			if (isInMap(mouseX, mouseY)) {
 				xOut = "X: " + cordX;
 				zOut = "Z: " + cordZ;
 			} else {
@@ -225,31 +245,28 @@ public class TrackingTabletGui extends GuiScreen {
 			Minecraft.getMinecraft().ingameGUI.drawModalRectWithCustomSizedTexture((width / 2 - 110) + 210 - wid / 2 - 7, (height / 2 - 123) + 9 + 3, 33, 0, 15, 15, 48, 48);
 			mc.fontRenderer.drawString(xOut, (width / 2 - 110) + 210 - wid / 2 - mc.fontRenderer.getStringWidth(xOut) / 2, (height / 2 - 123) + 9 + 25, 0xFFFFFF);
 			mc.fontRenderer.drawString(zOut, (width / 2 - 110) + 210 - wid / 2 - mc.fontRenderer.getStringWidth(zOut) / 2, (height / 2 - 123) + 9 + 35, 0xFFFFFF);
-
-			int color = -804253680;
-			int color1 = -804253680;
-			int color2 = -804253680;
-			
-			if (buttons(1, mouseX, mouseY)) {
-				color = 2139062143;
-			}else if(buttons(0, mouseX, mouseY)) {
-				color1 = 2139062143;
-			}else if(buttons(3, mouseX, mouseY)) {
-				color2 = 2139062143;
-			}
-			if(((TrackingTablet) this.tabletItem.getItem()).isLocked(this.tabletItem))
-				color2 = 2012912143;
 		
+			for(ButtonContainer container : buttons) {
+				int color = -804253680;
+				if(container.selected(mouseX, mouseY)) {
+					color = 2139062143;
+				}
+				if(container.type == (byte) 2 && ((TrackingTablet) this.tabletItem.getItem()).isLocked(this.tabletItem))
+					color = 2012912143;
+				this.drawGradientRect(container.one.x, container.one.y, container.one.x + container.sizeX, container.one.y + container.sizeZ, color, color);
+				int type = container.type;
+				if(type == 0) {
+						mc.fontRenderer.drawString("-", container.one.x + container.sizeX / 2 - (mc.fontRenderer.getStringWidth("-") - 1) / 2, container.one.y + container.sizeZ / 2 - mc.fontRenderer.getStringWidth("-") / 2, 0xFFFFFF);
+				}else if(type == 1) {
+					
+					mc.fontRenderer.drawString("+", container.one.x + container.sizeX / 2 - (mc.fontRenderer.getStringWidth("+") - 1) / 2, container.one.y + container.sizeZ / 2 - mc.fontRenderer.getStringWidth("+") / 2, 0xFFFFFF);
+				}else if(type == 2) {
+					Minecraft.getMinecraft().getTextureManager().bindTexture(ClientProxy.getHandlerInstance().guiTextures);
+					Minecraft.getMinecraft().ingameGUI.drawModalRectWithCustomSizedTexture(container.one.x + container.sizeX / 2 - 4, container.one.y + container.sizeZ / 2 - 6, 33, 32, 9, 13, 48, 48);
+				}
 			
-			this.drawGradientRect((width / 2 - 110) + 210 - 20, (height / 2 - 123) + 210 - 20, (width / 2 - 110) + 210, (height / 2 - 123) + 210, color, color);
-			this.drawGradientRect((width / 2 - 110) + 210 - 20, (height / 2 - 123) + 188 - 20, (width / 2 - 110) + 210, (height / 2 - 123) + 188, color1, color1);
-			
-			this.drawGradientRect((width / 2 - 110) + 210 - 20, (height / 2 - 123) + 166 - 20, (width / 2 - 110) + 210, (height / 2 - 123) + 166, color2, color2);
-			Minecraft.getMinecraft().getTextureManager().bindTexture(ClientProxy.getHandlerInstance().guiTextures);
-			Minecraft.getMinecraft().ingameGUI.drawModalRectWithCustomSizedTexture((width / 2 - 110) + 210 - 15, (height / 2 - 123) + 166 - 17, 33, 32, 9, 13, 48, 48);
-			
-			mc.fontRenderer.drawString("-", (width / 2 - 110) + 210 - 9 - mc.fontRenderer.getStringWidth("-") / 2, (height / 2 - 123) + 210 - 10 - mc.fontRenderer.getStringWidth("-") / 2, 0xFFFFFF);
-			mc.fontRenderer.drawString("+", (width / 2 - 110) + 210 - 9 - mc.fontRenderer.getStringWidth("+") / 2, (height / 2 - 123) + 188 - 10 - mc.fontRenderer.getStringWidth("+") / 2, 0xFFFFFF);
+				
+			}
 			
 			RenderDinosaurInfo closest = null;
 			for (RenderDinosaurInfo render : this.renderList) {
@@ -293,49 +310,46 @@ public class TrackingTabletGui extends GuiScreen {
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		if (mouseButton == 0) {
 
-			if ((width / 2 - 110) + 8 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 8 <= mouseY && (height / 2 - 123) + 210 >= mouseY) {
+			if (isInMap(mouseX, mouseY)) {
 				this.lastMouseClicked = new Vec2d(mouseX, mouseY);
-				if(buttons(2, mouseX, mouseY))
+				if(isButton(mouseX, mouseY) != null) {
 					Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-				if (buttons(0, mouseX, mouseY) && ClientProxy.getHandlerInstance().zoom < 4) {
+				if (isButton(mouseX, mouseY).type == 1 && ClientProxy.getHandlerInstance().zoom < 4) {
 
 					ClientProxy.getHandlerInstance().zoom = ClientProxy.getHandlerInstance().zoom + 1;
-				}else if(buttons(1, mouseX, mouseY) && ClientProxy.getHandlerInstance().zoom > 1) {
-					if (!(-(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2]) <= ClientProxy
+				}else if(isButton(mouseX, mouseY).type == 0 && ClientProxy.getHandlerInstance().zoom > 1) {
+					if (!(-getRange((byte) 2) <= ClientProxy
 							.getHandlerInstance().currentOffset.y
-							&& allowedOff[ClientProxy.getHandlerInstance().getZoomFactor()
-									- 2] >= ClientProxy.getHandlerInstance().currentOffset.y)) {
+							&& getRange((byte) 2) >= ClientProxy.getHandlerInstance().currentOffset.y)) {
 
 						if (ClientProxy.getHandlerInstance().currentOffset.y > 0) {
-							ClientProxy.getHandlerInstance().currentOffset.y = allowedOff[ClientProxy.getHandlerInstance()
-									.getZoomFactor() - 2];
+							ClientProxy.getHandlerInstance().currentOffset.y = getRange((byte) 2);
 						} else {
-							ClientProxy.getHandlerInstance().currentOffset.y = -allowedOff[ClientProxy.getHandlerInstance()
-									.getZoomFactor() - 2];
+							ClientProxy.getHandlerInstance().currentOffset.y = -getRange((byte) 2);
 						}
 
 					}
 
-					if (!(-(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2]) <= ClientProxy
+					if (!(-getRange((byte) 2) <= ClientProxy
 							.getHandlerInstance().currentOffset.x
-							&& allowedOff[ClientProxy.getHandlerInstance().getZoomFactor()
-									- 2] >= ClientProxy.getHandlerInstance().currentOffset.x)) {
+							&& getRange((byte) 2) >= ClientProxy.getHandlerInstance().currentOffset.x)) {
 
 						if (ClientProxy.getHandlerInstance().currentOffset.x > 0) {
-							ClientProxy.getHandlerInstance().currentOffset.x = allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2];
+							ClientProxy.getHandlerInstance().currentOffset.x = getRange((byte) 2);
 						} else {
-							ClientProxy.getHandlerInstance().currentOffset.x = -allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2];
+							ClientProxy.getHandlerInstance().currentOffset.x = -getRange((byte) 2);
 						}
 
 					}
 					if (ClientProxy.getHandlerInstance().zoom - 1 >= this.initZoom)
 						ClientProxy.getHandlerInstance().zoom = ClientProxy.getHandlerInstance().zoom - 1;
 				
-				}else if(buttons(3, mouseX, mouseY)) {
+				}else if(isButton(mouseX, mouseY).type == 2) {
 					((TrackingTablet) this.tabletItem.getItem()).setLocked(this.tabletItem, Boolean.logicalXor(((TrackingTablet) this.tabletItem.getItem()).isLocked(this.tabletItem), true), ClientProxy.getHandlerInstance().currentOffset.x + this.player.posX, ClientProxy.getHandlerInstance().currentOffset.y + this.player.posZ);
 					JurassiCraft.NETWORK_WRAPPER.sendToServer(new TabletGuiMessage((byte) 0, (byte)this.hand.ordinal(), ClientProxy.getHandlerInstance().currentOffset.x + this.player.posX, ClientProxy.getHandlerInstance().currentOffset.y + this.player.posZ));
 						
 				}
+			}
 			}
 		}
 		super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -346,17 +360,13 @@ public class TrackingTabletGui extends GuiScreen {
 		if(!((TrackingTablet) this.tabletItem.getItem()).isLocked(this.tabletItem)) {
 		if (clickedMouseButton == 0) {
 
-			if ((width / 2 - 110) + 8 <= mouseX && (width / 2 - 110) + 210 >= mouseX && (height / 2 - 123) + 8 <= mouseY
-					&& (height / 2 - 123) + 210 >= mouseY && !buttons(2, mouseX, mouseY)) {
+			if (isInMap(mouseX, mouseY) && isButton(mouseX, mouseY) == null) {
 				Vec2d newVector = new Vec2d(
 						ClientProxy.getHandlerInstance().currentOffset.x
 								+ (lastMouseClicked.x - mouseX) / ClientProxy.getHandlerInstance().getZoomFactor(),
 						ClientProxy.getHandlerInstance().currentOffset.y
 								+ (lastMouseClicked.y - mouseY) / ClientProxy.getHandlerInstance().getZoomFactor());
-				if (-(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1]) <= newVector.y
-						&& allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1] >= newVector.y
-						&& -(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1]) <= newVector.x
-						&& allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 1] >= newVector.x) {
+				if (inRange(getRange((byte) 1), newVector.x, newVector.y)) {
 					ClientProxy.getHandlerInstance().currentOffset = newVector;
 				}
 				this.lastMouseClicked = new Vec2d(mouseX, mouseY);
@@ -378,15 +388,14 @@ public class TrackingTabletGui extends GuiScreen {
 			float relY = lastMouseUpPos.y;
 
 			if (ClientProxy.getHandlerInstance().getZoomFactor() == initZoom && !((TrackingTablet) this.tabletItem.getItem()).isLocked(this.tabletItem)) {
-
 				ClientProxy.getHandlerInstance().currentOffset.x = (float) MathHelper.clamp(
 						ClientProxy.getHandlerInstance().currentOffset.x + relX * 0.75,
-						-allowedOff[ClientProxy.getHandlerInstance().getZoomFactor()],
-						allowedOff[ClientProxy.getHandlerInstance().getZoomFactor()]);
+						-getRange((byte) 0),
+						getRange((byte) 0));
 				ClientProxy.getHandlerInstance().currentOffset.y = (float) MathHelper.clamp(
 						ClientProxy.getHandlerInstance().currentOffset.y + relY * 0.75,
-						-allowedOff[ClientProxy.getHandlerInstance().getZoomFactor()],
-						allowedOff[ClientProxy.getHandlerInstance().getZoomFactor()]);
+						-getRange((byte) 0),
+						getRange((byte) 0));
 
 			}
 
@@ -394,27 +403,24 @@ public class TrackingTabletGui extends GuiScreen {
 
 		} else if (wheel < 0 && ClientProxy.getHandlerInstance().zoom > 1) {
 			if(!((TrackingTablet) this.tabletItem.getItem()).isLocked(this.tabletItem)) {
-			if (!(-(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2]) <= ClientProxy.getHandlerInstance().currentOffset.y && allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2] >= ClientProxy.getHandlerInstance().currentOffset.y)) {
+			if (!(-getRange((byte) 2) <= ClientProxy.getHandlerInstance().currentOffset.y && getRange((byte) 2) >= ClientProxy.getHandlerInstance().currentOffset.y)) {
 
 				if (ClientProxy.getHandlerInstance().currentOffset.y > 0) {
-					ClientProxy.getHandlerInstance().currentOffset.y = allowedOff[ClientProxy.getHandlerInstance()
-							.getZoomFactor() - 2];
+					ClientProxy.getHandlerInstance().currentOffset.y = getRange((byte) 2);
 				} else {
-					ClientProxy.getHandlerInstance().currentOffset.y = -allowedOff[ClientProxy.getHandlerInstance()
-							.getZoomFactor() - 2];
+					ClientProxy.getHandlerInstance().currentOffset.y = -getRange((byte) 2);
 				}
 
 			}
 
-			if (!(-(allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2]) <= ClientProxy
+			if (!(-getRange((byte) 2) <= ClientProxy
 					.getHandlerInstance().currentOffset.x
-					&& allowedOff[ClientProxy.getHandlerInstance().getZoomFactor()
-							- 2] >= ClientProxy.getHandlerInstance().currentOffset.x)) {
+					&& getRange((byte) 2) >= ClientProxy.getHandlerInstance().currentOffset.x)) {
 
 				if (ClientProxy.getHandlerInstance().currentOffset.x > 0) {
-					ClientProxy.getHandlerInstance().currentOffset.x = allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2];
+					ClientProxy.getHandlerInstance().currentOffset.x = getRange((byte) 2);
 				} else {
-					ClientProxy.getHandlerInstance().currentOffset.x = -allowedOff[ClientProxy.getHandlerInstance().getZoomFactor() - 2];
+					ClientProxy.getHandlerInstance().currentOffset.x = -getRange((byte) 2);
 				}
 
 			}
@@ -430,4 +436,38 @@ public class TrackingTabletGui extends GuiScreen {
 		drawTexturedModalRect((width - xSize) / 2, (height - ySize) / 2, 0, 0, xSize, ySize);
 	}
 
+}
+
+class ButtonContainer {
+	
+	public final Vec2i one;
+	public final int sizeX;
+	public final int sizeZ;
+	public final byte type;
+	
+	public ButtonContainer(int x1, int y1, int sizeX, int sizeZ, byte type) {
+		this.one = new Vec2i(x1, y1);
+		this.sizeX = sizeX;
+		this.sizeZ = sizeZ;
+		this.type = type;
+	}
+
+	public boolean selected(int mouseX, int mouseY) {
+		return this.one.x <= mouseX && this.one.x + this.sizeX >= mouseX && this.one.y <= mouseY && this.one.y + sizeZ >= mouseY;
+	}
+
+}
+
+class Vec2i {
+	
+	public int x;
+    public int y;
+    public Vec2i(int xIn, int yIn)
+    {
+        this.x = xIn;
+        this.y = yIn;
+    }
+	public static double distance(int x1, int z1, int x2, int z2) {
+		return Math.sqrt((z1 - z2) * (z1 - z2) + (x1 - x2) * (x1 - x2));
+	}
 }

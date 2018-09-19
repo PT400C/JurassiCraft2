@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 public class TabletMovingObjects {
-	
+
 	public double getPlayerOffX(EntityPlayer p, ItemStack stack) {
 		if(((TrackingTablet) stack.getItem()).isLocked(stack)) {
 			ClientProxy.getHandlerInstance().currentOffset.x = 0;
@@ -29,9 +29,8 @@ public class TabletMovingObjects {
 		return p.posZ + ClientProxy.getHandlerInstance().currentOffset.y;
 	}
 	public void renderDinosaurIcon(RenderDinosaurInfo e, EntityPlayer p, double X, double Z) {
-		
-		double offX = e.x - X;
-		double offZ =  -(e.z - Z); 
+		double offX = (-X + (double)e.x);
+		double offZ = -((double)e.z - Z); 
 		GL11.glPushMatrix();
 		GlStateManager.color(1f, 1f, 1f, 1f);
 		GlStateManager.translate((double) (offX * ClientProxy.getHandlerInstance().getZoomFactor()), (double) (offZ * ClientProxy.getHandlerInstance().getZoomFactor()), (double) 0.0);
