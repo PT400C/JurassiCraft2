@@ -3,3 +3,5 @@
 *Fixed that decayable JC leaves are loosing that property after some time
 *Fixed a rare crash problem with the dart gun
 -Removed the JurassiCraft Iron Nugget
+*Fixed a lighting issue with the attraction signs
+*Fixed another rare crash with dinosaurs when attacking other creatures
