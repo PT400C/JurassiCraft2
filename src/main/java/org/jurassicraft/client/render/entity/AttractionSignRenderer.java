@@ -45,11 +45,12 @@ public class AttractionSignRenderer implements IRenderFactory<AttractionSignEnti
             GlStateManager.scale(scale, scale, scale);
 
             if (HAS_COMPILED) {
+            	this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), type.sizeX, type.sizeY, true);
                 GlStateManager.callList(DISPLAY_LIST);
             } else {
                 DISPLAY_LIST = GLAllocation.generateDisplayLists(1);
                 GlStateManager.glNewList(DISPLAY_LIST, GL11.GL_COMPILE);
-                this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), type.sizeX, type.sizeY);
+                this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), type.sizeX, type.sizeY, false);
                 GlStateManager.glEndList();
 
                 HAS_COMPILED = true;
@@ -70,7 +71,7 @@ public class AttractionSignRenderer implements IRenderFactory<AttractionSignEnti
             return entity.type.texture;
         }
 
-        private void renderLayer(AttractionSignEntity entity, int width, int height, int textureWidth, int textureHeight) {
+        private void renderLayer(AttractionSignEntity entity, int width, int height, int textureWidth, int textureHeight, boolean lighting) {
             float centerWidth = (float) -textureWidth / 2.0F;
             float centerHeight = (float) -textureHeight;
             float pixelSize = 0.0625F;
@@ -83,7 +84,9 @@ public class AttractionSignRenderer implements IRenderFactory<AttractionSignEnti
                     float minX = centerWidth + x / pixelSize;
                     float maxY = centerHeight + (y + 1) / pixelSize;
                     float minY = centerHeight + y / pixelSize;
+                    if(lighting) {
                     this.setLightmap(entity, (maxX + minX) / 2.0F, (maxY + minY) / 2.0F);
+                    }else {
                     float maxTextureX = (textureWidth - x / pixelSize) / textureWidth;
                     float minTextureX = (textureWidth - (x + 1) / pixelSize) / textureWidth;
                     float maxTextureY = (textureHeight - y / pixelSize) / textureHeight;
@@ -137,6 +140,7 @@ public class AttractionSignRenderer implements IRenderFactory<AttractionSignEnti
                         buffer.pos(maxX, i - 1.0F, 0.0F).tex(minTextureX, maxTextureY + 0.5F).normal(0.0F, 0.0F, -1.0F).endVertex();
                         tessellator.draw();
                     }
+                }
                 }
             }
         }

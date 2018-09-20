@@ -57,6 +57,7 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
             this.bindTexture(texture);
 
             if (HAS_COMPILED) {
+            	this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), entity.getWidthPixels(), entity.getHeightPixels(), true);
                 GlStateManager.callList(DISPLAY_LIST);
             } else {
                 DISPLAY_LIST = GLAllocation.generateDisplayLists(1);
@@ -64,7 +65,7 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
                 float scale = 0.0625F;
                 GlStateManager.scale(scale, scale, scale);
 
-                this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), entity.getWidthPixels(), entity.getHeightPixels());
+                this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), entity.getWidthPixels(), entity.getHeightPixels(), false);
                 GlStateManager.glEndList();
 
                 HAS_COMPILED = true;
@@ -81,7 +82,7 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
             return null;
         }
 
-        private void renderLayer(PaddockSignEntity entity, int width, int height, int textureWidth, int textureHeight) {
+        private void renderLayer(PaddockSignEntity entity, int width, int height, int textureWidth, int textureHeight, boolean lighting) {
             float centerWidth = (float) -textureWidth / 2.0F;
             float centerHeight = (float) -textureHeight / 2.0F;
             float pixelSize = 0.0625F;
@@ -94,7 +95,9 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
                     float minX = centerWidth + x / pixelSize;
                     float maxY = centerHeight + (y + 1) / pixelSize;
                     float minY = centerHeight + y / pixelSize;
+                    if(lighting) {
                     this.setLightmap(entity, (maxX + minX) / 2.0F, (maxY + minY) / 2.0F);
+                    }else {
                     float maxTextureX = (textureWidth - x / pixelSize) / textureWidth;
                     float minTextureX = (textureWidth - (x + 1) / pixelSize) / textureWidth;
                     float maxTextureY = (textureHeight - y / pixelSize) / textureHeight;
@@ -148,6 +151,7 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
                         buffer.pos(maxX, i + 0.125F, depth).tex(minTextureX, minTextureY + 0.5F).normal(0.0F, 0.0F, -1.0F).endVertex();
                         buffer.pos(maxX, i + 0.125F, 0.0F).tex(minTextureX, maxTextureY + 0.5F).normal(0.0F, 0.0F, -1.0F).endVertex();
                         tessellator.draw();
+                    }
                     }
                 }
             }

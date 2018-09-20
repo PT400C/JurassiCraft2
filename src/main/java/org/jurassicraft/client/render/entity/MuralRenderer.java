@@ -40,13 +40,13 @@ public class MuralRenderer extends Render<MuralEntity> {
         GlStateManager.scale(scale, scale, scale);
 
         Integer displayList = DISPLAY_LIST.get(type);
-
         if (displayList != null) {
+        	this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), type.sizeX, type.sizeY, true);
             GlStateManager.callList(displayList);
         } else {
             displayList = GLAllocation.generateDisplayLists(1);
             GlStateManager.glNewList(displayList, GL11.GL_COMPILE);
-            this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), type.sizeX, type.sizeY);
+            this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), type.sizeX, type.sizeY, false);
             GlStateManager.glEndList();
 
             DISPLAY_LIST.put(type, displayList);
@@ -63,7 +63,7 @@ public class MuralRenderer extends Render<MuralEntity> {
         return entity.type.texture;
     }
 
-    private void renderLayer(MuralEntity entity, int width, int height, int textureWidth, int textureHeight) {
+    private void renderLayer(MuralEntity entity, int width, int height, int textureWidth, int textureHeight, boolean lighting) {
         float centerWidth = (float) -textureWidth / 2.0F;
         float centerHeight = (float) -textureHeight / 2.0F;
         float pixelSize = 0.0625F;
@@ -76,7 +76,9 @@ public class MuralRenderer extends Render<MuralEntity> {
                 float minX = centerWidth + x / pixelSize;
                 float maxY = -textureHeight + (y + 1) / pixelSize;
                 float minY = -textureHeight + y / pixelSize;
-                this.setLightmap(entity, (maxX + minX) / 2.0F, (maxY + minY) / 2.0F);
+                if(lighting) {
+                	  this.setLightmap(entity, (maxX + minX) / 2.0F, (maxY + minY) / 2.0F);
+                }else{
                 float maxTextureX = (textureWidth - x / pixelSize) / textureWidth;
                 float minTextureX = (textureWidth - (x + 1) / pixelSize) / textureWidth;
                 float maxTextureY = (textureHeight - y / pixelSize) / textureHeight;
@@ -131,6 +133,7 @@ public class MuralRenderer extends Render<MuralEntity> {
                     buffer.pos(maxX, i + 1, 0.0F).tex(minTextureX, maxTextureY + 0.5F).normal(0.0F, 0.0F, -1.0F).endVertex();
                     tessellator.draw();
                 }
+            }
             }
         }
     }
