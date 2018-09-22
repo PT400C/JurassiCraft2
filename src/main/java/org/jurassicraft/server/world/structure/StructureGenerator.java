@@ -129,7 +129,7 @@ public abstract class StructureGenerator extends WorldGenerator {
                     do {
                         world.setBlockState(setpos, this.getFillerState());
                         setpos = setpos.down();
-                    } while (world.getBlockState(setpos).getBlock().isReplaceable(world, setpos));
+                    } while (world.getBlockState(setpos).getBlock().isReplaceable(world, setpos) && setpos.getY() >= 0);
                 }
             }
         }

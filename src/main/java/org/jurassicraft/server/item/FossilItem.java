@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-
 import com.google.common.collect.Lists;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -19,7 +18,6 @@ import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.plant.PlantHandler;
 import org.jurassicraft.server.tab.TabHandler;
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -40,7 +38,6 @@ public class FossilItem extends Item implements GrindableItem {
     public FossilItem(String type, boolean fresh) {
         this.type = type.toLowerCase(Locale.ENGLISH).replaceAll(" ", "_");
         this.fresh = fresh;
-
         this.setHasSubtypes(true);
 
         this.setCreativeTab(TabHandler.FOSSILS);
@@ -51,6 +48,7 @@ public class FossilItem extends Item implements GrindableItem {
             String[] boneTypes = dinosaur.getBones();
 
             for (String boneType : boneTypes) {
+            	
                 List<Dinosaur> dinosaursWithType = fossilDinosaurs.get(boneType);
 
                 if (dinosaursWithType == null) {
@@ -58,12 +56,13 @@ public class FossilItem extends Item implements GrindableItem {
                 }
 
                 dinosaursWithType.add(dinosaur);
-
+        
                 fossilDinosaurs.put(boneType, dinosaursWithType);
+            	
             }
         }
     }
-
+    
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
         Dinosaur dinosaur = this.getDinosaur(stack);
@@ -89,7 +88,7 @@ public class FossilItem extends Item implements GrindableItem {
         List<Dinosaur> dinosaursForType = fossilDinosaurs.get(this.type);
         if(this.isInCreativeTab(tab))
         for (Dinosaur dinosaur : dinosaurs) {
-            if (dinosaursForType.contains(dinosaur) && !(!this.fresh && dinosaur instanceof Hybrid)) {
+           if (dinosaursForType.contains(dinosaur) && !(!this.fresh && dinosaur instanceof Hybrid)) {
                 subtypes.add(new ItemStack(this, 1, EntityHandler.getDinosaurId(dinosaur)));
             }
         }

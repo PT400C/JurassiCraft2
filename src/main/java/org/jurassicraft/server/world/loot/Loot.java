@@ -2,11 +2,14 @@ package org.jurassicraft.server.world.loot;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootEntry;
@@ -25,11 +28,15 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
+import org.jurassicraft.server.entity.FlyingDinosaurEntity;
 import org.jurassicraft.server.genetics.DinoDNA;
 import org.jurassicraft.server.genetics.GeneticsHelper;
+import org.jurassicraft.server.item.DisplayBlockItem;
+import org.jurassicraft.server.item.FossilItem;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.plant.Plant;
 import org.jurassicraft.server.plant.PlantHandler;
+import org.omg.PortableServer.POAHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +59,7 @@ public class Loot {
     public static final DinosaurData DINOSAUR_DATA = new DinosaurData();
     public static final PlantData PLANT_DATA = new PlantData();
     public static final RandomDNA RANDOM_DNA = new RandomDNA();
+    public static final PotionData POTION_DATA = new PotionData();
     public static final RandomDNA FULL_DNA = new RandomDNA(true);
 
     private static long tableID = 0;
@@ -95,10 +103,10 @@ public class Loot {
         }
 
         if (name == LootTableList.GAMEPLAY_FISHING) {
-            LootEntry gracilaria = Loot.entry(ItemHandler.GRACILARIA).weight(25).build();
+        	LootEntry gracilaria = Loot.entry(ItemHandler.GRACILARIA).weight(25).build();
             table.addPool(Loot.pool("gracilaria").rolls(1, 1).chance(0.1F).entry(gracilaria).build());
         } else if (name == LootTableList.CHESTS_VILLAGE_BLACKSMITH || name == LootTableList.CHESTS_NETHER_BRIDGE || name == LootTableList.CHESTS_SIMPLE_DUNGEON || name == LootTableList.CHESTS_STRONGHOLD_CORRIDOR || name == LootTableList.CHESTS_DESERT_PYRAMID || name == LootTableList.CHESTS_ABANDONED_MINESHAFT) {
-            LootEntry plantFossil = Loot.entry(ItemHandler.PLANT_FOSSIL).weight(5).count(1, 3).build();
+        	LootEntry plantFossil = Loot.entry(ItemHandler.PLANT_FOSSIL).weight(5).count(1, 3).build();
             LootEntry twig = Loot.entry(ItemHandler.TWIG_FOSSIL).weight(5).count(1, 3).build();
             LootEntry amber = Loot.entry(ItemHandler.AMBER).weight(2).count(0, 1).data(0, 1).build();
             LootEntry skull = Loot.entry(ItemHandler.FOSSILS.get("skull")).weight(2).function(DINOSAUR_DATA).count(1, 2).build();
@@ -107,21 +115,27 @@ public class Loot {
 
             LootEntry[] records = Loot.entries(ItemHandler.JURASSICRAFT_THEME_DISC, ItemHandler.DONT_MOVE_A_MUSCLE_DISC, ItemHandler.TROODONS_AND_RAPTORS_DISC).buildEntries();
             table.addPool(Loot.pool("records").rolls(0, 2).entries(records).build());
-        } else if (name == Loot.VISITOR_GROUND_STORAGE) {
-            LootEntry amber = Loot.entry(ItemHandler.AMBER).data(0, 1).count(0, 3).build();
+        }
+        if(name.getResourceDomain().equals(JurassiCraft.MODID)) {
+        if (name.getResourcePath().equals(Loot.VISITOR_GROUND_STORAGE.getResourcePath())) {
+        	LootEntry amber = Loot.entry(ItemHandler.AMBER).data(0, 1).count(0, 3).build();
             LootEntry wool = Loot.entry(Blocks.WOOL).data(0, 15).count(0, 64).build();
             table.addPool(Loot.pool("items").rolls(5, 6).entries(amber, wool).build());
-        } else if (name == Loot.VISITOR_LABORATORY) {
-            LootEntry softTissue = Loot.entry(ItemHandler.SOFT_TISSUE).count(0, 3).function(DINOSAUR_DATA).build();
+        } else if (name.getResourcePath().equals(Loot.VISITOR_LABORATORY.getResourcePath())) {
+        	LootEntry softTissue = Loot.entry(ItemHandler.SOFT_TISSUE).count(0, 3).function(DINOSAUR_DATA).build();
             LootEntry plantSoftTissue = Loot.entry(ItemHandler.PLANT_SOFT_TISSUE).count(0, 3).function(PLANT_DATA).build();
             LootEntry amber = Loot.entry(ItemHandler.AMBER).data(0, 1).count(0, 5).build();
             LootEntry dna = Loot.entry(ItemHandler.DNA).function(DINOSAUR_DATA).function(RANDOM_DNA).build();
             table.addPool(Loot.pool("items").rolls(3, 4).entries(dna, softTissue, plantSoftTissue, amber).build());
-        } else if (name == Loot.VISITOR_DINING_HALL) {
+        } else if (name.getResourcePath().equals(Loot.VISITOR_DINING_HALL.getResourcePath())) {
             LootEntry amber = Loot.entry(ItemHandler.AMBER).weight(2).count(0, 1).data(0, 1).build();
             LootEntry tooth = Loot.entry(ItemHandler.FOSSILS.get("tooth")).weight(2).function(DINOSAUR_DATA).count(1, 2).build();
             LootEntry actionFigure = Loot.entry(ItemHandler.DISPLAY_BLOCK).function(DINOSAUR_DATA).weight(1).build();
             table.addPool(Loot.pool("items").rolls(8, 11).entries(amber, tooth, actionFigure).build());
+        }else if (name.getResourcePath().equals(Loot.VISITOR_KITCHEN.getResourcePath())) {
+              LootEntry waterBottle = Loot.entry(Items.POTIONITEM).count(0, 1).function(POTION_DATA).build();
+              table.addPool(Loot.pool("items").rolls(3, 4).entries(waterBottle).build());
+        }
         }
         if(frozen) { //If the table was originally frozen, then freeze it.
             table.freeze();
@@ -253,7 +267,6 @@ public class Loot {
             return entries;
         }
     }
-
     public static class DinosaurData extends LootFunction {
         public DinosaurData() {
             super(new LootCondition[0]);
@@ -266,8 +279,43 @@ public class Loot {
         @Override
         public ItemStack apply(ItemStack stack, Random rand, LootContext context) {
             List<Dinosaur> dinosaurs = EntityHandler.getRegisteredDinosaurs();
-            Dinosaur dinosaur = dinosaurs.get(rand.nextInt(dinosaurs.size()));
-            stack.setItemDamage(EntityHandler.getDinosaurId(dinosaur));
+            for(int value = 0; value < dinosaurs.size(); value++) {
+            	 Dinosaur dinosaur = dinosaurs.get(rand.nextInt(dinosaurs.size()));
+            	 if(stack.getItem() instanceof FossilItem) {
+            		 FossilItem s = (FossilItem) stack.getItem();
+                 	 if(s.fossilDinosaurs.get("tooth").contains(dinosaur)) {
+                 		 stack.setItemDamage(EntityHandler.getDinosaurId(dinosaur));
+                          return stack;
+                 	 }
+            	 }else if(stack.getItem() instanceof DisplayBlockItem) {
+            		 DisplayBlockItem s = (DisplayBlockItem) stack.getItem();
+                 		 stack.setItemDamage(s.getMetadata(EntityHandler.getDinosaurId(dinosaur), 0, false));
+                          return stack;
+            	 }else {
+            	 stack.setItemDamage(EntityHandler.getDinosaurId(dinosaur));
+                 return stack;
+            	 }
+            	
+                
+            }
+			return stack;
+           
+        }
+    }
+    
+    public static class PotionData extends LootFunction {
+        public PotionData() {
+            super(new LootCondition[0]);
+        }
+
+        public PotionData(LootCondition[] conditions) {
+            super(conditions);
+        }
+
+        @Override
+        public ItemStack apply(ItemStack stack, Random rand, LootContext context) {
+        	stack = PotionUtils.addPotionToItemStack(stack, PotionTypes.WATER);
+            stack.setItemDamage(0);
             return stack;
         }
     }

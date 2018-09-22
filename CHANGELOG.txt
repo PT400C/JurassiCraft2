@@ -5,3 +5,6 @@
 -Removed the JurassiCraft Iron Nugget
 *Fixed a lighting issue with the attraction signs
 *Fixed another rare crash with dinosaurs when attacking other creatures
+*Vines don't grow on Clear Glass anymore
+*Fixed the loot in abandoned visitor centers
+*Fixed abandoned visitor centers not spawning via command when issued on a flat world
