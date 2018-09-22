@@ -36,8 +36,6 @@ import org.jurassicraft.server.item.FossilItem;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.plant.Plant;
 import org.jurassicraft.server.plant.PlantHandler;
-import org.omg.PortableServer.POAHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

@@ -68,8 +68,8 @@ public class ServerEventHandler {
             if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.FOREST) || BiomeDictionary.hasType(biome, BiomeDictionary.Type.CONIFEROUS) || BiomeDictionary.hasType(biome, BiomeDictionary.Type.SWAMP) || BiomeDictionary.hasType(biome, BiomeDictionary.Type.JUNGLE)) {
                 if (rand.nextInt(8) == 0) {
                     BlockPos topBlock = world.getTopSolidOrLiquidBlock(pos);
-
-                    if (world.getBlockState(topBlock.down()).isOpaqueCube() && !world.getBlockState(topBlock).getMaterial().isLiquid()) {
+                    IBlockState state = world.getBlockState(topBlock);
+                    if (world.getBlockState(topBlock.down()).isOpaqueCube() && !state.getMaterial().isLiquid() && !(state.getBlock() == Blocks.GRASS || state.getBlock() == Blocks.DIRT || state.getBlock() == Blocks.FARMLAND)) {
                         world.setBlockState(topBlock, BlockHandler.MOSS.getDefaultState(), 2 | 16);
                     }
                 }
@@ -80,7 +80,8 @@ public class ServerEventHandler {
             if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.SWAMP) || BiomeDictionary.hasType(biome, BiomeDictionary.Type.JUNGLE)) {
                 if (rand.nextInt(8) == 0) {
                     BlockPos topBlock = world.getTopSolidOrLiquidBlock(pos);
-                    if (world.getBlockState(topBlock.down()).isOpaqueCube() && !world.getBlockState(topBlock).getMaterial().isLiquid()) {
+                    IBlockState state = world.getBlockState(topBlock);
+                    if (world.getBlockState(topBlock.down()).isOpaqueCube() && !state.getMaterial().isLiquid() && !(state.getBlock() == Blocks.GRASS || state.getBlock() == Blocks.DIRT || state.getBlock() == Blocks.FARMLAND)) {
                         world.setBlockState(topBlock.up(), BlockHandler.WEST_INDIAN_LILAC.getDefaultState(), 2 | 16);
                         world.setBlockState(topBlock, BlockHandler.WEST_INDIAN_LILAC.getDefaultState().withProperty(DoublePlantBlock.HALF, DoublePlantBlock.BlockHalf.LOWER), 2 | 16);
                     }
@@ -91,7 +92,8 @@ public class ServerEventHandler {
         if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.JUNGLE)) {
             if (rand.nextInt(8) == 0) {
                 BlockPos topBlock = world.getTopSolidOrLiquidBlock(pos);
-                if (world.getBlockState(topBlock.down()).isOpaqueCube() && !world.getBlockState(topBlock).getMaterial().isLiquid()) {
+            	IBlockState state = world.getBlockState(topBlock);
+                if (world.getBlockState(topBlock.down()).isOpaqueCube() && !state.getMaterial().isLiquid() && !(state.getBlock() == Blocks.GRASS || state.getBlock() == Blocks.DIRT || state.getBlock() == Blocks.FARMLAND)) {
                     world.setBlockState(topBlock.up(), BlockHandler.HELICONIA.getDefaultState(), 2 | 16);
                     world.setBlockState(topBlock, BlockHandler.HELICONIA.getDefaultState().withProperty(DoublePlantBlock.HALF, DoublePlantBlock.BlockHalf.LOWER), 2 | 16);
                 }

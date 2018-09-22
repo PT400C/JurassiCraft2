@@ -62,7 +62,7 @@ public class ClearGlassBlock extends BlockGlass {
         return world.getBlockState(pos.offset(side.getOpposite())) != world.getBlockState(pos) && super.shouldSideBeRendered(state, world, pos, side);
     }
     
-    //This causes the blocks to look weird unter water! 
+    //This causes the blocks to look weird under water! 
     @Override
     public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
     {
