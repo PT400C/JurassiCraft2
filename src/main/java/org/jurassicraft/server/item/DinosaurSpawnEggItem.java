@@ -200,6 +200,9 @@ public class DinosaurSpawnEggItem extends Item {
 
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> lore, ITooltipFlag tooltipFlag) {
+    	int mode = this.getMode(stack);
+    	Boolean type = (mode > 0 ? mode == 1 : null);
+    	lore.add(TextFormatting.GOLD + LangUtils.translate("gender.name") +": "+ LangUtils.getGenderMode(type != null ? (type == true ? 1 : 2) : 0));
         lore.add(TextFormatting.BLUE + I18n.format("lore.baby_dino.name"));
         lore.add(TextFormatting.YELLOW + I18n.format("lore.change_gender.name"));
     }

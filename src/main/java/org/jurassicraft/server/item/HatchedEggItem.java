@@ -1,5 +1,6 @@
 package org.jurassicraft.server.item;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -7,7 +8,9 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import java.util.List;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
@@ -27,11 +30,29 @@ public class HatchedEggItem extends DNAContainerItem {
 
         return LangUtils.translate(dinosaur.givesDirectBirth() ? "item.gestated.name" :"item.hatched_egg.name").replace("{dino}", LangUtils.getDinoName(dinosaur));
     }
+    
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+    	tooltip.add(TextFormatting.GOLD +LangUtils.translate("gender.name") +": "+ this.getItemGender(stack));
+    }
 
     public Dinosaur getDinosaur(ItemStack stack) {
         return EntityHandler.getDinosaurById(stack.getMetadata());
     }
 
+    public String getItemGender(ItemStack stack) {
+    	Boolean gender = null;
+        NBTTagCompound nbt = stack.getTagCompound();
+  
+        if (stack.hasTagCompound() && nbt.hasKey("Gender")) {
+
+            gender = nbt.getBoolean("Gender");
+
+        }
+       
+        return LangUtils.getGenderMode(gender != null ? (gender == true ? 1 : 2) : 0);
+    }
+    
     public boolean getGender(EntityPlayer player, ItemStack stack) {
         NBTTagCompound nbt = stack.getTagCompound();
 

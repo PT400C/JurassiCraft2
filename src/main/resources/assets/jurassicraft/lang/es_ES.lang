@@ -494,6 +494,7 @@ cage.empty.name=Vacío
 gender.male.name=Masculino
 gender.female.name=Femenino
 gender.random.name=Aleatorio
+gender.name=MISSING
 spawnegg.genderchange.name=Este Huevo se Generará en Género {mode}.
 actionfigure.genderchange.name=Esta Figura de Acción se Generará en Género {mode}.
 amber.mosquito.name=Mosquito

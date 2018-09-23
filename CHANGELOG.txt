@@ -9,3 +9,4 @@
 *Fixed the loot in abandoned visitor centers
 *Fixed abandoned visitor centers not spawning via command when issued on a flat world
 *Fixed some plants spawning in impossible areas
++JC Spawneggs, action figures and hatched eggs now display their current gender as a toolip

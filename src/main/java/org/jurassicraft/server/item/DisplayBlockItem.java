@@ -83,6 +83,15 @@ public class DisplayBlockItem extends Item {
 
         return EnumActionResult.SUCCESS;
     }
+    
+    private Boolean getGender(World world, ItemStack stack){
+    	Boolean type = null;
+    	if(world != null) {
+    	int mode = this.getVariant(stack);
+    	type = (mode > 0 ? mode == 1 : null);
+    	}
+    	return type;
+    }
 
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
@@ -146,7 +155,9 @@ public class DisplayBlockItem extends Item {
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, World world, List<String> lore, ITooltipFlag tooltipFlag) {
         if (!this.isSkeleton(stack)) {
-            lore.add(TextFormatting.BLUE + I18n.format("lore.change_gender.name"));
+        	Boolean type = getGender(world, stack);
+        	lore.add(TextFormatting.GOLD + LangUtils.translate("gender.name") +": "+ LangUtils.getGenderMode(type != null ? (type == true ? 1 : 2) : 0));
+            lore.add(TextFormatting.BLUE + LangUtils.translate("lore.change_gender.name"));
         }
     }
 
