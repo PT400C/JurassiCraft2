@@ -1,5 +1,6 @@
 package org.jurassicraft.server.event;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -18,6 +19,7 @@ import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -34,6 +36,7 @@ import org.jurassicraft.server.entity.vehicle.CarEntity;
 import org.jurassicraft.server.entity.vehicle.HelicopterEntity;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.util.GameRuleHandler;
+import org.jurassicraft.server.util.JCBlockVine;
 import org.jurassicraft.server.world.WorldGenCoal;
 import org.jurassicraft.server.world.loot.Loot;
 
@@ -46,6 +49,11 @@ public class ServerEventHandler {
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
         GameRuleHandler.register(event.getWorld());
+    }
+    
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void blockRegistry(RegistryEvent.Register<Block> e) {
+    	e.getRegistry().register(new JCBlockVine().setRegistryName("minecraft", "vine"));
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
