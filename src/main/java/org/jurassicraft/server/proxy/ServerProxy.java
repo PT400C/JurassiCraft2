@@ -67,6 +67,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.jurassicraft.server.world.structure.StructureGenerationHandler;
 
 public class ServerProxy implements IGuiHandler {
+	public static ServerEventHandler commonEvents;
     public static final int GUI_CLEANING_STATION_ID = 0;
     public static final int GUI_FOSSIL_GRINDER_ID = 1;
     public static final int GUI_DNA_SEQUENCER_ID = 2;
@@ -99,9 +100,9 @@ public class ServerProxy implements IGuiHandler {
 
         NetworkRegistry.INSTANCE.registerGuiHandler(JurassiCraft.INSTANCE, this);
 
-        ServerEventHandler eventHandler = new ServerEventHandler();
+        commonEvents = new ServerEventHandler();
         MinecraftForge.EVENT_BUS.register(new RegistryHandler());
-        MinecraftForge.EVENT_BUS.register(eventHandler);
+        MinecraftForge.EVENT_BUS.register(commonEvents);
     }
 
     public void onPostInit(FMLPostInitializationEvent event) {

@@ -45,6 +45,12 @@ import java.util.List;
 import java.util.Random;
 
 public class ServerEventHandler {
+	
+	public static ArrayList<Block> vinesException = new ArrayList<>();
+	
+	public ServerEventHandler() {
+		this.vinesException.add(BlockHandler.CLEAR_GLASS);
+	}
 
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event) {
