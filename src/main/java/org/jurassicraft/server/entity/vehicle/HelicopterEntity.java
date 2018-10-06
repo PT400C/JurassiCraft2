@@ -33,13 +33,8 @@ import javax.annotation.Nonnull;
 
 public class HelicopterEntity extends CarEntity {
 
-    private static final BlockPos INACTIVE = new BlockPos(-1, -1, -1);
-
     private static final byte UPWARD   = 0b010000;
     private static final byte DOWNWARD = 0b100000;
-    
-    private BlockPos prevPos = INACTIVE;
-
     private boolean lastDirBackwards;
     private final float MAX_POWER = 80.0F;
     private final float REQUIRED_POWER = MAX_POWER / 2.0F;
@@ -67,11 +62,11 @@ public class HelicopterEntity extends CarEntity {
         double w = 5f; // width in blocks
         double h = 3.5f; // height in blocks
         double d = 8f; // depth in blocks
-        this.setEntityBoundingBox(new AxisAlignedBB( 0, 0, 0, w, h, d));
+        this.setEntityBoundingBox(new AxisAlignedBB(0, 0, 0, w, h, d));
         this.setSize(5f, 3.5f);
         this.speedModifier = 1.5f;
         this.isFlying = false;
-        this.direction = new MutableVec3(0,1,0);
+        this.direction = new MutableVec3(0, 1, 0);
     }
     
     public boolean upward() {
@@ -103,7 +98,7 @@ public class HelicopterEntity extends CarEntity {
         Seat frontLeft = new Seat(-0.55F, -0.34F, 0.1F, 0.5F, 0.25F);
         Seat frontRight = new Seat(0.55F, -0.34F, 0.1F, 0.5F, 0.25F);
         Seat backLeft = new Seat( 0.4F, 0.25F, -1F, 0.5F, 0.25F);
-        Seat backReft = new Seat( -0.4F, 0.25F, -1F, 0.5F, 0.25F);
+        Seat backReft = new Seat(-0.4F, 0.25F, -1F, 0.5F, 0.25F);
         return new Seat[] { middle, frontLeft, frontRight, backLeft, backReft};
     }
 
@@ -117,9 +112,11 @@ public class HelicopterEntity extends CarEntity {
         BlockPos startPos = this.getPosition();
      //   this.setPosition(this.posX, this.posY, this.posZ); //Make sure that the car is in the right position. Can cause issues when changing size of car
        //Why is that needed?
-        if(!startPos.equals(this.getPosition())) {
-            prevPos = this.getPosition();
-        }
+      
+        
+        //  if(!startPos.equals(this.getPosition())) {
+       //     prevPos = this.getPosition();
+     //   }
         super.onUpdate();
     }
 
@@ -160,7 +157,7 @@ public class HelicopterEntity extends CarEntity {
             seat.getOccupant().fallDistance = 0;
         }
         }
-        if (this.forward() && this.isFlying) {
+        if (forward() && this.isFlying) {
             this.rotationAmount += 1f;
         } else if (this.backward() && this.isFlying) {
             this.rotationAmount -= 1f;
@@ -262,8 +259,9 @@ public class HelicopterEntity extends CarEntity {
         }else{
             this.gearLift -= 0.02f;
         }
-        if(world.getBlockState(new BlockPos.MutableBlockPos((int)Math.floor( this.posX), (int)Math.floor( this.posY - 10f), (int)Math.floor( this.posZ))).getBlock() != Blocks.AIR){
-            this.shouldGearLift = false;
+       
+        if(this.getPosition().getY() - 10 < world.getChunkFromBlockCoords(this.getPosition()).getPrecipitationHeight(this.getPosition()).getY()){
+        	this.shouldGearLift = false;
         }else{
             this.shouldGearLift = true;
         }
@@ -294,13 +292,13 @@ public class HelicopterEntity extends CarEntity {
     @Override
     protected void writeEntityToNBT(NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
-        compound.setLong("PrevBlockPosition", this.prevPos.toLong());
+        //compound.setLong("PrevBlockPosition", this.prevPos.toLong());
     }
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound) {
         super.readEntityFromNBT(compound);
-        this.prevPos = BlockPos.fromLong(compound.getLong("PrevBlockPosition"));
+        //this.prevPos = BlockPos.fromLong(compound.getLong("PrevBlockPosition"));
     }
 
     @Override

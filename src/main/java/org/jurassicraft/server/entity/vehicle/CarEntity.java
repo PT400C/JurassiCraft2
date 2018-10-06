@@ -114,6 +114,8 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     
     public double estimatedSpeed = 0D;
     
+	private byte prevState = 0;
+    
     public CarEntity(World world) {
         super(world);
         this.setSize(3.0F, 2.5F);
@@ -185,10 +187,20 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         return this.dataManager.get(WATCHER_STATE);
         
     }
+    
+    public byte getPreviousState() {
+
+        return this.prevState;
+        
+    }
 
     public void setControlState(byte state) {
     	
         this.dataManager.set(WATCHER_STATE, state);
+    }
+    
+    public void setPreviousState(byte state) {
+        this.prevState = state;
     }
     
     public void setSpeed(Speed speed) {
@@ -469,21 +481,14 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         }
         EntityPlayerSP player = (EntityPlayerSP) driver;
         MovementInput movementInput = player.movementInput;
-        byte previous = this.getControlState();
         this.left(movementInput.leftKeyDown);
         this.right(movementInput.rightKeyDown);
         this.forward(movementInput.forwardKeyDown);
         this.backward(movementInput.backKeyDown);
-        boolean newSpeed = false;
-        for(Speed speed : Speed.values()) {
-            if(Keyboard.isKeyDown(speed.keyboardInput)) {
-                this.setSpeed(speed);
-                newSpeed = true;
-            }
-        }
-        if (this.getControlState() != previous || newSpeed) {
+        if (this.getControlState() != this.getPreviousState()) {
             JurassiCraft.NETWORK_WRAPPER.sendToServer(new UpdateVehicleControlMessage(this));
         }
+        this.setPreviousState(this.getControlState());
     }
 
     protected void applyMovement() {
@@ -852,15 +857,13 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     
     public enum Speed {
         //The modifiers ARE hardcoded. If you want to change them, please talk to me first. The tyre mark code relies on the modifiers being how they are
-        SLOW(Keyboard.KEY_LMENU, 0.5f),
-        MEDIUM(Keyboard.KEY_SPACE, 1f),
-        FAST(Keyboard.KEY_RMENU, 2f);
+        SLOW(0.5f),
+        MEDIUM(1f),
+        FAST(2f);
 
-        public final int keyboardInput;
         public final float modifier;
 
-        Speed(int keyboardInput, float modifier) {
-            this.keyboardInput = keyboardInput;
+        Speed(float modifier) {
             this.modifier = modifier;
         }
     }
