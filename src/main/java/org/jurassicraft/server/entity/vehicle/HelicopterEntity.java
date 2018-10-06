@@ -126,13 +126,21 @@ public class HelicopterEntity extends CarEntity {
 
     }
 
+    private boolean isController(EntityPlayer e) {
+    	if(this.getControllingPassenger() != null && this.getControllingPassenger().getUniqueID() == e.getUniqueID()) {
+    		return true;
+    	}
+    	return false;
+    }
     
     @Override
     protected void handleControl() {
     	
-    	this.upward(ClientProxy.getKeyHandler().HELICOPTER_UP.isKeyDown());
-        this.downward(ClientProxy.getKeyHandler().HELICOPTER_DOWN.isKeyDown());
-        super.handleControl();
+    	if(isController(Minecraft.getMinecraft().player)) {
+    		this.upward(ClientProxy.getKeyHandler().HELICOPTER_UP.isKeyDown());
+    		this.downward(ClientProxy.getKeyHandler().HELICOPTER_DOWN.isKeyDown());
+    		super.handleControl();
+    	}
     }
 
     @Override
