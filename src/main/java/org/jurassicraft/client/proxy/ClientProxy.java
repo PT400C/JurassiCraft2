@@ -24,7 +24,8 @@ import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.client.gui.*;
 import org.jurassicraft.client.model.JurassicraftTabulaModelHandler;
 import org.jurassicraft.client.render.RenderingHandler;
-import org.jurassicraft.client.sound.CarSound;
+import org.jurassicraft.client.sound.SoundHandler;
+import org.jurassicraft.client.sound.VehicleSound;
 import org.jurassicraft.server.block.entity.*;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.VenomEntity;
@@ -164,7 +165,11 @@ public class ClientProxy extends ServerProxy {
     }
 
     public static void playCarSound(CarEntity entity) {
-        MC.getSoundHandler().playSound(new CarSound(entity));
+        MC.getSoundHandler().playSound(new VehicleSound(entity, SoundHandler.CAR_MOVE));
+    }
+    
+    public static void playHelicopterSound(CarEntity entity) {
+        MC.getSoundHandler().playSound(new VehicleSound(entity, SoundHandler.CAR_MOVE));
     }
 
     public static void stopSound(ISound sound) {

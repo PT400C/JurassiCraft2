@@ -66,6 +66,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     private static final byte FORWARD  = 0b000100;
     private static final byte BACKWARD = 0b001000;
 
+    //TODO Recode that system
     protected final Seat[] seats = createSeats();
     protected final WheelData wheeldata = createWheels();
     
@@ -235,7 +236,11 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 
     @Override
     public Entity getControllingPassenger() {
-        return this.seats[0].occupant;
+        return this.getPassengers().isEmpty() ? null : this.getPassengers().get(0);
+    }
+    
+    public Entity getSeatController() {
+        return this.seats[0].getOccupant();
     }
     
     @Override
@@ -283,9 +288,45 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 		 }
     }
     
+	@Override
+	public void fall(float distance, float damageMultiplier) {
+		
+		if (!world.isRemote) {
+			float damage = MathHelper.ceil((distance - 3F) * damageMultiplier);
+			
+			if (damage > 0) {
+				this.setHealth(this.getHealth() - (float) (damage * 1.25F));
+				
+				if (this.getHealth() < 0) {
+					this.setDead();
+					
+					if (this.world.getGameRules().getBoolean("doEntityDrops")) {
+						
+						this.dropItems();
+						ItemStack recordItem = this.dataManager.get(RECORD_ITEM);
+						if (!recordItem.isEmpty()) {
+							this.entityDropItem(recordItem, 0);
+						}
+					}
+				}
+			}
+		}
+	}
+    
     @Override
     public void onEntityUpdate() {
-    	 if (!world.isRemote) {
+    	if (!world.isRemote) {
+    	 if (this.getHealth() < 0 && !this.isDead) {
+             this.setDead();
+             if (this.world.getGameRules().getBoolean("doEntityDrops")) {
+                 this.dropItems();
+                 ItemStack recordItem = this.dataManager.get(RECORD_ITEM);
+                 if(!recordItem.isEmpty()) {
+                     this.entityDropItem(recordItem, 0);
+                 }
+             }
+         }
+    	
         	 for(Seat seat : this.seats){
         		 if(seat.getOccupant() != null && seat.getOccupant() instanceof EntityPlayerMP) {
         			 resetFlyTicks((EntityPlayerMP) seat.getOccupant());
@@ -313,28 +354,10 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
                     seat.getOccupant().attackEntityFrom(DamageSource.DROWN, 0.5f);
                 }
             }
+            this.setHealth(this.getHealth() - 0.25F);
         }
         if(previousPosition == null) {
             previousPosition = this.getPositionVector();
-        }
-        if(!this.onGround){
-            if(!this.wasOnGroundLastTick) {
-                this.prevUnairbornPos = this.previousPosition;
-                this.wasOnGroundLastTick = true;
-            }
-            double amountFallen = this.prevUnairbornPos.y - this.getPositionVector().y;
-            double damageAmount = 0;
-            if(amountFallen / 3 == Math.floor(amountFallen / 3)){
-                damageAmount++;
-            }
-            for (Seat seat : seats) {
-                if(seat.getOccupant() != null) {
-                    if (this.onGround) {
-                        seat.getOccupant().attackEntityFrom(DamageSource.FALL, (float) damageAmount / 2);
-                    }
-                }
-            }
-            this.setHealth(this.getHealth() - (float)(damageAmount * 2.5));
         }
         estimatedSpeed = this.getPositionVector().distanceTo(previousPosition) / (world.getTotalWorldTime() - prevWorldTime);
         previousPosition = this.getPositionVector();
@@ -392,7 +415,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     }
     
     protected void createWheelParticles(CarWheel wheel) {
-	this.createWheelParticles(wheel, false);
+    	this.createWheelParticles(wheel, false);
     }
     
     protected void createWheelParticles(CarWheel wheel, boolean runBetween) {
@@ -426,9 +449,9 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 
     }
     
-    protected boolean shouldTyresRender() {
-	return this.getSpeed() != Speed.SLOW;
-    }
+	protected boolean shouldTyresRender() {
+		return this.getSpeed() != Speed.SLOW;
+	}
 
     @Override
     public void onUpdate() {
@@ -463,37 +486,45 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         this.doBlockCollisions();
     }
 
-    private void updateMotion() {
-        final double resist = 0.8F;
-        this.motionX *= resist;
-        this.motionY *= resist;
-        this.motionZ *= resist;
-        this.rotationDelta *= resist;
-        if(!this.hasNoGravity())
-            this.motionY -= 0.15F;
+	private void updateMotion() {
+		final double resist = 0.8F;
+		this.motionX *= resist;
+		this.motionY *= resist;
+		this.motionZ *= resist;
+		this.rotationDelta *= resist;
+		if (!this.hasNoGravity())
+			this.motionY -= 0.15F;
 
-    }
+	}
 
-    protected void handleControl() {
-        Entity driver = this.getControllingPassenger();
-        if (!(driver instanceof EntityPlayer) || !((EntityPlayer) driver).isUser()) {
-            return;
-        }
-        EntityPlayerSP player = (EntityPlayerSP) driver;
-        MovementInput movementInput = player.movementInput;
-        this.left(movementInput.leftKeyDown);
-        this.right(movementInput.rightKeyDown);
-        this.forward(movementInput.forwardKeyDown);
-        this.backward(movementInput.backKeyDown);
-        if (this.getControlState() != this.getPreviousState()) {
-            JurassiCraft.NETWORK_WRAPPER.sendToServer(new UpdateVehicleControlMessage(this));
-        }
-        this.setPreviousState(this.getControlState());
-    }
+	protected void handleControl() {
+		
+		Entity driver = this.getSeatController();
+		if (driver != null)
+			driver = this.getControllingPassenger();
+		if (!(driver instanceof EntityPlayer) || !((EntityPlayer) driver).isUser()) {
+			return;
+		}
+		EntityPlayerSP player = (EntityPlayerSP) driver;
+		MovementInput movementInput = player.movementInput;
+		if (this.isInWater()) {
+			this.setControlState((byte) 0);
+		} else {
 
-    protected void applyMovement() {
+			this.left(movementInput.leftKeyDown);
+			this.right(movementInput.rightKeyDown);
+			this.forward(movementInput.forwardKeyDown);
+			this.backward(movementInput.backKeyDown);
+		}
+		if (this.getControlState() != this.getPreviousState()) {
+			JurassiCraft.NETWORK_WRAPPER.sendToServer(new UpdateVehicleControlMessage(this));
+		}
+		this.setPreviousState(this.getControlState());
+
+	}
+
+	protected void applyMovement() {
 	    Speed speed = this.getSpeed();
-        
 	    float moveAmount = 0.0f;
         if ((this.left() || this.right()) && !(this.forward() || this.backward())) {
             moveAmount += 0.05F;
@@ -605,21 +636,15 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         return true;
     }
     
-    @Override
-    protected void addPassenger(Entity passenger) {
-        super.addPassenger(passenger);
-        if(passenger instanceof EntityPlayerMP) {
-        	resetFlyTicks((EntityPlayerMP) passenger);
-        }
-        if (passenger instanceof EntityPlayer && !(this.getControllingPassenger() instanceof EntityPlayer)) {
-            Entity existing = this.seats[0].occupant;
-            this.seats[0].occupant = passenger;
-            this.usherPassenger(existing, 1);
-        } else {
-            this.usherPassenger(passenger, 0);
-        }
-    }
-
+	@Override
+	protected void addPassenger(Entity passenger) {
+		super.addPassenger(passenger);
+		if (passenger instanceof EntityPlayerMP) {
+			resetFlyTicks((EntityPlayerMP) passenger);
+		}
+		this.usherPassenger(passenger, 0);
+	}
+    
     private void usherPassenger(Entity passenger, int start) {
         for (int i = start; i < this.seats.length; i++) {
             if(this.tryPutInSeat(passenger, i)) {
@@ -628,22 +653,27 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         }
     }
 
-    @Override
-    public boolean tryPutInSeat(Entity passenger, int seatID) {
-        if(seatID < this.seats.length && seatID >= 0) {
-            Seat seat = this.seats[seatID];
-            if (seat.occupant == null && seat.predicate.test(passenger)) {
-                for(Seat seat1 : this.seats) {
-                    if(seat1.occupant == passenger) {
-                        seat1.occupant = null;
-                    }
-                }
-                seat.occupant = passenger;
-                return true;
-            }
-        }
-        return false;
-    }
+	@Override
+	public boolean tryPutInSeat(Entity passenger, int seatID) {
+		if (this.seats[0].occupant == passenger) {
+			this.setControlState((byte) 0);
+		}
+		if (seatID < this.seats.length && seatID >= 0) {
+			Seat seat = this.seats[seatID];
+			if (seat.occupant == null && seat.predicate.test(passenger)) {
+				for (Seat seat1 : this.seats) {
+					if (seat1.occupant == passenger) {
+						seat1.occupant = null;
+					}
+				}
+
+				seat.occupant = passenger;
+
+				return true;
+			}
+		}
+		return false;
+	}
 
     @Nullable
     @Override
@@ -684,16 +714,6 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
                 this.healCooldown = 40;
             }
             this.setHealth(this.getHealth() - amount);
-            if (this.getHealth() < 0 && !this.isDead) {
-                this.setDead();
-                if (this.world.getGameRules().getBoolean("doEntityDrops")) {
-                    this.dropItems();
-                    ItemStack recordItem = this.dataManager.get(RECORD_ITEM);
-                    if(!recordItem.isEmpty()) {
-                        this.entityDropItem(recordItem, 0);
-                    }
-                }
-            }
         }
         return true;
     }
@@ -710,6 +730,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
             }
             Vec3d pos;
             if (seat == null) {
+            	
                 pos = new Vec3d(this.posX, this.posY + this.height, this.posZ);
             } else {
                 pos = seat.getPos();
@@ -770,71 +791,71 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         compound.setTag("RecordItem", this.dataManager.get(RECORD_ITEM).serializeNBT());
     }
 
-    private void startSound() {
+    public void startSound() {
         ClientProxy.playCarSound(this);
     }
 
     public final class Seat {
 
-        private final InterpValue interpValue = new InterpValue(CarEntity.this,0.1D);
+    	 private final InterpValue interpValue = new InterpValue(CarEntity.this, 0.1D);
 
-        private float offsetX;
-        private float offsetY;
-        private float offsetZ;
+         private float offsetX;
+         private float offsetY;
+         private float offsetZ;
 
-        private final float radius;
-        private final float height;
-        private final Predicate<Entity> predicate;
-        
-        private Entity occupant;
+         private final float radius;
+         private final float height;
+         private final Predicate<Entity> predicate;
+         
+         private Entity occupant;
 
-        public Seat(float offsetX, float offsetY, float offsetZ, float radius, float height) {
-            this(offsetX, offsetY, offsetZ, radius, height, entity -> true);
-        }
-        
-        public Seat(float offsetX, float offsetY, float offsetZ, float radius, float height, Predicate<Entity> predicate) {
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
-            this.offsetZ = offsetZ;
-            this.radius = radius;
-            this.height = height;
-            this.predicate = predicate;
-        }
+         public Seat(float offsetX, float offsetY, float offsetZ, float radius, float height) {
+             this(offsetX, offsetY, offsetZ, radius, height, entity -> true);
+         }
+         
+         public Seat(float offsetX, float offsetY, float offsetZ, float radius, float height, Predicate<Entity> predicate) {
+             this.offsetX = offsetX;
+             this.offsetY = offsetY;
+             this.offsetZ = offsetZ;
+             this.radius = radius;
+             this.height = height;
+             this.predicate = predicate;
+         }
 
-        protected void so(float x, float y, float z) {
-            this.offsetX = x;
-            this.offsetY = y;
-            this.offsetZ = z;
-        }
+         protected void so(float x, float y, float z) {
+             this.offsetX = x;
+             this.offsetY = y;
+             this.offsetZ = z;
+         }
 
-        public Entity getOccupant() {
-            return this.occupant;
-        }
+         public Entity getOccupant() {
+             return this.occupant;
+         }
 
-        public Vec3d getPos() {
-            double theta = Math.toRadians(CarEntity.this.rotationYaw);
-            double sideX = Math.cos(theta);
-            double sideZ = Math.sin(theta);
-            double forwardTheta = theta + Math.PI / 2;
-            double forwardX = Math.cos(forwardTheta);
-            double forwardZ = Math.sin(forwardTheta);
-            double x = CarEntity.this.posX + sideX * this.offsetX + forwardX * this.offsetZ;
-            double y = CarEntity.this.posY + this.offsetY;
-            double z = CarEntity.this.posZ + sideZ * this.offsetX + forwardZ * this.offsetZ;
-            return new Vec3d(x, y, z);
-        }
+         public Vec3d getPos() {
+             double theta = Math.toRadians(CarEntity.this.rotationYaw);
+             double sideX = Math.cos(theta);
+             double sideZ = Math.sin(theta);
+             double forwardTheta = theta + Math.PI / 2;
+             double forwardX = Math.cos(forwardTheta);
+             double forwardZ = Math.sin(forwardTheta);
+             double x = CarEntity.this.posX + sideX * this.offsetX + forwardX * this.offsetZ;
+             double y = CarEntity.this.posY + this.offsetY;
+             double z = CarEntity.this.posZ + sideZ * this.offsetX + forwardZ * this.offsetZ;
+             return new Vec3d(x, y, z);
+         }
 
-        public AxisAlignedBB getBounds() {
-            Vec3d pos = this.getPos();
-            double x = pos.x;
-            double y = pos.y;
-            double z = pos.z;
-            return new AxisAlignedBB(x - this.radius, y, z - this.radius, x + this.radius, y + this.offsetY + this.height, z + this.radius);
-        }
+         public AxisAlignedBB getBounds() {
+             Vec3d pos = this.getPos();
+             double x = pos.x;
+             double y = pos.y;
+             double z = pos.z;
+             return new AxisAlignedBB(x - this.radius, y, z - this.radius, x + this.radius, y + this.offsetY + this.height, z + this.radius);
+         }
 
-        public InterpValue getInterpValue() {
-            return interpValue;
-        }
+         public InterpValue getInterpValue() {
+             return interpValue;
+         }
     }
     
     protected final class WheelData {
@@ -875,6 +896,6 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     public abstract void dropItems();
 
     public float getSoundVolume() {
-	return Math.abs(this.wheelRotateAmount) + 0.001F;
+    	return (Math.abs(this.wheelRotateAmount) + 0.001F) / (this.sound == null || this.sound.isDonePlaying() ? 2f : 4f);
     }
 }
