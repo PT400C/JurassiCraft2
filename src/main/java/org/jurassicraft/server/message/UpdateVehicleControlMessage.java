@@ -38,7 +38,7 @@ public class UpdateVehicleControlMessage extends AbstractMessage<UpdateVehicleCo
         if (entity instanceof CarEntity)
         {
             CarEntity car = (CarEntity) entity;
-            if (car.getControllingPassenger() == player)
+            if (car.getSeatController() == player || car.getControllingPassenger() == player)
             {
                 car.setControlState(message.state);
             }

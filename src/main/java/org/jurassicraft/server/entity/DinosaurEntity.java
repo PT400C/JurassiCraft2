@@ -436,7 +436,8 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 }
 
                 if (!this.world.isRemote) {
-                    this.setAnimation(EntityAnimation.INJURED.get());
+                	if (!((float)this.hurtResistantTime > (float)this.maxHurtResistantTime / 2.0F))
+                		this.setAnimation(EntityAnimation.INJURED.get());
                 }
 
                 if (this.shouldSleep()) {
@@ -450,26 +451,29 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 return super.attackEntityFrom(damageSource, amount);
             }
         } else if (!this.world.isRemote) {
-            if (canHarmInCreative) {
-                return super.attackEntityFrom(damageSource, amount);
-            }
+           
+        	if(!(((float)this.hurtResistantTime > (float)this.maxHurtResistantTime / 2.0F))) {
+        		if (damageSource != DamageSource.DROWN) {
+        			if (!this.dead && this.carcassHealth >= 0 && this.world.getGameRules().getBoolean("doMobLoot")) {
+        				this.dropMeat(attacker);
+        			}
 
-            if (this.hurtResistantTime <= this.maxHurtResistantTime / 2.0F) {
-                this.hurtTime = this.maxHurtTime = 10;
-            }
+        			if (this.carcassHealth <= 0) {
+        				this.onDeath(damageSource);
+        				this.setDead();
+        			}
 
-            if (damageSource != DamageSource.DROWN) {
-                if (!this.dead && this.carcassHealth >= 0 && this.world.getGameRules().getBoolean("doMobLoot")) {
-                    this.dropMeat(attacker);
-                }
-
-                if (this.carcassHealth <= 0) {
-                    this.onDeath(damageSource);
-                    this.setDead();
-                }
-
-                this.carcassHealth--;
-            }
+        			this.carcassHealth--;
+        		}
+            
+        		if (canHarmInCreative) {
+        			return super.attackEntityFrom(damageSource, amount);
+        		}	
+            
+        		if (this.hurtResistantTime <= this.maxHurtResistantTime / 2.0F) {
+        			this.hurtTime = this.maxHurtTime = 10;
+        		}
+        	}
         }
 
         return false;

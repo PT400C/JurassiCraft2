@@ -2,14 +2,16 @@ package org.jurassicraft.client.sound;
 
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.HelicopterEntity;
 
 @SideOnly(Side.CLIENT)
-public class CarSound extends EntitySound<CarEntity> {
-    public CarSound(CarEntity entity) {
-        super(entity, SoundHandler.CAR_MOVE, SoundCategory.BLOCKS);
+public class VehicleSound extends EntitySound<CarEntity> {
+    public VehicleSound(CarEntity entity, SoundEvent vehicleMove) {
+        super(entity, vehicleMove, SoundCategory.NEUTRAL);
     }
 
     @Override
@@ -19,7 +21,8 @@ public class CarSound extends EntitySound<CarEntity> {
 
     @Override
     public float getVolume() {
-        return (Math.abs(this.entity.wheelRotateAmount) + 0.001F) / (entity.sound == null || entity.sound.isDonePlaying() ? 2f : 4f);
+    	
+    	return ((CarEntity) this.entity).getSoundVolume();
     }
 
     @Override

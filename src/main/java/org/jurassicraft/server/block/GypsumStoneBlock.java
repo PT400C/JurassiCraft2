@@ -24,6 +24,25 @@ public class GypsumStoneBlock extends Block {
 
     @Override
     public int quantityDropped(Random random) {
-        return random.nextInt(5) + 4;
+		return random.nextInt(5) + 4;
+    }
+    
+    @Override
+    public int quantityDroppedWithBonus(int level, Random random)
+    {
+        if (level > 0 && Item.getItemFromBlock(this) != this.getItemDropped((IBlockState)this.getBlockState().getValidStates().iterator().next(), random, level))
+        {
+            int i = random.nextInt(level + 2) - 2;
+
+            if (i < 0)
+            {
+                i = 0;
+            }
+            return this.quantityDropped(random) * (i + 1);
+        }
+        else
+        {
+            return this.quantityDropped(random);
+        }
     }
 }

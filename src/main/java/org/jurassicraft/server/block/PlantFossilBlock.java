@@ -35,7 +35,7 @@ public class PlantFossilBlock extends Block implements CleanableItem {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return this.getRandomOutput(rand, 1.0);
+        return this.getRandomOutput(rand, fortune);
     }
 
     @Override
@@ -45,30 +45,31 @@ public class PlantFossilBlock extends Block implements CleanableItem {
 
     @Override
     public ItemStack getCleanedItem(ItemStack stack, Random random) {
-        return new ItemStack(this.getRandomOutput(random, 2.0));
+        return new ItemStack(this.getRandomOutput(random, 2));
     }
 
-    private Item getRandomOutput(Random rand, double luck) {
-        double chance = rand.nextDouble() / luck;
+    private Item getRandomOutput(Random rand, int luck) {
+        double chance = rand.nextDouble();
+        chance = chance - 0.3 * (Math.random() * luck);
 
-        if (chance < 0.35) {
+        if (chance < 0.20) {
             return ItemHandler.PLANT_FOSSIL;
-        } else if (chance < 0.50) {
+        } else if (chance < 0.35) {
             return ItemHandler.TWIG_FOSSIL;
-        } else if (chance < 0.75) {
+        } else if (chance < 0.65) {
             return Items.COAL;
-        } else if (chance < 0.85) {
+        } else if (chance < 0.80) {
             return Items.FLINT;
         } else {
-            return Item.getItemFromBlock(Blocks.COBBLESTONE);
+        	return Item.getItemFromBlock(Blocks.COBBLESTONE);
         }
     }
 
     @Override
     public List<Pair<Float, ItemStack>> getChancedOutputs(ItemStack inputItem) {
         List<Pair<Float, ItemStack>> list = Lists.newArrayList();
-        list.add(Pair.of(0.7F, new ItemStack(ItemHandler.PLANT_FOSSIL)));
-        list.add(Pair.of(0.3F, new ItemStack(ItemHandler.TWIG_FOSSIL)));
+        list.add(Pair.of(0.6F, new ItemStack(ItemHandler.PLANT_FOSSIL)));
+        list.add(Pair.of(0.4F, new ItemStack(ItemHandler.TWIG_FOSSIL)));
         return list;
     }
 }

@@ -1,15 +1,21 @@
 package org.jurassicraft.server.item;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
+import org.jurassicraft.server.genetics.DinoDNA;
+import org.jurassicraft.server.genetics.GeneticsHelper;
 import org.jurassicraft.server.tab.TabHandler;
 import org.jurassicraft.server.util.LangUtils;
 
@@ -17,7 +23,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DinosaurMeatItem extends ItemFood {
+public class DinosaurMeatItem extends ItemFood{
     public DinosaurMeatItem() {
         super(3, 0.3F, true);
         this.setHasSubtypes(true);
@@ -52,6 +58,31 @@ public class DinosaurMeatItem extends ItemFood {
             if (dinosaur.shouldRegister()) {
                 subtypes.add(new ItemStack(this, 1, EntityHandler.getDinosaurId(dinosaur)));
             }
+        }
+    }
+    
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> lore, ITooltipFlag flagIn) {
+        NBTTagCompound nbt = stack.getTagCompound();
+
+        if (nbt != null && nbt.hasKey("Genetics") && nbt.hasKey("DNAQuality")) {
+            int quality = nbt.getInteger("DNAQuality");
+
+            TextFormatting colour;
+
+            if (quality > 75) {
+                colour = TextFormatting.GREEN;
+            } else if (quality > 50) {
+                colour = TextFormatting.YELLOW;
+            } else if (quality > 25) {
+                colour = TextFormatting.GOLD;
+            } else {
+                colour = TextFormatting.RED;
+            }
+
+
+            lore.add(colour + LangUtils.translate(LangUtils.LORE.get("dna_quality")).replace("{quality}", LangUtils.getFormattedQuality(quality)));
+            lore.add(TextFormatting.BLUE + LangUtils.translate(LangUtils.LORE.get("genetic_code")).replace("{code}", LangUtils.getFormattedGenetics(nbt.getString("Genetics"))));
         }
     }
 

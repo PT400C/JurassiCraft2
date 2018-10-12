@@ -2,7 +2,6 @@ package org.jurassicraft.server.entity.vehicle;
 
 import net.minecraft.block.BlockAir;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,19 +12,26 @@ import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.BlockStateLoader;
 import net.minecraftforge.client.model.b3d.B3DModel;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.server.permission.context.ContextKeys;
 import org.lwjgl.input.Keyboard;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.proxy.ClientProxy;
+import org.jurassicraft.client.sound.EntitySound;
 import org.jurassicraft.server.entity.ai.util.InterpValue;
 import org.jurassicraft.server.entity.vehicle.CarEntity.Speed;
 import org.jurassicraft.server.item.ItemHandler;
+import org.jurassicraft.server.message.CarEntityPlayRecord;
 import org.jurassicraft.server.message.UpdateVehicleControlMessage;
 import org.jurassicraft.server.util.MutableVec3;
 
@@ -33,13 +39,8 @@ import javax.annotation.Nonnull;
 
 public class HelicopterEntity extends CarEntity {
 
-    private static final BlockPos INACTIVE = new BlockPos(-1, -1, -1);
-
     private static final byte UPWARD   = 0b010000;
     private static final byte DOWNWARD = 0b100000;
-    
-    private BlockPos prevPos = INACTIVE;
-
     private boolean lastDirBackwards;
     private final float MAX_POWER = 80.0F;
     private final float REQUIRED_POWER = MAX_POWER / 2.0F;
@@ -60,6 +61,7 @@ public class HelicopterEntity extends CarEntity {
     public double rotAmount = 0D;
     private Vec3d prevInAirPos;
     private float damageAmount;
+    private MutableBlockPos mb = new MutableBlockPos();
     /* =================================== CAR START ===========================================*/
 
     public HelicopterEntity(World worldIn) {
@@ -67,11 +69,11 @@ public class HelicopterEntity extends CarEntity {
         double w = 5f; // width in blocks
         double h = 3.5f; // height in blocks
         double d = 8f; // depth in blocks
-        this.setEntityBoundingBox(new AxisAlignedBB( 0, 0, 0, w, h, d));
+        this.setEntityBoundingBox(new AxisAlignedBB(0, 0, 0, w, h, d));
         this.setSize(5f, 3.5f);
         this.speedModifier = 1.5f;
         this.isFlying = false;
-        this.direction = new MutableVec3(0,1,0);
+        this.direction = new MutableVec3(0, 1, 0);
     }
     
     public boolean upward() {
@@ -82,6 +84,10 @@ public class HelicopterEntity extends CarEntity {
         return this.getStateBit(DOWNWARD);
     }
     
+    @Override
+    public void startSound() {
+        ClientProxy.playHelicopterSound(this);
+    }
     
     public void upward(boolean upward) {
         this.setStateBit(UPWARD, upward);
@@ -103,7 +109,7 @@ public class HelicopterEntity extends CarEntity {
         Seat frontLeft = new Seat(-0.55F, -0.34F, 0.1F, 0.5F, 0.25F);
         Seat frontRight = new Seat(0.55F, -0.34F, 0.1F, 0.5F, 0.25F);
         Seat backLeft = new Seat( 0.4F, 0.25F, -1F, 0.5F, 0.25F);
-        Seat backReft = new Seat( -0.4F, 0.25F, -1F, 0.5F, 0.25F);
+        Seat backReft = new Seat(-0.4F, 0.25F, -1F, 0.5F, 0.25F);
         return new Seat[] { middle, frontLeft, frontRight, backLeft, backReft};
     }
 
@@ -117,9 +123,11 @@ public class HelicopterEntity extends CarEntity {
         BlockPos startPos = this.getPosition();
      //   this.setPosition(this.posX, this.posY, this.posZ); //Make sure that the car is in the right position. Can cause issues when changing size of car
        //Why is that needed?
-        if(!startPos.equals(this.getPosition())) {
-            prevPos = this.getPosition();
-        }
+      
+        
+        //  if(!startPos.equals(this.getPosition())) {
+       //     prevPos = this.getPosition();
+     //   }
         super.onUpdate();
     }
 
@@ -129,13 +137,57 @@ public class HelicopterEntity extends CarEntity {
 
     }
 
+    private boolean isController(EntityPlayer e) {
+    	if((this.getSeatController() != null && this.getSeatController().getUniqueID() == e.getUniqueID()) && (this.getControllingPassenger() != null && this.getControllingPassenger().getUniqueID() == e.getUniqueID())) {
+    		return true;
+    	}
+    	return false;
+    }
     
     @Override
-    protected void handleControl() {
+    public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
+        if(!world.isRemote) {
+            if (!player.isSneaking() && !(player.getRidingEntity() == this)) {
+                player.startRiding(this);
+            }
+        }
+        return true;
+    }
+    
+	@SideOnly(Side.CLIENT)
+	@Override
+	protected void handleControl() {
+
+		if (isController(Minecraft.getMinecraft().player)) {
+			if (this.isInWater()) {
+				this.upward(false);
+				this.downward(false);
+			} else {
+				this.upward(ClientProxy.getKeyHandler().HELICOPTER_UP.isKeyDown());
+				this.downward(ClientProxy.getKeyHandler().HELICOPTER_DOWN.isKeyDown());
+			}
+			super.handleControl();
+		}
+	}
+    
+    @Override
+    public void fall(float distance, float damageMultiplier) {
     	
-    	this.upward(ClientProxy.getKeyHandler().HELICOPTER_UP.isKeyDown());
-        this.downward(ClientProxy.getKeyHandler().HELICOPTER_DOWN.isKeyDown());
-        super.handleControl();
+    	if(!world.isRemote && !isFlying) {
+    		float damage = MathHelper.ceil((distance - 3F) * damageMultiplier);
+    		if (damage > 0){
+    			
+    			this.setHealth(this.getHealth() - (float)(damage * 1.25F));
+    			
+    			if (this.getHealth() < 0) {
+    				this.setDead();
+    				if (this.world.getGameRules().getBoolean("doEntityDrops")) {
+    					this.dropItems();
+    				}
+    			}
+    		}
+        }
+
     }
 
     @Override
@@ -151,7 +203,13 @@ public class HelicopterEntity extends CarEntity {
 
     @Override
     public void onEntityUpdate() {
-        super.onEntityUpdate();
+    	  if(world.isRemote) {
+          	this.isFlying = this.hasNoGravity();
+          }
+    	   super.onEntityUpdate();
+      
+        if(!this.isInWater()){
+        	
         //this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX-0.65f, this.posY+2f, this.posZ+ -2.9, 0.0f, 0.0f, 0.0f, new int[0]);
         //this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX+0.65f, this.posY+2f, this.posZ+ -2.9, 0.0f, 0.0f, 0.0f, new int[0]);
         if(!world.isRemote) {
@@ -160,7 +218,7 @@ public class HelicopterEntity extends CarEntity {
             seat.getOccupant().fallDistance = 0;
         }
         }
-        if (this.forward() && this.isFlying) {
+        if (forward() && this.isFlying) {
             this.rotationAmount += 1f;
         } else if (this.backward() && this.isFlying) {
             this.rotationAmount -= 1f;
@@ -203,11 +261,13 @@ public class HelicopterEntity extends CarEntity {
         }
         this.interpRotationPitch.setTarget(this.direction.zCoord * -30D);
         this.interpRotationRoll.setTarget(this.direction.xCoord * 20D);
-        if (this.seats[0].getOccupant() != null) {
+        if ((this.getSeatController() != null || this.getControllingPassenger() != null)) {
             if (this.upward()) {
-                this.motionY += 0.2f;
-                if (this.motionY >= 4f) {
-                    this.motionY = 4f;
+            	this.motionY += 0.005f;
+                if(this.motionY > 0)
+                	this.motionY *= 1.35f;
+                if (this.motionY >= 1.5f) {
+                    this.motionY = 1.5f;
                 }
 
                 this.isFlying = true;
@@ -221,15 +281,19 @@ public class HelicopterEntity extends CarEntity {
                     }
                 }
 
-            } else if (this.downward()) {
-                this.motionY -= 0.3f;
-                if (this.motionY <= -4f) {
-                    this.motionY = -4f;
+            } else if (this.downward() && this.isFlying) {
+            	this.motionY -= 0.02f;
+            	
+            	if(this.motionY < 0)
+            		this.motionY *= 1.3f;
+                if (this.motionY <= -1.3f) {
+                    this.motionY = -1.3f;
                 }
                 this.shouldFallDamage = false;
 
 
             } else {
+            	
                 if(!this.isFlying){
                     this.setNoGravity(false);
                     for(Seat seat : this.seats){
@@ -239,7 +303,7 @@ public class HelicopterEntity extends CarEntity {
                     }
 
                 }else{
-                    this.rotorRotationAmount += 5f;
+                    this.rotorRotationAmount += 0.01f;
                 }
             }
         }
@@ -253,21 +317,39 @@ public class HelicopterEntity extends CarEntity {
         }
         if(this.onGround == true) {
             this.isFlying = false;
-            this.rotorRotationAmount -= 0.2f;
+            this.rotorRotationAmount -= 0.05f;
         }else{
-            this.rotorRotationAmount += 5f;
+            this.rotorRotationAmount += 0.0001f;
         }
+        if(world.isRemote) {
         if(!this.shouldGearLift) {
             this.gearLift += 0.02f;
         }else{
             this.gearLift -= 0.02f;
         }
-        if(world.getBlockState(new BlockPos.MutableBlockPos((int)Math.floor( this.posX), (int)Math.floor( this.posY - 10f), (int)Math.floor( this.posZ))).getBlock() != Blocks.AIR){
-            this.shouldGearLift = false;
+        
+        boolean found = false;
+        float dist = -1;
+        mb.setPos(this.getPosition());
+        while(!found) {
+            if(this.posY < 0) {
+                break;
+            }
+            if(world.isAirBlock(mb)) {
+                mb = mb.setPos(mb.getX(), mb.getY() - 1, mb.getZ());
+            } else {
+                found = true;
+                dist = (float)(this.posY - mb.getY() - 1);
+            }
+        }
+       // if(this.getPosition().getY() - 10 < world.getChunkFromBlockCoords(this.getPosition()).getPrecipitationHeight(this.getPosition()).getY()){
+        if(dist < 10){
+        	this.shouldGearLift = false;
         }else{
             this.shouldGearLift = true;
         }
-        if(this.seats[0].getOccupant() == null){
+        }
+        if(this.getSeatController() == null && this.getControllingPassenger() == null){
             this.setNoGravity(false);
         }
         if(this.onGround && this.shouldFallDamage){
@@ -281,34 +363,38 @@ public class HelicopterEntity extends CarEntity {
         if(this.rotorRotationAmount > 1.5f){
             this.rotorRotationAmount = 1.5f;
         }
+        if(world.isRemote) {
         if(this.gearLift < -0.5f){
             this.gearLift = -0.5f;
         }
         if(this.gearLift > 0){
             this.gearLift = 0f;
         }
+        }
         this.rotAmount += this.rotorRotationAmount / 2d;
-       
+    }else {
+    	this.setNoGravity(false);
+    	this.wheelRotateAmount = 0;
+    	this.rotorRotationAmount = 0;
+    }
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
-        compound.setLong("PrevBlockPosition", this.prevPos.toLong());
+        //compound.setLong("PrevBlockPosition", this.prevPos.toLong());
     }
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound) {
         super.readEntityFromNBT(compound);
-        this.prevPos = BlockPos.fromLong(compound.getLong("PrevBlockPosition"));
+        //this.prevPos = BlockPos.fromLong(compound.getLong("PrevBlockPosition"));
     }
 
     @Override
     public float getSoundVolume() {
-        return this.getControllingPassenger() != null ? this.getSpeed().modifier / 2f : 0f;
+        return this.rotorRotationAmount > 0 ? (Math.abs(this.rotorRotationAmount) + 0.001F) / (this.sound == null || this.sound.isDonePlaying() ? 2f : 4f) : (Math.abs(this.wheelRotateAmount) + 0.001F) / (this.sound == null || this.sound.isDonePlaying() ? 2f : 4f);
     }
-
-
 
     @Nonnull
     @Override
@@ -325,6 +411,7 @@ public class HelicopterEntity extends CarEntity {
     protected boolean shouldTyresRender() {
         return false;
     }
+    
     @Override
     public void updatePassenger(Entity passenger) {
         if (this.isPassenger(passenger)) {

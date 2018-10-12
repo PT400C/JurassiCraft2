@@ -1,7 +1,9 @@
 package org.jurassicraft.client.sound;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 
@@ -27,9 +29,10 @@ public class EntitySound<T extends Entity> extends MovingSound {
         if (this.entity.isDead || !predicate.test(this.entity)) {
             this.donePlaying = true;
         } else {
-            this.xPosF = (float) this.entity.posX;
-            this.yPosF = (float) this.entity.posY;
-            this.zPosF = (float) this.entity.posZ;
+        	 EntityPlayer player = Minecraft.getMinecraft().player;
+             this.xPosF = (float) (entity.posX + (player.posX - entity.posX) / 2);
+             this.yPosF = (float) (entity.posY + (player.posY - entity.posY) / 2);
+             this.zPosF = (float) (entity.posZ + (player.posZ - entity.posZ) / 2);
         }
     }
 

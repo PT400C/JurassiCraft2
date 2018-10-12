@@ -6,6 +6,9 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.entity.EntityHandler;
+import org.jurassicraft.server.proxy.ServerProxy;
+import org.jurassicraft.server.world.structure.StructureGenerationHandler;
 
 @Config(modid = JurassiCraft.MODID, category = "")
 @Mod.EventBusSubscriber(modid = JurassiCraft.MODID)
@@ -29,7 +32,10 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
 
     public static class Entities {
         @Config.Name("Dinosaur Spawning")
-        public boolean naturalSpawning = false;
+        public boolean naturalSpawning_D = false;
+        
+        @Config.Name("Goat Spawning")
+        public boolean naturalSpawning_G = false;
 
         @Config.Name("Only Hunt when Hungry")
         public boolean huntWhenHungry = false;
@@ -83,11 +89,15 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
     }
 
     public static class StructureGeneration {
-        @Config.Name("Visitor Generation")
+        @Config.Name("Visitor Center Generation")
         public boolean visitorcentergeneration = true;
 
-        @Config.Name("Raptor Generation")
+        @Config.Name("Raptor Paddock Generation")
         public boolean raptorgeneration = true;
+        
+        @Config.Name("Raptor Paddock Rarity")
+        @Config.Comment("Tested between 1/50 and 1/infinite (The default rarity is 1/4000)")
+        public int paddockRarity = 4000;
     }
 
     public static class Vehicles {
@@ -97,10 +107,14 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
         @Config.Name("Enable Tour Rail Blocks")
         public boolean tourRailBlockEnabled = true;
     }
+    
     @SubscribeEvent
     public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if(JurassiCraft.MODID.equals(event.getModID())) {
             ConfigManager.sync(JurassiCraft.MODID, Config.Type.INSTANCE);
+            StructureGenerationHandler.reloadGenerators();
+            EntityHandler.reinitSpawns();
+            ServerProxy.reinitSpawns();
         }
     }
 }

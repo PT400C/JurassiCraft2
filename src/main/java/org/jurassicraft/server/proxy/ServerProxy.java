@@ -16,6 +16,7 @@ import org.jurassicraft.server.block.entity.EmbryonicMachineBlockEntity;
 import org.jurassicraft.server.block.entity.FeederBlockEntity;
 import org.jurassicraft.server.block.entity.FossilGrinderBlockEntity;
 import org.jurassicraft.server.block.entity.IncubatorBlockEntity;
+import org.jurassicraft.server.conf.JurassiCraftConfig;
 import org.jurassicraft.server.container.CleaningStationContainer;
 import org.jurassicraft.server.container.CultivateContainer;
 import org.jurassicraft.server.container.DNACombinatorHybridizerContainer;
@@ -55,6 +56,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -91,7 +93,7 @@ public class ServerProxy implements IGuiHandler {
         BlockHandler.init();
         ItemHandler.init();
         StorageTypeRegistry.init();
-        StructureGenerationHandler.register();
+        StructureGenerationHandler.registerInit();
         VillagerHandler.init();
 
         FoodNutrients.register();
@@ -117,15 +119,28 @@ public class ServerProxy implements IGuiHandler {
     public void onInit(FMLInitializationEvent event) {
         for(Biome biome : ForgeRegistries.BIOMES.getValuesCollection()) { //Adds the goat spawning to biomes that spawn pigs. TODO: maybe add a config for biomes ?
             List<Biome.SpawnListEntry> list = biome.getSpawnableList(EnumCreatureType.CREATURE);
-            boolean shouldAddGoat = false;
-            for(Biome.SpawnListEntry entry : list) {
-                if(entry.entityClass == EntityPig.class) {
-                    shouldAddGoat = true;
-                }
-            }
-            if(shouldAddGoat) {
-                list.add(new Biome.SpawnListEntry(GoatEntity.class,  10, 2, 4));
-            }
+            addSpawn(list);
+        }
+    }
+    
+    private void addSpawn(List<SpawnListEntry> list) {
+    	 boolean shouldAddGoat = false;
+    	 for(Biome.SpawnListEntry entry : list) {
+             if(entry.entityClass == EntityPig.class) {
+                 shouldAddGoat = true;
+             }
+         }
+         if(shouldAddGoat && JurassiCraftConfig.ENTITIES.naturalSpawning_G) {
+             list.add(new Biome.SpawnListEntry(GoatEntity.class, 10, 2, 4));
+         }
+    }
+    
+    public static void reinitSpawns() {
+        for(Biome biome : ForgeRegistries.BIOMES.getValuesCollection()) {
+            List<Biome.SpawnListEntry> list = biome.getSpawnableList(EnumCreatureType.CREATURE);
+            list.removeIf(entry -> entry.entityClass == GoatEntity.class);
+            JurassiCraft.PROXY.addSpawn(list);
+            
         }
     }
 

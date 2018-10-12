@@ -9,6 +9,8 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import org.jurassicraft.server.conf.JurassiCraftConfig;
 import org.jurassicraft.server.maps.MapUtils;
 
 import java.util.*;
@@ -52,11 +54,21 @@ public enum StructureGenerationHandler implements IWorldGenerator {
             }
         }
     }
+    
+    public static void registerInit() {
+    	GameRegistry.registerWorldGenerator(INSTANCE, 0);
+    	register();
+    }
 
-    public static void register() {
-        GameRegistry.registerWorldGenerator(INSTANCE, 0);
+    private static void register() {
+        
         StructureGenerationHandler.registerGenerator(VisitorCentreGenerator::new, StructureUtils.StructureData::isVisitorCenter,(world, pos, random) -> world.getChunkFromBlockCoords(pos) == world.getChunkFromBlockCoords(MapUtils.getVisitorCenterPosition()));
-        StructureGenerationHandler.registerGenerator(RaptorPaddockGenerator::new, StructureUtils.StructureData::isRaptorPaddock,4000, Biomes.JUNGLE, Biomes.MUTATED_JUNGLE, Biomes.JUNGLE_EDGE, Biomes.MUTATED_JUNGLE_EDGE, Biomes.SAVANNA, Biomes.MUTATED_SAVANNA);
+        StructureGenerationHandler.registerGenerator(RaptorPaddockGenerator::new, StructureUtils.StructureData::isRaptorPaddock, JurassiCraftConfig.STRUCTURE_GENERATION.paddockRarity, Biomes.JUNGLE, Biomes.MUTATED_JUNGLE, Biomes.JUNGLE_EDGE, Biomes.MUTATED_JUNGLE_EDGE, Biomes.SAVANNA, Biomes.MUTATED_SAVANNA);
+    }
+    
+    public static void reloadGenerators() {
+    	StructureGenerationHandler.clear();
+    	register();
     }
 
     public static void registerGenerator(Function<Random, StructureGenerator> generatorFunction, Predicate<StructureUtils.StructureData> configPredicate, int weight, Biome... validBiomes) {
@@ -75,6 +87,10 @@ public enum StructureGenerationHandler implements IWorldGenerator {
 
     private static void addEntry(Biome biome, GeneratorEntry generator) {
         GENERATORS.computeIfAbsent(biome, b -> new ArrayList<>()).add(generator);
+    }
+    
+    private static void clear() {
+        GENERATORS.clear();
     }
 
     private static class GeneratorEntry {

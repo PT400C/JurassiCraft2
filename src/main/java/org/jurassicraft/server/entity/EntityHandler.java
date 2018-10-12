@@ -142,9 +142,24 @@ public class EntityHandler {
 
             registerEntity(clazz, dinosaur.getName());
 
-            if (canSpawn && JurassiCraftConfig.ENTITIES.naturalSpawning) {
-                EntityRegistry.addSpawn(clazz, dinosaur.getSpawnChance(), 1, Math.min(6, dinosaur.getMaxHerdSize() / 2), dinosaur.isMarineCreature() ? EnumCreatureType.WATER_CREATURE : EnumCreatureType.CREATURE, dinosaur.getSpawnBiomes());
-            }
+            addSpawn(canSpawn, clazz, dinosaur);
+        }
+    }
+    
+    private static void addSpawn(boolean canSpawn, Class clazz, Dinosaur dinosaur) {
+    	if (canSpawn && JurassiCraftConfig.ENTITIES.naturalSpawning_D) {
+            EntityRegistry.addSpawn(clazz, dinosaur.getSpawnChance(), 1, Math.min(6, dinosaur.getMaxHerdSize() / 2), dinosaur.isMarineCreature() ? EnumCreatureType.WATER_CREATURE : EnumCreatureType.CREATURE, dinosaur.getSpawnBiomes());
+        }
+    }
+    
+    public static void reinitSpawns() {
+        for (Map.Entry<Integer, Dinosaur> entry : DINOSAURS.entrySet()) {
+            Dinosaur dinosaur = entry.getValue();
+            Class<? extends DinosaurEntity> clazz = dinosaur.getDinosaurClass();
+            EntityRegistry.removeSpawn(clazz, dinosaur.isMarineCreature() ? EnumCreatureType.WATER_CREATURE : EnumCreatureType.CREATURE, dinosaur.getSpawnBiomes());
+            boolean canSpawn = !(dinosaur instanceof Hybrid) && dinosaur.shouldRegister();
+            addSpawn(canSpawn, clazz, dinosaur);
+            
         }
     }
     
@@ -153,8 +168,6 @@ public class EntityHandler {
         ResourceLocation registryName = new ResourceLocation("jurassicraft:entities." + formattedName);
         EntityRegistry.registerModEntity(registryName, entity, "jurassicraft." + formattedName, entityId++, JurassiCraft.INSTANCE, 1024, 1, true);
     }
-    
-    
 
     private static void registerEntity(Class<? extends Entity> entity, String name, int primary, int secondary) {
         String formattedName = name.toLowerCase(Locale.ENGLISH).replaceAll(" ", "_");

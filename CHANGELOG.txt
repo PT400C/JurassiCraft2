@@ -10,3 +10,9 @@
 *Fixed abandoned visitor centers not spawning via command when issued on a flat world
 *Fixed some plants spawning in impossible areas
 +JC Spawneggs, action figures and hatched eggs now display their current gender as a toolip
++Gypsum stone blocks are affected by fortune when destroyed
+*Adjusted the chances of rare drops from plant fossil blocks
++Added two new config options for goat spawning and the rarity of raptor paddocks
+*dinosaur meat without DNA will no longer be processed by the DNA extractor
+*Fixed an incompatibility with the Ice and Fire mod
+*Improved the helicopter's behaviour (Kicks for flying etc.)
