@@ -534,8 +534,6 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 	protected void handleControl() {
 		
 		Entity driver = this.getControllingPassenger();
-		if (driver != null)
-			driver = this.getControllingPassenger();
 		if (!(driver instanceof EntityPlayer) || !((EntityPlayer) driver).isUser()) {
 			return;
 		}
@@ -676,8 +674,8 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 		if (passenger instanceof EntityPlayerMP) {
 			resetFlyTicks((EntityPlayerMP) passenger);
 		}
-		if(!passenger.world.isRemote)
-		this.usherPassenger(passenger, 0);
+		if (!passenger.world.isRemote)
+			this.usherPassenger(passenger, 0);
 	}
     
     private void usherPassenger(Entity passenger, int start) {
@@ -724,6 +722,7 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 		return false;
 	}
 
+	@Nonnull
 	private String str(int input) {
 		
 		return Integer.toString(input);
@@ -833,6 +832,7 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
     }
 
     public void startSound() {
+    	
         ClientProxy.playCarSound(this);
     }
 
@@ -906,6 +906,7 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
     }
     
     public enum Speed {
+    	
         //The modifiers ARE hardcoded. If you want to change them, please talk to me first. The tyre mark code relies on the modifiers being how they are
         SLOW(0.5f),
         MEDIUM(1f),
