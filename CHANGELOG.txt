@@ -1,18 +1,1 @@
-*Fixed that spawning action figures of a certain gender didn't work on servers
-*Fixed that dinosaurs weren't rendered correctly in mob spawners
-*Fixed that decayable JC leaves are loosing that property after some time
-*Fixed a rare crash problem with the dart gun
--Removed the JurassiCraft Iron Nugget
-*Fixed a lighting issue with the attraction signs
-*Fixed another rare crash with dinosaurs when attacking other creatures
-*Vines don't grow on Clear Glass anymore
-*Fixed the loot in abandoned visitor centers
-*Fixed abandoned visitor centers not spawning via command when issued on a flat world
-*Fixed some plants spawning in impossible areas
-+JC Spawneggs, action figures and hatched eggs now display their current gender as a toolip
-+Gypsum stone blocks are affected by fortune when destroyed
-*Adjusted the chances of rare drops from plant fossil blocks
-+Added two new config options for goat spawning and the rarity of raptor paddocks
-*dinosaur meat without DNA will no longer be processed by the DNA extractor
-*Fixed an incompatibility with the Ice and Fire mod
-*Improved the helicopter's behaviour (Kicks for flying etc.)
+*Revamped the way the JurassiCraft vehicle seats work
