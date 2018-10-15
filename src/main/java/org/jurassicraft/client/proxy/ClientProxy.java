@@ -30,7 +30,7 @@ import org.jurassicraft.server.block.entity.*;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.VenomEntity;
 import org.jurassicraft.server.entity.particle.VenomParticle;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 import org.jurassicraft.server.event.KeyBindingHandler;
 import org.jurassicraft.server.item.JournalItem;
 import org.jurassicraft.server.proxy.ServerProxy;
@@ -164,11 +164,11 @@ public class ClientProxy extends ServerProxy {
         MC.displayGuiScreen(new JournalGui(type));
     }
 
-    public static void playCarSound(CarEntity entity) {
+    public static void playCarSound(VehicleEntity entity) {
         MC.getSoundHandler().playSound(new VehicleSound(entity, SoundHandler.CAR_MOVE));
     }
     
-    public static void playHelicopterSound(CarEntity entity) {
+    public static void playHelicopterSound(VehicleEntity entity) {
         MC.getSoundHandler().playSound(new VehicleSound(entity, SoundHandler.CAR_MOVE));
     }
 

@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.client.sound.EntitySound;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 
 public class CarEntityPlayRecord extends AbstractMessage<CarEntityPlayRecord> {
 
@@ -25,7 +25,7 @@ public class CarEntityPlayRecord extends AbstractMessage<CarEntityPlayRecord> {
     @SuppressWarnings("unused")
     public CarEntityPlayRecord(){}
 
-    public CarEntityPlayRecord(CarEntity entity, ItemRecord record){
+    public CarEntityPlayRecord(VehicleEntity entity, ItemRecord record){
         soundEvent = record.getSound();
         entityId = entity.getEntityId();
     }
@@ -47,8 +47,8 @@ public class CarEntityPlayRecord extends AbstractMessage<CarEntityPlayRecord> {
     @SideOnly(Side.CLIENT)
     public void onClientReceived(Minecraft client, CarEntityPlayRecord message, EntityPlayer player, MessageContext messageContext) {
         Entity entity = player.world.getEntityByID(message.entityId);
-        if(entity instanceof CarEntity) {
-            CarEntity carEntity = (CarEntity)entity;
+        if(entity instanceof VehicleEntity) {
+            VehicleEntity carEntity = (VehicleEntity)entity;
             if(carEntity.sound != null) {
                 carEntity.sound.setFinished();
             }

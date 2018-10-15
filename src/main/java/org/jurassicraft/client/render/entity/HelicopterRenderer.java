@@ -15,7 +15,7 @@ import org.jurassicraft.client.model.TabulaModelUV;
 import org.jurassicraft.client.model.animation.entity.vehicle.CarAnimator;
 import org.jurassicraft.client.model.animation.entity.vehicle.HelicopterAnimator;
 import org.jurassicraft.server.entity.ai.util.MathUtils;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
@@ -62,7 +62,7 @@ public abstract class HelicopterRenderer<E extends HelicopterEntity> extends Ren
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         this.bindEntityTexture(entity);
         this.renderModel(entity, x, y, z, yaw, partialTicks, false);
-        int destroyStage = Math.min(10, (int) (10 - (entity.getHealth() / CarEntity.MAX_HEALTH) * 10)) - 1;
+        int destroyStage = Math.min(10, (int) (10 - (entity.getHealth() / VehicleEntity.MAX_HEALTH) * 10)) - 1;
         if (destroyStage >= 0) {
             GlStateManager.color(1, 1, 1, 0.5F);
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.DST_COLOR, GlStateManager.DestFactor.SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);

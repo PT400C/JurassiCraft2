@@ -37,7 +37,7 @@ import org.jurassicraft.client.render.entity.TyretrackRenderer;
 import org.jurassicraft.client.sound.EntitySound;
 import org.jurassicraft.server.damage.DamageSources;
 import org.jurassicraft.server.entity.ai.util.InterpValue;
-import org.jurassicraft.server.entity.vehicle.CarEntity.Seat;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity.Seat;
 import org.jurassicraft.server.entity.vehicle.util.CarWheel;
 import org.jurassicraft.server.entity.vehicle.util.WheelParticleData;
 import org.jurassicraft.server.message.CarEntityPlayRecord;
@@ -45,6 +45,7 @@ import org.jurassicraft.server.message.UpdateVehicleControlMessage;
 import org.lwjgl.input.Keyboard;
 import org.omg.CORBA.DoubleHolder;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector4d;
@@ -54,19 +55,19 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Predicate;
 
-public abstract class CarEntity extends Entity implements MultiSeatedEntity {
-    public static final DataParameter<Byte> WATCHER_STATE = EntityDataManager.createKey(CarEntity.class, DataSerializers.BYTE);
-    public static final DataParameter<Float> WATCHER_HEALTH = EntityDataManager.createKey(CarEntity.class, DataSerializers.FLOAT);
-    public static final DataParameter<Integer> WATCHER_SPEED = EntityDataManager.createKey(CarEntity.class, DataSerializers.VARINT);
-    public static final DataParameter<ItemStack> RECORD_ITEM = EntityDataManager.createKey(CarEntity.class, DataSerializers.ITEM_STACK);
-
+public abstract class VehicleEntity extends Entity implements MultiSeatedEntity {
+    public static final DataParameter<Byte> WATCHER_STATE = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.BYTE);
+    public static final DataParameter<Float> WATCHER_HEALTH = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.FLOAT);
+    public static final DataParameter<Integer> WATCHER_SPEED = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.VARINT);
+    public static final DataParameter<ItemStack> RECORD_ITEM = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.ITEM_STACK);
+    public static final DataParameter<NBTTagCompound> WATCHER_SEATS = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.COMPOUND_TAG);
+    
     public static final float MAX_HEALTH = 40;
     private static final byte LEFT     = 0b000001;
     private static final byte RIGHT    = 0b000010;
     private static final byte FORWARD  = 0b000100;
     private static final byte BACKWARD = 0b001000;
 
-    //TODO Recode that system
     protected final Seat[] seats = createSeats();
     protected final WheelData wheeldata = createWheels();
     
@@ -103,7 +104,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     public List<CarWheel> allWheels = Lists.newArrayList(backLeftWheel, frontLeftWheel, backRightWheel, frontRightWheel);
 
     @SideOnly(Side.CLIENT)
-    public EntitySound<CarEntity> sound;
+    public EntitySound<VehicleEntity> sound;
     @SideOnly(Side.CLIENT)
     public InterpValue steerAmount;
 
@@ -117,7 +118,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     
 	private byte prevState = 0;
     
-    public CarEntity(World world) {
+    public VehicleEntity(World world) {
         super(world);
         this.setSize(3.0F, 2.5F);
         this.stepHeight = 1.5F;
@@ -140,6 +141,11 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         this.dataManager.register(WATCHER_HEALTH, MAX_HEALTH);
         this.dataManager.register(WATCHER_SPEED, 1);
         this.dataManager.register(RECORD_ITEM, ItemStack.EMPTY);
+        NBTTagCompound s = new NBTTagCompound();
+        for(int i = 0; i < createSeats().length; i++) {
+        	s.setString(str(i), "");
+        }
+        this.dataManager.register(WATCHER_SEATS, s);
     }
 
     public boolean left() {
@@ -230,18 +236,39 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     }
 
     @Override
-    protected boolean canFitPassenger(Entity passenger) {
+    protected boolean canFitPassenger(@Nonnull Entity passenger) {
         return this.getPassengers().size() < this.seats.length;
     }
 
     @Override
-    public Entity getControllingPassenger() {
-        return this.getPassengers().isEmpty() ? null : this.getPassengers().get(0);
+	public Entity getControllingPassenger() {
+		String id = getIfExists(0, false);
+		return id.equals("") ? null : this.world.getEntityByID(Integer.parseInt(id));
+	}
+    
+    @Nullable
+    @Override
+    public Entity getEntityInSeat(int seatID) {
+    	
+    	String id = this.getIfExists(seatID, false);
+    	return id.equals("") ? null : this.world.getEntityByID(Integer.parseInt(id));
     }
     
-    public Entity getSeatController() {
-        return this.seats[0].getOccupant();
-    }
+	public String getIfExists(int seatID, boolean reset) {
+
+		String string = this.dataManager.get(WATCHER_SEATS).getString(str(seatID));
+		if (!string.equals("")) {
+			if (!(this.world.getEntityByID(Integer.parseInt(string)) != null && this.world.getEntityByID(Integer.parseInt(string)).getRidingEntity() == this)) {
+				if(reset)
+					setSeat(str(seatID), "");
+				return "";
+			} else {
+				return string;
+			}
+		}
+		return "";
+
+	}
     
     @Override
     public boolean canBeCollidedWith() {
@@ -271,7 +298,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         this.interpProgress = duration;
     }
 
-    private void resetFlyTicks(EntityPlayerMP entity) {
+    private void resetFlyTicks(@Nonnull EntityPlayerMP entity) {
     	entity.fallDistance = 0F;
 		Field field = null;
 		Field field2 = null;
@@ -319,96 +346,95 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 		}
 	}
     
-    @Override
-    public void onEntityUpdate() {
-    	if (!world.isRemote) {
-    	 if (this.getHealth() < 0 && !this.isDead) {
-             this.setDead();
-             if (this.world.getGameRules().getBoolean("doEntityDrops")) {
-                 this.dropItems();
-                 ItemStack recordItem = this.dataManager.get(RECORD_ITEM);
-                 if(!recordItem.isEmpty()) {
-                     this.entityDropItem(recordItem, 0);
-                 }
-             }
-         }
-    	
-        	 for(Seat seat : this.seats){
-        		 if(seat.getOccupant() != null && seat.getOccupant() instanceof EntityPlayerMP) {
-        			 resetFlyTicks((EntityPlayerMP) seat.getOccupant());
-        		 }
-        	 }
+	@Override
+	public void onEntityUpdate() {
+		if (!world.isRemote) {
+			if (this.getHealth() < 0 && !this.isDead) {
+				this.setDead();
+				if (this.world.getGameRules().getBoolean("doEntityDrops")) {
+					this.dropItems();
+					ItemStack recordItem = this.dataManager.get(RECORD_ITEM);
+					if (!recordItem.isEmpty()) {
+						this.entityDropItem(recordItem, 0);
+					}
+				}
+			}
+
 			
-        }
-        if(this.getSpeed() == Speed.FAST) {
-            this.allWheels.forEach(wheel -> this.createWheelParticles(wheel, true));
-        }
-        this.allWheels.forEach(this::createWheelParticles);
+		}
+		
+		if (this.getSpeed() == Speed.FAST) {
+			this.allWheels.forEach(wheel -> this.createWheelParticles(wheel, true));
+		}
+		this.allWheels.forEach(this::createWheelParticles);
 
-        if(shouldStopUpdates()) {
-            super.onEntityUpdate();
-            return;
-        }
-        if(!world.isRemote) {
-            if(prevWorldTime != -1) {
-                world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(0.1f), this::canRunoverEntity).forEach(this::runOverEntity);
-            }
-        }
-        if(this.isInWater()){
-            for (Seat seat : seats) {
-                if(seat.getOccupant() != null) {
-                    seat.getOccupant().attackEntityFrom(DamageSource.DROWN, 0.5f);
-                }
-            }
-            this.setHealth(this.getHealth() - 0.25F);
-        }
-        if(previousPosition == null) {
-            previousPosition = this.getPositionVector();
-        }
-        estimatedSpeed = this.getPositionVector().distanceTo(previousPosition) / (world.getTotalWorldTime() - prevWorldTime);
-        previousPosition = this.getPositionVector();
-        prevWorldTime = world.getTotalWorldTime();
-        
-        for(int i = 0; i < 4; i++) {
-            List<WheelParticleData> markedRemoved = Lists.newArrayList();
-            wheelDataList[i].forEach(wheel -> wheel.onUpdate(markedRemoved));
-            markedRemoved.forEach(wheelDataList[i]::remove);
-        }
+		if (shouldStopUpdates()) {
+			super.onEntityUpdate();
+			return;
+		}
+		if (!world.isRemote) {
+			if (prevWorldTime != -1) {
+				world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(0.1f),
+						this::canRunoverEntity).forEach(this::runOverEntity);
+			}
+		}
+		if (this.isInWater()) {
+			for (int i = 0; i < this.seats.length; i++) {
+				Entity e = this.getEntityInSeat(i);
+				if (e != null) {
+					e.attackEntityFrom(DamageSource.DROWN, 0.5f);
+				}
+			}
+			this.setHealth(this.getHealth() - 0.25F);
+		}
+		if (previousPosition == null) {
+			previousPosition = this.getPositionVector();
+		}
+		estimatedSpeed = this.getPositionVector().distanceTo(previousPosition)
+				/ (world.getTotalWorldTime() - prevWorldTime);
+		previousPosition = this.getPositionVector();
+		prevWorldTime = world.getTotalWorldTime();
 
-        super.onEntityUpdate();
+		for (int i = 0; i < 4; i++) {
+			List<WheelParticleData> markedRemoved = Lists.newArrayList();
+			wheelDataList[i].forEach(wheel -> wheel.onUpdate(markedRemoved));
+			markedRemoved.forEach(wheelDataList[i]::remove);
+		}
 
-        this.allWheels.forEach(this::processWheel);
-        
-        Vector4d vec = wheeldata.carVector;
-        this.backValue.setTarget(this.calculateWheelHeight(vec.y, false));
-        this.frontValue.setTarget(this.calculateWheelHeight(vec.w, false));
-        this.leftValue.setTarget(this.calculateWheelHeight(vec.z, true));
-        this.rightValue.setTarget(this.calculateWheelHeight(vec.x, true));
+		super.onEntityUpdate();
 
-        if (!this.world.isRemote) {
-            if (this.healCooldown > 0) {
-                this.healCooldown--;
-            } else if (this.healAmount > 0) {
-                this.setHealth(this.getHealth() + 1);
-                this.healAmount--;
-                if (this.getHealth() > MAX_HEALTH) {
-                    this.setHealth(MAX_HEALTH);
-                    this.healAmount = 0;
-                }
-            }
-        }
+		this.allWheels.forEach(this::processWheel);
 
-        this.tickInterp();
-        this.updateMotion();
-        if (this.getPassengers().isEmpty() || !(this.getPassengers().get(0) instanceof EntityPlayer)) {
-            this.setControlState((byte) 0);
-        }
-        if (this.world.isRemote) {
-            this.handleControl();
-        }
-        this.applyMovement();
-        this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-    }
+		Vector4d vec = wheeldata.carVector;
+		this.backValue.setTarget(this.calculateWheelHeight(vec.y, false));
+		this.frontValue.setTarget(this.calculateWheelHeight(vec.w, false));
+		this.leftValue.setTarget(this.calculateWheelHeight(vec.z, true));
+		this.rightValue.setTarget(this.calculateWheelHeight(vec.x, true));
+
+		if (!this.world.isRemote) {
+			if (this.healCooldown > 0) {
+				this.healCooldown--;
+			} else if (this.healAmount > 0) {
+				this.setHealth(this.getHealth() + 1);
+				this.healAmount--;
+				if (this.getHealth() > MAX_HEALTH) {
+					this.setHealth(MAX_HEALTH);
+					this.healAmount = 0;
+				}
+			}
+		}
+
+		this.tickInterp();
+		this.updateMotion();
+		if (this.getPassengers().isEmpty() || !(this.getPassengers().get(0) instanceof EntityPlayer)) {
+			this.setControlState((byte) 0);
+		}
+		if (this.world.isRemote) {
+			this.handleControl();
+		}
+		this.applyMovement();
+		this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+	}
     
     protected boolean canRunoverEntity(Entity entity) {
 	    return EntitySelectors.NOT_SPECTATING.apply(entity) && !this.getPassengers().contains(entity);
@@ -465,6 +491,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
         if(shouldStopUpdates()) {
             return;
         }
+
         AxisAlignedBB aabb = this.getEntityBoundingBox();
         for(BlockPos pos : BlockPos.getAllInBoxMutable(new BlockPos(Math.floor(aabb.minX), Math.floor(aabb.minY), Math.floor(aabb.minZ)), new BlockPos(Math.ceil(aabb.maxX), Math.ceil(aabb.maxY), Math.ceil(aabb.maxZ)))) {
             IBlockState state = world.getBlockState(pos);
@@ -502,10 +529,11 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 			this.motionY -= 0.15F;
 
 	}
-
+	
+	@SideOnly(Side.CLIENT)
 	protected void handleControl() {
 		
-		Entity driver = this.getSeatController();
+		Entity driver = this.getControllingPassenger();
 		if (driver != null)
 			driver = this.getControllingPassenger();
 		if (!(driver instanceof EntityPlayer) || !((EntityPlayer) driver).isUser()) {
@@ -648,32 +676,47 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 		if (passenger instanceof EntityPlayerMP) {
 			resetFlyTicks((EntityPlayerMP) passenger);
 		}
+		if(!passenger.world.isRemote)
 		this.usherPassenger(passenger, 0);
 	}
     
     private void usherPassenger(Entity passenger, int start) {
         for (int i = start; i < this.seats.length; i++) {
-            if(this.tryPutInSeat(passenger, i)) {
+            if(this.tryPutInSeat(passenger, i, false)) {
                 return;
             }
         }
     }
+    
+	private void setSeat(String seatID, String uuid) {
+		NBTTagCompound comp = new NBTTagCompound();
+		comp.merge(this.dataManager.get(WATCHER_SEATS));
+		comp.setString(seatID, uuid);
+		this.dataManager.set(WATCHER_SEATS, comp);
+		if (seatID.equals("0")) {
+			if (this.getControllingPassenger() == null) {
+				if (this.getControlState() != (byte) 0) {
+					this.setControlState((byte) 0);
+					JurassiCraft.NETWORK_WRAPPER.sendToServer(new UpdateVehicleControlMessage(this));
+				}
+			}
+		}
+	}
 
 	@Override
-	public boolean tryPutInSeat(Entity passenger, int seatID) {
-		if (this.seats[0].occupant == passenger) {
-			this.setControlState((byte) 0);
-		}
+	public boolean tryPutInSeat(Entity passenger, int seatID, boolean isPacket) {
 		if (seatID < this.seats.length && seatID >= 0) {
 			Seat seat = this.seats[seatID];
-			if (seat.occupant == null && seat.predicate.test(passenger)) {
-				for (Seat seat1 : this.seats) {
-					if (seat1.occupant == passenger) {
-						seat1.occupant = null;
+			int seatNumber = getSeatForEntity(passenger);
+			if ((seatNumber == 0 && seatID == 0 && !isPacket) || getIfExists(seatID, false).equals("")) {
+				if (seatNumber != -1) {
+
+					if (!passenger.world.isRemote) {
+						setSeat(str(seatNumber), "");
 					}
 				}
-
-				seat.occupant = passenger;
+				if (!passenger.world.isRemote)
+					setSeat(str(seatID), str(passenger.getEntityId()));
 
 				return true;
 			}
@@ -681,16 +724,16 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 		return false;
 	}
 
-    @Nullable
-    @Override
-    public Entity getEntityInSeat(int seatID) {
-        return getSeat(seatID).getOccupant();
-    }
+	private String str(int input) {
+		
+		return Integer.toString(input);
+	}
 
+	@Nullable
     @Override
     public int getSeatForEntity(Entity entity) {
         for(int i = 0; i < this.seats.length; i++) {
-            if(this.seats[i].getOccupant() == entity) {
+        	if(getIfExists(i, true).equals(str(entity.getEntityId()))) {
                 return i;
             }
         }
@@ -699,13 +742,9 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 
     @Override
     protected void removePassenger(Entity passenger) {
+    	
         super.removePassenger(passenger);
-        for (Seat seat : this.seats) {
-            if (passenger.equals(seat.occupant)) {
-                seat.occupant = null;
-                break;
-            }
-        }
+        
     }
 
     @Override
@@ -727,13 +766,9 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
     @Override
     public void updatePassenger(Entity passenger) {
         if (this.isPassenger(passenger)) {
-            Seat seat = null;
-            for (Seat s : this.seats) {
-                if (passenger.equals(s.occupant)) {
-                    seat = s;
-                    break;
-                }
-            }
+        	Seat seat = null;
+			if (getSeatForEntity(passenger) != -1)
+				seat = this.seats[getSeatForEntity(passenger)];
             Vec3d pos;
             if (seat == null) {
             	
@@ -803,7 +838,7 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 
     public final class Seat {
 
-    	 private final InterpValue interpValue = new InterpValue(CarEntity.this, 0.1D);
+    	 private final InterpValue interpValue = new InterpValue(VehicleEntity.this, 0.1D);
 
          private float offsetX;
          private float offsetY;
@@ -811,21 +846,13 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
 
          private final float radius;
          private final float height;
-         private final Predicate<Entity> predicate;
          
-         private Entity occupant;
-
          public Seat(float offsetX, float offsetY, float offsetZ, float radius, float height) {
-             this(offsetX, offsetY, offsetZ, radius, height, entity -> true);
-         }
-         
-         public Seat(float offsetX, float offsetY, float offsetZ, float radius, float height, Predicate<Entity> predicate) {
              this.offsetX = offsetX;
              this.offsetY = offsetY;
              this.offsetZ = offsetZ;
              this.radius = radius;
              this.height = height;
-             this.predicate = predicate;
          }
 
          protected void so(float x, float y, float z) {
@@ -834,20 +861,16 @@ public abstract class CarEntity extends Entity implements MultiSeatedEntity {
              this.offsetZ = z;
          }
 
-         public Entity getOccupant() {
-             return this.occupant;
-         }
-
          public Vec3d getPos() {
-             double theta = Math.toRadians(CarEntity.this.rotationYaw);
+             double theta = Math.toRadians(VehicleEntity.this.rotationYaw);
              double sideX = Math.cos(theta);
              double sideZ = Math.sin(theta);
              double forwardTheta = theta + Math.PI / 2;
              double forwardX = Math.cos(forwardTheta);
              double forwardZ = Math.sin(forwardTheta);
-             double x = CarEntity.this.posX + sideX * this.offsetX + forwardX * this.offsetZ;
-             double y = CarEntity.this.posY + this.offsetY;
-             double z = CarEntity.this.posZ + sideZ * this.offsetX + forwardZ * this.offsetZ;
+             double x = VehicleEntity.this.posX + sideX * this.offsetX + forwardX * this.offsetZ;
+             double y = VehicleEntity.this.posY + this.offsetY;
+             double z = VehicleEntity.this.posZ + sideZ * this.offsetX + forwardZ * this.offsetZ;
              return new Vec3d(x, y, z);
          }
 

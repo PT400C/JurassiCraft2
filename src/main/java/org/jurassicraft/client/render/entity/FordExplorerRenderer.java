@@ -4,7 +4,7 @@ import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.ResetControlTabulaModel;
 import org.jurassicraft.client.model.animation.entity.vehicle.CarAnimator;
 import org.jurassicraft.client.model.animation.entity.vehicle.CarAnimator.Door;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 import org.jurassicraft.server.entity.vehicle.FordExplorerEntity;
 import org.jurassicraft.server.tabula.TabulaModelHelper;
 

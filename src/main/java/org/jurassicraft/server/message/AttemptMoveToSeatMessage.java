@@ -9,7 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.jurassicraft.JurassiCraft;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 import org.jurassicraft.server.entity.vehicle.MultiSeatedEntity;
 
 public class AttemptMoveToSeatMessage extends AbstractMessage<AttemptMoveToSeatMessage> {
@@ -50,21 +50,22 @@ public class AttemptMoveToSeatMessage extends AbstractMessage<AttemptMoveToSeatM
 
     @Override
     public void onClientReceived(Minecraft client, AttemptMoveToSeatMessage message, EntityPlayer player, MessageContext messageContext) {
-        putEntityInSeat(player.world, message);
+        putEntityInSeat(player.world, message, player);
     }
 
     @Override
     public void onServerReceived(MinecraftServer server, AttemptMoveToSeatMessage message, EntityPlayer player, MessageContext messageContext) {
-        if(putEntityInSeat(player.world, message)) {
+        if(putEntityInSeat(player.world, message, player)) {
             JurassiCraft.NETWORK_WRAPPER.sendToDimension(new AttemptMoveToSeatMessage(message), player.dimension);
         }
     }
 
-    private boolean putEntityInSeat(World world, AttemptMoveToSeatMessage message) {
+    private boolean putEntityInSeat(World world, AttemptMoveToSeatMessage message, EntityPlayer player) {
         Entity entity = world.getEntityByID(message.entityID);
         if(entity instanceof MultiSeatedEntity) {
             MultiSeatedEntity multiSeatedEntity = ((MultiSeatedEntity)entity);
-            multiSeatedEntity.tryPutInSeat(multiSeatedEntity.getEntityInSeat(message.fromSeat), message.toSeat);
+            VehicleEntity e = (VehicleEntity) entity;
+            multiSeatedEntity.tryPutInSeat(world.getEntityByID(player.getEntityId()), message.toSeat, true);
             return true;
         }
         return false;

@@ -2,7 +2,7 @@ package org.jurassicraft.server.entity.vehicle.util;
 
 import java.util.List;
 
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 
 import net.minecraft.util.math.Vec3d;
 

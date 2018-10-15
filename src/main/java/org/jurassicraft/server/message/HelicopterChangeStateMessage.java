@@ -1,6 +1,6 @@
 package org.jurassicraft.server.message;
 
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 import org.jurassicraft.server.entity.vehicle.FordExplorerEntity;
 
 import io.netty.buffer.ByteBuf;

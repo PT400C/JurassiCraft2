@@ -29,7 +29,7 @@ import javax.vecmath.Vector4d;
 import java.util.Arrays;
 import java.util.List;
 
-public class FordExplorerEntity extends CarEntity {
+public class FordExplorerEntity extends VehicleEntity {
 
     public static final BlockPos INACTIVE = new BlockPos(-1, -1, -1);
     
@@ -132,8 +132,8 @@ public class FordExplorerEntity extends CarEntity {
     @Override
     protected void removePassenger(Entity passenger) {
         super.removePassenger(passenger);
-        for (Seat seat : this.seats) {
-            if (passenger.equals(seat.getOccupant())) {
+        for (int i = 0; i < this.seats.length; i++) {
+            if (passenger.equals(this.getEntityInSeat(i))) {
                 passenger.noClip = false;
         	break;
             }

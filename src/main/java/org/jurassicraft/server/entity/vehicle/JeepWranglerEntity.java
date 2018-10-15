@@ -4,7 +4,7 @@ import org.jurassicraft.server.item.ItemHandler;
 
 import net.minecraft.world.World;
 
-public class JeepWranglerEntity extends CarEntity {
+public class JeepWranglerEntity extends VehicleEntity {
     public JeepWranglerEntity(World world) {
         super(world);
         this.speedModifier = 0f;

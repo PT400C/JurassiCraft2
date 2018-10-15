@@ -15,7 +15,7 @@ import org.jurassicraft.client.model.TabulaModelUV;
 import org.jurassicraft.client.model.animation.entity.vehicle.CarAnimator;
 import org.jurassicraft.client.model.animation.entity.vehicle.HelicopterAnimator;
 import org.jurassicraft.server.entity.ai.util.MathUtils;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
@@ -29,7 +29,7 @@ import org.jurassicraft.server.entity.vehicle.JeepWranglerEntity;
 import org.jurassicraft.server.tabula.TabulaModelHelper;
 
 @SideOnly(Side.CLIENT)
-public abstract class CarRenderer<E extends CarEntity> extends Render<E> {
+public abstract class CarRenderer<E extends VehicleEntity> extends Render<E> {
     private static final ResourceLocation[] DESTROY_STAGES = IntStream.range(0, 10)
         .mapToObj(n -> new ResourceLocation(String.format("textures/blocks/destroy_stage_%d.png", n)))
         .toArray(ResourceLocation[]::new);
@@ -64,7 +64,7 @@ public abstract class CarRenderer<E extends CarEntity> extends Render<E> {
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         this.bindEntityTexture(entity);
         this.renderModel(entity, x, y, z, yaw, partialTicks, false);
-        int destroyStage = Math.min(10, (int) (10 - (entity.getHealth() / CarEntity.MAX_HEALTH) * 10)) - 1;
+        int destroyStage = Math.min(10, (int) (10 - (entity.getHealth() / VehicleEntity.MAX_HEALTH) * 10)) - 1;
         if (destroyStage >= 0) {
             GlStateManager.color(1, 1, 1, 0.5F);
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.DST_COLOR, GlStateManager.DestFactor.SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -91,7 +91,7 @@ public abstract class CarRenderer<E extends CarEntity> extends Render<E> {
         GlStateManager.popMatrix();
     }
 
-    protected void doCarRotations(CarEntity entity, float partialTicks) {
+    protected void doCarRotations(VehicleEntity entity, float partialTicks) {
         if(!(entity instanceof HelicopterEntity)) {
             double backValue = entity.backValue.getValueForRendering(partialTicks);
             double frontValue = entity.frontValue.getValueForRendering(partialTicks);

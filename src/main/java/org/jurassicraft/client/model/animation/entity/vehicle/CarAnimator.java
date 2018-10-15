@@ -8,12 +8,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.Vec3d;
 import org.jurassicraft.server.entity.ai.util.InterpValue;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 import org.jurassicraft.server.entity.vehicle.HelicopterEntity;
 
 import java.util.List;
 
-public class CarAnimator implements ITabulaModelAnimator<CarEntity> {
+public class CarAnimator implements ITabulaModelAnimator<VehicleEntity> {
     private final List<CarAnimator.Door> doorList = Lists.newArrayList();
     public float partialTicks;
 
@@ -23,12 +23,12 @@ public class CarAnimator implements ITabulaModelAnimator<CarEntity> {
     }
     
     @Override
-    public void setRotationAngles(TabulaModel model, CarEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float rotationYaw, float rotationPitch, float scale) {
+    public void setRotationAngles(TabulaModel model, VehicleEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float rotationYaw, float rotationPitch, float scale) {
         if(!(entity instanceof HelicopterEntity)) {
             doorList.forEach(door -> {
                 InterpValue value = door.getInterpValue(entity);
-                CarEntity.Seat seat = door.getSeat(entity);
-                CarEntity.Seat closestSeat = seat;
+                VehicleEntity.Seat seat = door.getSeat(entity);
+                VehicleEntity.Seat closestSeat = seat;
                 EntityPlayer player = Minecraft.getMinecraft().player;
                 Vec3d playerPos = player.getPositionVector();
                 for (Door door1 : this.doorList) {
@@ -36,7 +36,7 @@ public class CarAnimator implements ITabulaModelAnimator<CarEntity> {
                         closestSeat = door1.getSeat(entity);
                     }
                 }
-                value.setTarget(Math.toRadians(entity.getPassengers().contains(player) || seat.getOccupant() != null || closestSeat != seat || closestSeat.getPos().distanceTo(playerPos) > 4D ? 0F : door.isLeft() ? 60F : -60F));
+                value.setTarget(Math.toRadians(entity.getPassengers().contains(player) || entity.getEntityInSeat(door.getSeatIndex()) != null || closestSeat != seat || closestSeat.getPos().distanceTo(playerPos) > 4D ? 0F : door.isLeft() ? 60F : -60F));
                 model.getCube(door.getName()).rotateAngleY = (float) value.getValueForRendering(partialTicks);
             });
 
@@ -74,15 +74,19 @@ public class CarAnimator implements ITabulaModelAnimator<CarEntity> {
 			this.isLeft = isLeft;
 		}
 
-		public InterpValue getInterpValue(CarEntity entity) {
+		public InterpValue getInterpValue(VehicleEntity entity) {
 			return getSeat(entity).getInterpValue();
 		}
 
 		public String getName() {
 			return name;
 		}
+		
+		public int getSeatIndex() {
+			return this.seatIndex;
+		}
 
-		public CarEntity.Seat getSeat(CarEntity entity) {
+		public VehicleEntity.Seat getSeat(VehicleEntity entity) {
 			return entity.getSeat(seatIndex);
 		}
 

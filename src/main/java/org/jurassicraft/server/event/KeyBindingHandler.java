@@ -8,7 +8,7 @@ import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 import org.lwjgl.input.Keyboard;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class KeyBindingHandler {
         @Override
         public boolean isActive() {
             EntityPlayer player = Minecraft.getMinecraft().player;
-            return player != null && player.getRidingEntity() instanceof CarEntity;
+            return player != null && player.getRidingEntity() instanceof VehicleEntity;
         }
 
         @Override

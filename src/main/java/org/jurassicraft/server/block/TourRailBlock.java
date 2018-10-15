@@ -22,7 +22,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.jurassicraft.server.block.entity.TourRailBlockEntity;
-import org.jurassicraft.server.entity.vehicle.CarEntity;
+import org.jurassicraft.server.entity.vehicle.VehicleEntity;
 import org.jurassicraft.server.tab.TabHandler;
 
 import javax.annotation.Nonnull;
@@ -880,20 +880,20 @@ public final class TourRailBlock extends Block {
 
     public enum SpeedType {
         NONE(null, -1),
-        SLOW(CarEntity.Speed.SLOW, 0xa80000), //RED
-        MEDIUM(CarEntity.Speed.MEDIUM, 0xff7600), //ORANGE
-        FAST(CarEntity.Speed.FAST, 0x00a800); //GREEN
+        SLOW(VehicleEntity.Speed.SLOW, 0xa80000), //RED
+        MEDIUM(VehicleEntity.Speed.MEDIUM, 0xff7600), //ORANGE
+        FAST(VehicleEntity.Speed.FAST, 0x00a800); //GREEN
 
-        private final CarEntity.Speed speed;
+        private final VehicleEntity.Speed speed;
         private final int color;
 
-        SpeedType(CarEntity.Speed speed, int color) {
+        SpeedType(VehicleEntity.Speed speed, int color) {
             this.speed = speed;
             this.color = color;
         }
 
         @Nonnull
-        public CarEntity.Speed getSpeed(CarEntity.Speed defaultSpeed) {
+        public VehicleEntity.Speed getSpeed(VehicleEntity.Speed defaultSpeed) {
             return speed == null ? defaultSpeed : speed;
         }
 
