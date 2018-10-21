@@ -18,15 +18,28 @@ import net.minecraft.entity.player.EntityPlayer;
     import net.minecraft.util.ITickable;
     import net.minecraft.util.NonNullList;
     import net.minecraft.util.math.MathHelper;
-    import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.relauncher.Side;
     import net.minecraftforge.fml.relauncher.SideOnly;
-    import org.jurassicraft.JurassiCraft;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.SidedInvWrapper;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.jurassicraft.JurassiCraft;
     import org.jurassicraft.server.api.CleanableItem;
-    import org.jurassicraft.server.container.CleaningStationContainer;
+import org.jurassicraft.server.api.GrindableItem;
+import org.jurassicraft.server.container.CleaningStationContainer;
+import org.jurassicraft.server.item.ItemHandler;
+
+import com.google.common.primitives.Ints;
 
 public class CleaningStationBlockEntity extends TileEntityLockable implements ITickable, ISidedInventory {
     private static final int[] SLOTS_TOP = new int[] { 0 };
-    private static final int[] SLOTS_BOTTOM = new int[] { 7, 6, 5, 4, 3, 2, 1 };
+    private static final int[] SLOTS_BOTTOM = new int[] { 7, 6, 5, 4, 3, 2};
     private static final int[] SLOTS_SIDES = new int[] { 1 }; // 0 = cleaning 1 = fuel 2 = output
 
     private NonNullList<ItemStack> slots = NonNullList.withSize(8,ItemStack.EMPTY);
@@ -311,31 +324,62 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
     }
 
     @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack) {
-        return index != 2 && (index != 1 || isItemFuel(stack));
-    }
-
-    @Override
     public int[] getSlotsForFace(EnumFacing side) {
-        return side == EnumFacing.DOWN ? SLOTS_BOTTOM : (side == EnumFacing.UP ? SLOTS_TOP : SLOTS_SIDES);
+        return ArrayUtils.addAll(SLOTS_TOP, ArrayUtils.addAll(SLOTS_SIDES, SLOTS_BOTTOM));
     }
 
     @Override
     public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
         return this.isItemValidForSlot(index, stack);
     }
+    
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(SLOTS_TOP).contains(slotID)) {
+			if (itemstack != null && CleanableItem.getCleanableItem(itemstack) != null && CleanableItem.getCleanableItem(itemstack).isCleanable(itemstack)) {
+				return true;
+			}
+		} else if (Ints.asList(SLOTS_SIDES).contains(slotID)) {
+
+			if (itemstack != null && CleaningStationBlockEntity.isItemFuel(itemstack)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     @Override
     public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-        if (direction == EnumFacing.DOWN && index == 1) {
-            Item item = stack.getItem();
-
-            return item == Items.WATER_BUCKET || item == Items.BUCKET;
-        }
-
         return true;
     }
 
+    @Override
+    @Nullable
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    {
+        if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                return (T) handlerPull;
+        return super.getCapability(capability, facing);
+    }
+    
+	IItemHandler handlerPull = new SidedInvWrapper(this, null) {
+
+		@Override
+		@Nonnull
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			if (slot == 1 && inv.getStackInSlot(slot) != null && inv.getStackInSlot(slot).getItem() == Items.BUCKET) {
+				return super.extractItem(slot, amount, simulate);
+
+			} else if (Ints.asList(SLOTS_BOTTOM).contains(slot)) {
+				return super.extractItem(slot, amount, simulate);
+
+			}
+			return ItemStack.EMPTY;
+
+		}
+	};
+    
     @Override
     public String getGuiID() {
         return JurassiCraft.MODID + ":cleaning_station";
@@ -414,4 +458,5 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 	public boolean isEmpty() {
 		return false;
 	}
+	
 }

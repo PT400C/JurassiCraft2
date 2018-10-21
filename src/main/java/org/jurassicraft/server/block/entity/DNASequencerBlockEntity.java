@@ -2,13 +2,19 @@ package org.jurassicraft.server.block.entity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.api.SequencableItem;
 import org.jurassicraft.server.container.DNASequencerContainer;
 import org.jurassicraft.server.item.ItemHandler;
+
+import com.google.common.primitives.Ints;
 
 import java.util.Random;
 
@@ -97,6 +103,32 @@ public class DNASequencerBlockEntity extends MachineBaseBlockEntity {
         return OUTPUTS;
     }
 
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if (slotID % 2 == 0) {
+				if (itemstack != null && SequencableItem.getSequencableItem(itemstack) != null && this.getStackInSlot(slotID).getCount() == 0
+						&& SequencableItem.getSequencableItem(itemstack).isSequencable(itemstack)) {
+					return true;
+				}
+			} else {
+				if (itemstack != null && itemstack.getItem() == ItemHandler.STORAGE_DISC
+						&& (itemstack.getTagCompound() == null || !itemstack.getTagCompound().hasKey("DNAQuality")) && this.getStackInSlot(slotID).getCount() == 0) {
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+    
     @Override
     protected NonNullList<ItemStack> getSlots() {
         return this.slots;

@@ -2,6 +2,7 @@ package org.jurassicraft.server.container;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.tileentity.TileEntity;
@@ -41,6 +42,13 @@ public class CultivateContainer extends MachineContainer {
         if (!player.world.isRemote) {
             this.cultivator.closeInventory(player);
         }
+    }
+    
+    @Override
+    public void addListener(IContainerListener listener)
+    {
+        super.addListener(listener);
+        listener.sendAllWindowProperties(this, this.cultivator);
     }
 
     @Override

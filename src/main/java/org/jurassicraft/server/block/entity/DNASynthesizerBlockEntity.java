@@ -4,11 +4,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.api.SynthesizableItem;
 import org.jurassicraft.server.container.DNASynthesizerContainer;
 import org.jurassicraft.server.item.ItemHandler;
+
+import com.google.common.primitives.Ints;
 
 import java.util.Random;
 
@@ -111,6 +115,25 @@ public class DNASynthesizerBlockEntity extends MachineBaseBlockEntity {
         return this.hasCustomName() ? this.customName : "container.dna_synthesizer";
     }
 
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if ((slotID == 0 && itemstack != null && SynthesizableItem.getSynthesizableItem(itemstack) != null && SynthesizableItem.getSynthesizableItem(itemstack).isSynthesizable(itemstack))
+					|| slotID == 1 && itemstack != null && itemstack.getItem() == ItemHandler.EMPTY_TEST_TUBE
+					|| slotID == 2 && itemstack != null && itemstack.getItem() == ItemHandler.DNA_NUCLEOTIDES) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+    
 	@Override
 	public boolean isEmpty() {
 		return false;

@@ -6,8 +6,11 @@ import org.jurassicraft.server.block.BlockHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockShulkerBox;
 import net.minecraft.block.BlockVine;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +19,9 @@ import net.minecraft.world.World;
 public class JCBlockVine extends BlockVine {
 
 	public JCBlockVine() {
+		
+		this.setHardness(0.2F);
+		this.setSoundType(SoundType.PLANT);
 		this.setUnlocalizedName("vine");
 	}
 

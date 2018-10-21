@@ -4,27 +4,46 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemBucketMilk;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
+import org.jurassicraft.server.block.BlockHandler;
+import org.jurassicraft.server.container.CleaningStationContainer;
 import org.jurassicraft.server.container.CultivateContainer;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.food.FoodNutrients;
+import org.jurassicraft.server.item.DNAItem;
 import org.jurassicraft.server.item.ItemHandler;
+import org.jurassicraft.server.item.PlantDNAItem;
+import org.jurassicraft.server.item.SyringeItem;
 import org.jurassicraft.server.message.CultivatorSyncNutrients;
+import org.jurassicraft.server.proxy.ServerProxy;
+
+import com.google.common.primitives.Ints;
+import com.sun.jna.platform.win32.WinUser.GUITHREADINFO;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 public class CultivatorBlockEntity extends MachineBaseBlockEntity implements TemperatureControl {
-    private static final int[] INPUTS = new int[] { 0, 1, 2, 3 };
-    private static final int[] OUTPUTS = new int[] { 4 };
+    private static final int[] INPUTS = new int[] {0, 1, 2, 3};
+    private static final int[] OUTPUTS = new int[] {0, 3};
     public static final int MAX_NUTRIENTS = 3000;
     private NonNullList<ItemStack> slots = NonNullList.withSize(5, ItemStack.EMPTY);
     private int waterLevel;
@@ -254,7 +273,7 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
         return new CultivateContainer(playerInventory, this);
     }
 
-    @Override
+	@Override
     public String getGuiID() {
         return JurassiCraft.MODID + ":cultivator";
     }
@@ -382,17 +401,73 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
 	public boolean isEmpty() {
 		return false;
 	}
+	
+	@Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		if(!this.isProcessing(0)) {
+		if(slotID == 0) {
+			ItemStack stackInSlot = this.getStackInSlot(slotID);
+			
+			if (stackInSlot != null && stackInSlot.getItem() == ItemHandler.HATCHED_EGG) {
+				return true;
+			}else {
+				return false;
+			}
+		}
+		return true;
+		}
+		return false;
+		
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if(!this.handler.isUp && !this.isProcessing(0)) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if ((slotID == 0 && itemstack != null && this.getStackInSlot(slotID).getCount() == 0 && itemstack.getItem() instanceof SyringeItem && SyringeItem.getDinosaur(itemstack).getBirthType() == Dinosaur.BirthType.LIVE_BIRTH)
+					|| (slotID == 1 && itemstack != null && FoodNutrients.NUTRIENTS.containsKey(itemstack.getItem()))
+					|| (slotID == 2 && itemstack != null && CleaningStationBlockEntity.isItemFuel(itemstack))) {
+
+				return true;
+			}
+		}
+		}
+		return false;
+	}
 
 	@Override
 	protected NonNullList<ItemStack> getSlots() {
 //        NonNullList<ItemStack> slots = NonNullList.withSize(5, ItemStack.EMPTY);
 		return slots;
 	}
-
+	
 	@Override
 	protected void setSlots(NonNullList<ItemStack> slot) {
 //		ItemStack stack = this.slots.get(1);
 //		stack.grow(slot.size());
 		this.slots = slot;
 	}
+	
+	@Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(this.pos, 0, this.writeToNBT(new NBTTagCompound()));
+    }
+	
+	private IncubatorCapability handler = new IncubatorCapability(this);
+
+	@Override
+	@Nullable
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+
+		if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            if(!(facing == EnumFacing.DOWN)){
+                return (T) handler;
+            }
+		return super.getCapability(capability, facing);
+	}
+
+	public IItemHandler getCapabilityHandler() {
+		return super.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+	}
+
 }

@@ -19,6 +19,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import javax.annotation.Nullable;
 
@@ -424,12 +425,11 @@ public abstract  class MachineBaseBlockEntity extends TileEntityLockable impleme
 		return null;
 	}
 
-    net.minecraftforge.items.IItemHandler handler = new SidedInvWrapper(this, net.minecraft.util.EnumFacing.UP);
-    net.minecraftforge.items.IItemHandler handlerBottom = new SidedInvWrapper(this, net.minecraft.util.EnumFacing.DOWN);
+    IItemHandler handler = new SidedInvWrapper(this, EnumFacing.UP);
+    IItemHandler handlerBottom = new SidedInvWrapper(this, EnumFacing.DOWN);
 
-    @SuppressWarnings("unchecked")
     @Override
-    @javax.annotation.Nullable
+    @Nullable
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
         if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
