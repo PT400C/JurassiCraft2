@@ -21,6 +21,7 @@ import org.jurassicraft.server.conf.JurassiCraftConfig;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.item.ItemHandler;
+import org.jurassicraft.server.util.JCBlockVine;
 import org.jurassicraft.server.util.RegistryHandler;
 
 import java.util.*;
@@ -45,7 +46,7 @@ public class BlockHandler
     public static final List<EncasedFossilBlock> ENCASED_FOSSILS = new ArrayList<>();
 
     public static final PlantFossilBlock PLANT_FOSSIL = new PlantFossilBlock();
-
+    public static final JCBlockVine VINES = new JCBlockVine();
     public static final CleaningStationBlock CLEANING_STATION = new CleaningStationBlock();
     public static final FossilGrinderBlock FOSSIL_GRINDER = new FossilGrinderBlock();
     public static final DNASequencerBlock DNA_SEQUENCER = new DNASequencerBlock();

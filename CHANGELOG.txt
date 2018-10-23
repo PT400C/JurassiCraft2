@@ -1,1 +1,4 @@
-*Revamped the way the JurassiCraft vehicle seats work
++Revamped the way the JurassiCraft vehicle seats work
+*Vines are burnable and sound like vines again
++Pushing/Pulling items with hoppers in JC machines is now supported
+*Fixed syncing issues of the cultivator

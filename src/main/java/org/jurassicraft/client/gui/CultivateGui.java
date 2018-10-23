@@ -2,14 +2,29 @@ package org.jurassicraft.client.gui;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.network.FMLOutboundHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.FMLOutboundHandler.OutboundTarget;
+import net.minecraftforge.fml.common.network.internal.FMLMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.block.entity.CultivatorBlockEntity;
 import org.jurassicraft.server.container.CultivateContainer;
 import org.jurassicraft.server.message.ChangeTemperatureMessage;
+import org.jurassicraft.server.proxy.ServerProxy;
+
+import io.netty.channel.embedded.EmbeddedChannel;
 
 import java.io.IOException;
 
@@ -26,14 +41,6 @@ public class CultivateGui extends GuiContainer {
         this.cultivator = entity;
         this.xSize = 352;
         this.ySize = 188;
-    }
-
-    @Override
-    public void updateScreen() {
-        if (this.cultivator.isProcessing(0)) {
-            this.mc.player.closeScreen();
-            this.mc.displayGuiScreen(new CultivateProcessGui(this.playerInventory, this.cultivator));
-        }
     }
 
     @Override

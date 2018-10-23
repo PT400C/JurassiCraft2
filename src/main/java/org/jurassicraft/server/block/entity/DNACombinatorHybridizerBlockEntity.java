@@ -5,11 +5,13 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.api.Hybrid;
 import org.jurassicraft.server.container.DNACombinatorHybridizerContainer;
 import org.jurassicraft.server.dinosaur.Dinosaur;
@@ -17,6 +19,8 @@ import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.genetics.DinoDNA;
 import org.jurassicraft.server.genetics.PlantDNA;
 import org.jurassicraft.server.item.ItemHandler;
+
+import com.google.common.primitives.Ints;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -245,6 +249,22 @@ public class DNACombinatorHybridizerBlockEntity extends MachineBaseBlockEntity {
 
         return nbt;
     }
+
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(this.hybridizerMode ? HYBRIDIZER_OUTPUTS : COMBINATOR_OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(this.hybridizerMode ? HYBRIDIZER_INPUTS : COMBINATOR_INPUTS).contains(slotID)) {
+			if (itemstack != null && itemstack.getItem() == ItemHandler.STORAGE_DISC && this.getStackInSlot(slotID).getCount() == 0 && (itemstack.getTagCompound() != null && itemstack.getTagCompound().hasKey("DNAQuality"))) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     public boolean getMode() {
         return this.hybridizerMode;

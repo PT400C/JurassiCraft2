@@ -1,19 +1,32 @@
 package org.jurassicraft.server.block.entity;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.api.IncubatorEnvironmentItem;
 import org.jurassicraft.server.container.IncubatorContainer;
 import org.jurassicraft.server.item.DinosaurEggItem;
 import org.jurassicraft.server.item.ItemHandler;
 
+import com.google.common.primitives.Ints;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 public class IncubatorBlockEntity extends MachineBaseBlockEntity implements TemperatureControl {
     private static final int[] INPUTS = new int[] { 0, 1, 2, 3, 4 };
@@ -168,6 +181,41 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
             this.temperature[id - 10] = value;
         }
     }
+    
+    @Override
+	public int[] getSlotsForFace(EnumFacing side) {
+		
+		return ArrayUtils.addAll(INPUTS, ENVIRONMENT);
+	}
+    
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return true;
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if (itemstack != null && itemstack.getItem() == ItemHandler.EGG) {
+				return true;
+			}
+		}else if(Ints.asList(ENVIRONMENT).contains(slotID)) {
+			if (itemstack != null && itemstack.getItem() instanceof IncubatorEnvironmentItem || Block.getBlockFromItem(itemstack.getItem()) instanceof IncubatorEnvironmentItem) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	@Override
+    @Nullable
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    {
+        if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                return (T) handlerPull;
+        return super.getCapability(capability, facing);
+    }
 
     @Override
     protected boolean shouldResetProgress() {
@@ -193,4 +241,21 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 	public boolean isEmpty() {
 		return false;
 	}
+	
+	IItemHandler handlerPull = new SidedInvWrapper(this, null) {
+
+		@Override
+		@Nonnull
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			if (Ints.asList(INPUTS).contains(slot)) {
+				ItemStack stackInSlot = inv.getStackInSlot(slot);
+				if (stackInSlot != null && stackInSlot.getItem() == ItemHandler.HATCHED_EGG) {
+					return super.extractItem(slot, amount, simulate);
+				}
+
+			}
+			return ItemStack.EMPTY;
+
+		}
+	};
 }

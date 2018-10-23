@@ -4,12 +4,17 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
+import org.jurassicraft.server.api.SynthesizableItem;
 import org.jurassicraft.server.container.EmbryonicMachineContainer;
 import org.jurassicraft.server.item.DNAItem;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.item.PlantDNAItem;
+
+import com.google.common.primitives.Ints;
 
 public class EmbryonicMachineBlockEntity extends MachineBaseBlockEntity {
     private static final int[] INPUTS = new int[] { 0, 1, 2 };
@@ -124,6 +129,25 @@ public class EmbryonicMachineBlockEntity extends MachineBaseBlockEntity {
     public String getName() {
         return this.hasCustomName() ? this.customName : "container.embryonic_machine";
     }
+    
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if ((slotID == 0 && itemstack != null && (itemstack.getItem() instanceof DNAItem || itemstack.getItem() instanceof PlantDNAItem) && this.getStackInSlot(slotID).getCount() == 0)
+					|| (slotID == 1 && itemstack != null && (itemstack.getItem() == ItemHandler.PLANT_CELLS_PETRI_DISH || itemstack.getItem() == ItemHandler.PETRI_DISH))
+					|| (slotID == 2 && itemstack != null && itemstack.getItem() == ItemHandler.EMPTY_SYRINGE)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     @Override
     protected void onSlotUpdate() {
