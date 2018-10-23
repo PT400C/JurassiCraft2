@@ -1,3 +1,4 @@
 *Vines are burnable and sound like vines again
 +Pushing/Pulling items with hoppers in JC machines is now supported
 *Revamped the vehicle seats behaviour
+*Fixed syncing issues of the cultivator
