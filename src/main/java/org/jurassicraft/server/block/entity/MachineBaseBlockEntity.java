@@ -16,14 +16,21 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
-public abstract  class MachineBaseBlockEntity extends TileEntityLockable implements ITickable, ISidedInventory {
+import io.netty.buffer.ByteBuf;
+
+public abstract  class MachineBaseBlockEntity extends TileEntityLockable implements ISyncable, ITickable, ISidedInventory {
     protected String customName;
 
     protected int[] processTime = new int[this.getProcessCount()];
@@ -91,6 +98,7 @@ public abstract  class MachineBaseBlockEntity extends TileEntityLockable impleme
         if (this.hasCustomName()) {
             compound.setString("CustomName", this.customName);
         }
+        
         return compound;
     }
 
@@ -105,6 +113,13 @@ public abstract  class MachineBaseBlockEntity extends TileEntityLockable impleme
         return ItemStackHelper.getAndSplit(slots, index, count);
     }
 
+    @Override
+	public NonNullList getSyncFields(NonNullList fields)
+	{
+
+		return fields;
+	}
+    
     @Override
     public ItemStack removeStackFromSlot(int index) {
         return removeStackFromSlot(index);
@@ -180,6 +195,7 @@ public abstract  class MachineBaseBlockEntity extends TileEntityLockable impleme
     public void update() {
     	
         NonNullList<ItemStack> slots = this.getSlots();
+        
         if(!world.isRemote) {
         for (int process = 0; process < this.getProcessCount(); process++) {
             boolean flag = this.isProcessing(process);
@@ -441,4 +457,7 @@ public abstract  class MachineBaseBlockEntity extends TileEntityLockable impleme
             }
         return super.getCapability(capability, facing);
     }
+    
+    @Override
+	public void packetDataHandler(ByteBuf dataStream) {}
 }

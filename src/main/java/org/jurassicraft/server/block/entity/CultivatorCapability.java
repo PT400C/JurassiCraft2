@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public class IncubatorCapability implements IItemHandlerModifiable {
+public class CultivatorCapability implements IItemHandlerModifiable {
 	
 	private final CultivatorBlockEntity otherTile;
 	private CultivatorBlockEntity mainTile;
 	public boolean isUp = false;
 
-	public IncubatorCapability(@Nullable CultivatorBlockEntity otherTile) {
+	public CultivatorCapability(@Nullable CultivatorBlockEntity otherTile) {
 		
 		this.otherTile = otherTile;
 		updateTile();
