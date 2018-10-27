@@ -162,32 +162,25 @@ public class InventoryDinosaur implements IInventory {
     }
 
     public void dropItems(World world, Random rand) {
-        for (int i = 0; i < this.getSizeInventory(); ++i) {
-            ItemStack itemstack = this.getStackInSlot(i);
+		for (int i = 0; i < this.getSizeInventory(); ++i) {
 
-            if (!itemstack.isEmpty()) {
-                float offsetX = rand.nextFloat() * 0.8F + 0.1F;
-                float offsetY = rand.nextFloat() * 0.8F + 0.1F;
-                float offsetZ = rand.nextFloat() * 0.8F + 0.1F;
+			ItemStack itemstack = this.getStackInSlot(i);
 
-                while (itemstack.getCount() > 0) {
-                    int j = rand.nextInt(21) + 10;
+			if (!itemstack.isEmpty()) {
+				float offsetX = rand.nextFloat() * 0.8F + 0.1F;
+				float offsetY = rand.nextFloat() * 0.8F + 0.1F;
+				float offsetZ = rand.nextFloat() * 0.8F + 0.1F;
+				EntityItem itemEntity = new EntityItem(world, this.entity.posX + offsetX, this.entity.posY + offsetY, this.entity.posZ + offsetZ, new ItemStack(itemstack.getItem(), itemstack.getCount(), itemstack.getItemDamage()));
+				float multiplier = 0.05F;
+				itemEntity.motionX = (float) rand.nextGaussian() * multiplier;
+				itemEntity.motionY = (float) rand.nextGaussian() * multiplier + 0.2F;
+				itemEntity.motionZ = (float) rand.nextGaussian() * multiplier;
+				world.spawnEntity(itemEntity);
+				itemstack.shrink(itemstack.getCount());
 
-                    if (j > itemstack.getCount()) {
-                        j = itemstack.getCount();
-                    }
-
-                    j -= itemstack.getCount();
-                    EntityItem itemEntity = new EntityItem(world, this.entity.posX + offsetX, this.entity.posY + offsetY, this.entity.posZ + offsetZ, new ItemStack(itemstack.getItem(), j, itemstack.getItemDamage()));
-                    float multiplier = 0.05F;
-                    itemEntity.motionX = (float) rand.nextGaussian() * multiplier;
-                    itemEntity.motionY = (float) rand.nextGaussian() * multiplier + 0.2F;
-                    itemEntity.motionZ = (float) rand.nextGaussian() * multiplier;
-                    world.spawnEntity(itemEntity);
-                }
-            }
-        }
-    }
+			}
+		}
+	}
 
     @Override
     public boolean isEmpty() {
