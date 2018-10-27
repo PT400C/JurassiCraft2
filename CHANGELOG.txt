@@ -1,1 +1,2 @@
 *Revamped the way the JurassiCraft vehicle seats work
+*Fixed a breaking crash with the dinosaur's inventories
