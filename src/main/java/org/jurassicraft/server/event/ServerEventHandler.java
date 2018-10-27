@@ -59,7 +59,7 @@ public class ServerEventHandler {
     
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void blockRegistry(RegistryEvent.Register<Block> e) {
-    	e.getRegistry().register(new JCBlockVine().setRegistryName("minecraft", "vine"));
+    	e.getRegistry().register(BlockHandler.VINES.setRegistryName("minecraft", "vine"));
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)

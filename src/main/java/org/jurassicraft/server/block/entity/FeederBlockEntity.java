@@ -16,14 +16,25 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.sound.SoundHandler;
+import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.block.machine.FeederBlock;
 import org.jurassicraft.server.container.FeederContainer;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.food.FoodHelper;
-
+import org.jurassicraft.server.food.FoodType;
+import com.google.common.primitives.Ints;
 import java.util.Random;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class FeederBlockEntity extends TileEntityLockable implements ITickable, ISidedInventory {
     private static final int[] CARNIVOROUS_SLOTS = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -45,21 +56,6 @@ public class FeederBlockEntity extends TileEntityLockable implements ITickable, 
     @Override
     public String getGuiID() {
         return JurassiCraft.MODID + ":feeder";
-    }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side) {
-        return side.getAxis() == EnumFacing.Axis.Y ? CARNIVOROUS_SLOTS : HERBIVOROUS_SLOTS;
-    }
-
-    @Override
-    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
-        return this.isItemValidForSlot(index, stack);
-    }
-
-    @Override
-    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-        return true;
     }
 
     @Override
@@ -109,8 +105,18 @@ public class FeederBlockEntity extends TileEntityLockable implements ITickable, 
     }
 
     @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack) {
-        return true;
+    public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+    	if (Ints.asList(CARNIVOROUS_SLOTS).contains(slotID)) {
+			if (itemstack != null && (FoodHelper.isFoodType(itemstack.getItem(), FoodType.MEAT) || FoodHelper.isFoodType(itemstack.getItem(), FoodType.FISH))) {
+				return true;
+			}
+		}else if (Ints.asList(HERBIVOROUS_SLOTS).contains(slotID)) {
+			if (itemstack != null && FoodHelper.isFoodType(itemstack.getItem(), FoodType.PLANT)) {
+				return true;
+			}
+		}
+
+		return false;
     }
 
     @Override
@@ -345,4 +351,59 @@ public class FeederBlockEntity extends TileEntityLockable implements ITickable, 
 	public boolean isEmpty() {
 		return false;
 	}
+
+    @Override
+    @Nullable
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    {
+        if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                return (T) handlerPull;
+        return super.getCapability(capability, facing);
+    }
+
+	@Override
+	public int[] getSlotsForFace(EnumFacing side) {
+		
+		return ArrayUtils.addAll(CARNIVOROUS_SLOTS, HERBIVOROUS_SLOTS);
+	}
+
+	@Override
+	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
+		return this.isItemValidForSlot(index, itemStackIn);
+	}
+
+	@Override
+	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+		return false;
+	}
+	
+	IItemHandler handlerPull = new IItemHandler() {
+
+		@Override
+		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+			return null;
+		}
+
+		@Override
+		public ItemStack getStackInSlot(int slot) {
+			return null;
+		}
+
+		@Override
+		public int getSlots() {
+			return 0;
+		}
+
+		@Override
+		public int getSlotLimit(int slot) {
+			return 0;
+		}
+
+		@Override
+		@Nonnull
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			return ItemStack.EMPTY;
+		}
+	};
+	
 }

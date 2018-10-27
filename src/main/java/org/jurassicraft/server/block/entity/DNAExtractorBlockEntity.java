@@ -6,8 +6,10 @@ import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.container.DNAExtractorContainer;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
@@ -18,6 +20,8 @@ import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.plant.Plant;
 import org.jurassicraft.server.plant.PlantHandler;
 
+import com.google.common.primitives.Ints;
+
 import java.util.List;
 import java.util.Random;
 
@@ -26,7 +30,7 @@ public class DNAExtractorBlockEntity extends MachineBaseBlockEntity {
     private static final int[] OUTPUTS = new int[]{2, 3, 4, 5};
 
     private NonNullList<ItemStack> slots = NonNullList.withSize(6, ItemStack.EMPTY);
-
+    
     @Override
     protected int getProcess(int slot) {
         return 0;
@@ -45,6 +49,23 @@ public class DNAExtractorBlockEntity extends MachineBaseBlockEntity {
         }
         return false;
     }
+    
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+
+		if ((slotID == 0 && itemstack != null && itemstack.getItem() == ItemHandler.AMBER || itemstack.getItem() == ItemHandler.SEA_LAMPREY || itemstack.getItem() == ItemHandler.DINOSAUR_MEAT)
+				|| slotID == 1 && itemstack != null && itemstack.getItem() == ItemHandler.STORAGE_DISC && (itemstack.getTagCompound() == null || !itemstack.getTagCompound().hasKey("DNAQuality"))) {
+
+			return true;
+		}
+
+		return false;
+	}
 
     @Override
     protected void processItem(int process) {
@@ -153,7 +174,7 @@ public class DNAExtractorBlockEntity extends MachineBaseBlockEntity {
 
     @Override
     public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
-        return new DNAExtractorContainer(playerInventory, this);
+    	return new DNAExtractorContainer(playerInventory, this);
     }
 
     @Override

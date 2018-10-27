@@ -43,6 +43,7 @@ import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.item.JournalItem;
 import org.jurassicraft.server.plant.PlantHandler;
 import org.jurassicraft.server.recipe.SmeltingRecipeHandler;
+import org.jurassicraft.server.util.JCBlockVine;
 import org.jurassicraft.server.util.RegistryHandler;
 import org.jurassicraft.server.maps.VillagerTradeHandler;
 import org.jurassicraft.server.world.WorldGenerator;
@@ -50,6 +51,7 @@ import org.jurassicraft.server.world.WorldGenerator;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -121,6 +123,7 @@ public class ServerProxy implements IGuiHandler {
             List<Biome.SpawnListEntry> list = biome.getSpawnableList(EnumCreatureType.CREATURE);
             addSpawn(list);
         }
+        Blocks.FIRE.setFireInfo(BlockHandler.VINES, 15, 100);
     }
     
     private void addSpawn(List<SpawnListEntry> list) {

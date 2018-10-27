@@ -19,6 +19,7 @@ public class DNAItem extends DNAContainerItem {
         super();
         this.setCreativeTab(TabHandler.DNA);
         this.setHasSubtypes(true);
+        this.setMaxStackSize(1);
     }
 
     @Override

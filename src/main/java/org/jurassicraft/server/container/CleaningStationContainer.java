@@ -41,6 +41,7 @@ public class CleaningStationContainer extends MachineContainer {
         }
     }
     
+    @Override
     public void addListener(IContainerListener listener)
     {
         super.addListener(listener);

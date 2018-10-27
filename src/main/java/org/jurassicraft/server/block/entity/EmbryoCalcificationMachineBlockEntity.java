@@ -1,17 +1,23 @@
 package org.jurassicraft.server.block.entity;
 
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
+import org.jurassicraft.server.api.SynthesizableItem;
 import org.jurassicraft.server.container.EmbryoCalcificationMachineContainer;
 import org.jurassicraft.server.dinosaur.Dinosaur;
+import org.jurassicraft.server.dinosaur.Dinosaur.BirthType;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.item.SyringeItem;
+
+import com.google.common.primitives.Ints;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 
 public class EmbryoCalcificationMachineBlockEntity extends MachineBaseBlockEntity {
@@ -110,6 +116,24 @@ public class EmbryoCalcificationMachineBlockEntity extends MachineBaseBlockEntit
     public String getName() {
         return this.hasCustomName() ? this.customName : "container.embryo_calcification_machine";
     }
+    
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if ((slotID == 0 && itemstack != null && itemstack.getItem() instanceof SyringeItem && SyringeItem.getDinosaur(itemstack).getBirthType() == BirthType.EGG_LAYING)
+					|| slotID == 1 && itemstack != null && itemstack.getItem() == Items.EGG) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     @Override
     protected void onSlotUpdate() {

@@ -15,4 +15,9 @@ public class TestTubeSlot extends Slot {
     public boolean isItemValid(ItemStack stack) {
         return stack.getItem() instanceof DNAItem || stack.getItem() instanceof PlantDNAItem;
     }
+    
+    @Override
+    public int getItemStackLimit(ItemStack stack) {
+    	return 1;
+    }
 }

@@ -7,11 +7,15 @@ import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.container.FossilGrinderContainer;
 
+import com.google.common.primitives.Ints;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import scala.actors.threadpool.Arrays;
 
 public class FossilGrinderBlockEntity extends MachineBaseBlockEntity {
     private static final int[] INPUTS = new int[] { 0, 1, 2, 3, 4, 5 };
@@ -42,6 +46,22 @@ public class FossilGrinderBlockEntity extends MachineBaseBlockEntity {
 
         return false;
     }
+    
+	@Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if (itemstack != null && GrindableItem.getGrindableItem(itemstack) != null && GrindableItem.getGrindableItem(itemstack).isGrindable(itemstack)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     @Override
     protected void processItem(int process) {

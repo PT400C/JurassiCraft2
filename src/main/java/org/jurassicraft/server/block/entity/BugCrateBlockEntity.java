@@ -2,7 +2,11 @@ package org.jurassicraft.server.block.entity;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.api.BreedableBug;
+import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.container.BugCrateContainer;
+import org.jurassicraft.server.food.FoodHelper;
+
+import com.google.common.primitives.Ints;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,6 +14,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 
 public class BugCrateBlockEntity extends MachineBaseBlockEntity {
@@ -168,6 +173,27 @@ public class BugCrateBlockEntity extends MachineBaseBlockEntity {
             }
         }
     }
+    
+    @Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		return Ints.asList(OUTPUTS).contains(slotID);
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			
+			if((float)(slotID / 2F) <= 1 && itemstack.getItem() instanceof BreedableBug) {
+				return true;
+			}else if(!((float)(slotID / 2F) <= 1)){
+				if(FoodHelper.isFood(itemstack.getItem()) && !(itemstack.getItem() instanceof BreedableBug)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public boolean isEmpty() {

@@ -1,30 +1,59 @@
 package org.jurassicraft.server.block.entity;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ContainerChest;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemBucketMilk;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
-
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.api.GrindableItem;
+import org.jurassicraft.server.block.BlockHandler;
+import org.jurassicraft.server.container.CleaningStationContainer;
 import org.jurassicraft.server.container.CultivateContainer;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.food.FoodNutrients;
+import org.jurassicraft.server.item.DNAItem;
 import org.jurassicraft.server.item.ItemHandler;
-import org.jurassicraft.server.message.CultivatorSyncNutrients;
+import org.jurassicraft.server.item.PlantDNAItem;
+import org.jurassicraft.server.item.SyringeItem;
+import org.jurassicraft.server.message.TileEntityFieldsMessage;
+import org.jurassicraft.server.proxy.ServerProxy;
 
+import com.google.common.primitives.Ints;
+import com.sun.jna.platform.win32.WinUser.GUITHREADINFO;
+
+import io.netty.buffer.ByteBuf;
+
+import java.util.ArrayList;
 import java.util.Random;
 
-public class CultivatorBlockEntity extends MachineBaseBlockEntity implements TemperatureControl {
-    private static final int[] INPUTS = new int[] { 0, 1, 2, 3 };
-    private static final int[] OUTPUTS = new int[] { 4 };
+import javax.annotation.Nullable;
+
+public class CultivatorBlockEntity extends MachineBaseBlockEntity implements TemperatureControl, ISyncable {
+    private static final int[] INPUTS = new int[] {0, 1, 2, 3};
+    private static final int[] OUTPUTS = new int[] {0, 3};
     public static final int MAX_NUTRIENTS = 3000;
     private NonNullList<ItemStack> slots = NonNullList.withSize(5, ItemStack.EMPTY);
     private int waterLevel;
@@ -33,6 +62,7 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
     private int minerals;
     private int vitamins;
     private int temperature;
+    private boolean isActive = false;
 
     private DinosaurEntity dinosaurEntity; //Used for rendering entities
 
@@ -50,9 +80,25 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
                 return this.lipids >= dino.getLipids() && this.minerals >= dino.getMinerals() && this.proximates >= dino.getProximates() && this.vitamins >= dino.getVitamins();
             }
         }
-
         return false;
     }
+    
+    @Override
+	public void packetDataHandler(ByteBuf fields)
+	{
+		super.packetDataHandler(fields);
+		
+		if(FMLCommonHandler.instance().getEffectiveSide().isClient())
+		{
+			setField(0, fields.readInt());
+			//This assumes that every field is of type integer!
+			for(int i = 2; i < getFieldCount(); i++){
+				setField(i, fields.readInt());
+			}
+			
+		}
+		
+	}
 
     @Override
     protected void processItem(int process) {
@@ -78,7 +124,6 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
             }
 
             hatchedEgg.setTagCompound(compound);
-
             this.slots.set(0, hatchedEgg);
         }
     }
@@ -86,8 +131,9 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
     @Override
     public void update() {
         super.update();
-        boolean sync = false;
         if (!this.world.isRemote) {
+
+        	boolean sync = false;
             if (this.waterLevel < 2 && this.slots.get(2).getItem() == Items.WATER_BUCKET) {
                 if (this.slots.get(3).getCount() < 16) {
                     this.slots.get(2).shrink(1);
@@ -113,12 +159,37 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
 
                 }
             }
+            
+            boolean active = this.isProcessing(0);
+            boolean syncActive = false;
+            if(active != isActive) {
+            	isActive = active;
+            	syncActive = true;
+            	
+            	
+            }
+            if (sync) {
+                this.markDirty();
+            }
+            if(syncActive || sync)
+            	JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+            
+            if(syncActive) {
+            	
+            	for (EntityPlayer entityplayer : this.world.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB((double)((float)this.pos.getX() - 5.0F), (double)((float)this.pos.getY() - 5.0F), (double)((float)this.pos.getZ() - 5.0F), (double)((float)(this.pos.getX() + 1) + 5.0F), (double)((float)(this.pos.getY() + 1) + 5.0F), (double)((float)(this.pos.getZ() + 1) + 5.0F))))
+                {
+                    if (entityplayer.openContainer instanceof CultivateContainer)
+                    {
+                        if(this.isProcessing(0)) {
+                        	entityplayer.openGui(JurassiCraft.INSTANCE, ServerProxy.GUI_CULTIVATOR_ID, this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ());
+                        }
+                    }
+                    
+                }
+            }
         }
 
-        if (sync) {
-            this.markDirty();
-            JurassiCraft.NETWORK_WRAPPER.sendToAll(new CultivatorSyncNutrients(this));
-        }
+        
     }
 
     private void consumeNutrients() {
@@ -236,6 +307,20 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
         }
         return dinosaurEntity == null ? createEntity() : dinosaurEntity;
     }
+    
+    @Override
+	public NonNullList getSyncFields(NonNullList fields)
+	{
+		super.getSyncFields(fields);
+		
+		fields.add(this.getField(0));
+		
+		for(int i = 2; i < getFieldCount(); i++){
+			fields.add(this.getField(i));
+		}
+		
+		return fields;
+	}
 
     private DinosaurEntity createEntity() {
         try {
@@ -254,7 +339,7 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
         return new CultivateContainer(playerInventory, this);
     }
 
-    @Override
+	@Override
     public String getGuiID() {
         return JurassiCraft.MODID + ":cultivator";
     }
@@ -382,17 +467,73 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
 	public boolean isEmpty() {
 		return false;
 	}
+	
+	@Override
+	public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side) {
+		if(!this.isProcessing(0)) {
+		if(slotID == 0) {
+			ItemStack stackInSlot = this.getStackInSlot(slotID);
+			
+			if (stackInSlot != null && stackInSlot.getItem() == ItemHandler.HATCHED_EGG) {
+				return true;
+			}else {
+				return false;
+			}
+		}
+		return true;
+		}
+		return false;
+		
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+		if(!this.handler.isUp && !this.isProcessing(0)) {
+		if (Ints.asList(INPUTS).contains(slotID)) {
+			if ((slotID == 0 && itemstack != null && this.getStackInSlot(slotID).getCount() == 0 && itemstack.getItem() instanceof SyringeItem && SyringeItem.getDinosaur(itemstack).getBirthType() == Dinosaur.BirthType.LIVE_BIRTH)
+					|| (slotID == 1 && itemstack != null && FoodNutrients.NUTRIENTS.containsKey(itemstack.getItem()))
+					|| (slotID == 2 && itemstack != null && CleaningStationBlockEntity.isItemFuel(itemstack))) {
+
+				return true;
+			}
+		}
+		}
+		return false;
+	}
 
 	@Override
 	protected NonNullList<ItemStack> getSlots() {
 //        NonNullList<ItemStack> slots = NonNullList.withSize(5, ItemStack.EMPTY);
 		return slots;
 	}
-
+	
 	@Override
 	protected void setSlots(NonNullList<ItemStack> slot) {
 //		ItemStack stack = this.slots.get(1);
 //		stack.grow(slot.size());
 		this.slots = slot;
 	}
+	
+	@Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(this.pos, 0, this.writeToNBT(new NBTTagCompound()));
+    }
+	
+	private CultivatorCapability handler = new CultivatorCapability(this);
+
+	@Override
+	@Nullable
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+
+		if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            if(!(facing == EnumFacing.DOWN)){
+                return (T) handler;
+            }
+		return super.getCapability(capability, facing);
+	}
+
+	public IItemHandler getCapabilityHandler() {
+		return super.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+	}
+
 }
