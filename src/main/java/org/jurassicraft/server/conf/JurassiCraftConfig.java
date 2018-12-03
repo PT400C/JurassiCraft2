@@ -26,6 +26,9 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
     @Config.Name("structure Generation")
     public static final StructureGeneration STRUCTURE_GENERATION = new StructureGeneration();
 
+    @Config.Name("items")
+    public static final Items ITEMS = new Items();
+    
     @Config.Name("vehicles")
     public static final Vehicles VEHICLES = new Vehicles();
 
@@ -42,9 +45,6 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
 
         @Config.Name("Allow Carcass Spawning")
         public boolean allowCarcass = true;
-
-        @Config.Name("Override growth serum disable")
-        public boolean disableGrowthSerumRecipe = true;
 
     }
 
@@ -98,6 +98,11 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
         @Config.Name("Raptor Paddock Rarity")
         @Config.Comment("Tested between 1/50 and 1/infinite (The default rarity is 1/4000)")
         public int paddockRarity = 4000;
+    }
+    
+    public static class Items {
+        @Config.Name("Disable Growth Serum")
+        public boolean disableGrowthSerum = false;
     }
 
     public static class Vehicles {

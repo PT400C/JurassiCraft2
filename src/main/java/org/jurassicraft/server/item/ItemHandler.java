@@ -5,7 +5,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.jurassicraft.client.sound.SoundHandler;
 import org.jurassicraft.server.api.Hybrid;
@@ -77,6 +80,7 @@ public class ItemHandler {
 
     public static final Item GROWTH_SERUM = new EntityRightClickItem(interaction -> {
             if (interaction.getTarget() instanceof DinosaurEntity) {
+            	if(!JurassiCraftConfig.ITEMS.disableGrowthSerum) {
                 DinosaurEntity dinosaur = (DinosaurEntity) interaction.getTarget();
                 if (!dinosaur.isCarcass()) {
                     dinosaur.setFullyGrown();
@@ -86,6 +90,12 @@ public class ItemHandler {
                     }
                     return true;
                 }
+            	}else {
+            		if(!interaction.getTarget().world.isRemote) {
+            			interaction.getPlayer().sendStatusMessage(new TextComponentString(TextFormatting.RED + I18n.format("growth_serum.denied.name")), true);
+            		}
+            		return false;
+            	}
             }
 	return false;
     }).setCreativeTab(TabHandler.ITEMS);
@@ -315,9 +325,7 @@ public class ItemHandler {
         registerItem(PLASTER_AND_BANDAGE, "Plaster And Bandage");
         registerItem(EMPTY_TEST_TUBE, "Empty Test Tube");
         registerItem(EMPTY_SYRINGE, "Empty Syringe");
-        if(!JurassiCraftConfig.ENTITIES.disableGrowthSerumRecipe && !Minecraft.getMinecraft().world.isRemote)
-            registerItem(GROWTH_SERUM, "Growth Serum");
-
+        registerItem(GROWTH_SERUM, "Growth Serum");
         registerItem(BREEDING_WAND, "Breeding Wand");
         registerItem(BIRTHING_WAND, "Birthing_Wand");
         registerItem(PREGNANCY_TEST, "Pregnancy Test");

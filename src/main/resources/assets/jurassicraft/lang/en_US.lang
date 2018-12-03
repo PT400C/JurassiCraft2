@@ -32,6 +32,7 @@ entity.Villager.jurassicraft:geneticist=Geneticist
 
 //Items ==================================================
 item.plaster_and_bandage.name=Plaster and Bandage
+growth_serum.denied.name=This function has been remote disabled
 
 item.attraction_sign.name={type} Attraction Sign
 attraction_sign.aquarium.name=Aquarium

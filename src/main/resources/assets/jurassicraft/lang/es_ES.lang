@@ -31,6 +31,7 @@ entity.Villager.jurassicraft:geneticist=Genetista
 
 //Items ==================================================
 item.plaster_and_bandage.name=Yeso y Venda
+growth_serum.denied.name=Esta función no está activa
 
 item.attraction_sign.name={type} Cartel de Atracción
 attraction_sign.aquarium.name=Acuario
