@@ -4,11 +4,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -20,6 +23,7 @@ import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -33,6 +37,8 @@ import org.jurassicraft.server.block.FossilizedTrackwayBlock;
 import org.jurassicraft.server.block.plant.DoublePlantBlock;
 import org.jurassicraft.server.conf.JurassiCraftConfig;
 import org.jurassicraft.server.entity.vehicle.VehicleEntity;
+import org.jurassicraft.server.entity.villager.VillagerHandler;
+import org.jurassicraft.server.entity.villager.ai.EntityAIResearchFossil;
 import org.jurassicraft.server.entity.vehicle.HelicopterEntity;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.util.GameRuleHandler;
@@ -50,6 +56,7 @@ public class ServerEventHandler {
 	
 	public ServerEventHandler() {
 		this.vinesException.add(BlockHandler.CLEAR_GLASS);
+		this.vinesException.add(BlockHandler.REINFORCED_GLASS);
 	}
 
     @SubscribeEvent
@@ -216,4 +223,16 @@ public class ServerEventHandler {
             }
         }
     }
+    
+    @SubscribeEvent
+	public void onEntitySpawn(EntityJoinWorldEvent event) {
+		Entity entity = event.getEntity();
+		if (entity instanceof EntityVillager) {
+			EntityVillager villager = (EntityVillager) entity;
+			if (villager.getProfessionForge().equals(VillagerHandler.PALEONTOLOGIST)) {
+				villager.tasks.addTask(6, new EntityAIResearchFossil(villager, 0.4));
+			}
+			villager.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.IRON_SHOVEL));
+		}
+	}
 }

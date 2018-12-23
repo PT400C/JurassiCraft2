@@ -28,6 +28,7 @@ entity.jurassicraft.attraction_sign.name=Cartel de Atracción
 entity.jurassicraft.paddock_sign.name=Cartel de Prados
 
 entity.Villager.jurassicraft:geneticist=Genetista
+entity.Villager.jurassicraft:paleontologist=Paleontóloga
 
 //Items ==================================================
 item.plaster_and_bandage.name=Yeso y Venda
@@ -242,6 +243,7 @@ item.wild_potato.name=Patata Salvaje
 item.wild_potato_cooked.name=Patata Salvaje Cocinada
 
 //Blocks ==================================================
+tile.ancient_item_holding_block.name=Bloque de sujeción de artículo antiguo
 tile.fossil_block.name=Fósil de {dinosaur}
 tile.encased_fossil.name=Fósil Recubierto de {dinosaur}
 tile.plant_fossil_block.name=Fósil Vegetal
@@ -378,6 +380,9 @@ tile.cultivate.name=Cultivador {color}
 tile.cultivator.name=Cultivador
 
 tile.clear_glass.name=Cristal Transparente
+tile.clear_glass_pane.name=Panel De Vidrio Transparente
+tile.reinforced_glass.name=Cristal Reforzado
+tile.reinforced_glass_pane.name=Panel De Vidrio Reforzado
 
 tile.feeder.name=Comedero
 tile.bug_crate.name=Caja Granja de Insectos
@@ -565,6 +570,8 @@ key.vehicle_5.switch=Intentando Mover al Asiento 6
 key.vehicle_6.switch=Intentando Mover al Asiento 7
 key.vehicle_7.switch=Intentando Mover al Asiento 8
 key.vehicle_8.switch=Intentando Mover al Asiento 9
+key.vehicle_helicopter.up=Ascender
+key.vehicle_helicopter.down=Descender
 
 //Other =============
 message.tame.name=Has domado un {dinosaur}

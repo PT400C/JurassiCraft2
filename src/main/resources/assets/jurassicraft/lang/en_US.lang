@@ -29,6 +29,7 @@ entity.jurassicraft.attraction_sign.name=Attraction Sign
 entity.jurassicraft.paddock_sign.name=Paddock Sign
 
 entity.Villager.jurassicraft:geneticist=Geneticist
+entity.Villager.jurassicraft:paleontologist=Paleontologist
 
 //Items ==================================================
 item.plaster_and_bandage.name=Plaster and Bandage
@@ -243,6 +244,7 @@ item.wild_potato.name=Wild Potato
 item.wild_potato_cooked.name=Cooked Wild Potato
 
 //Blocks ==================================================
+tile.ancient_item_holding_block.name=Ancient Item Holding Block
 tile.fossil_block.name={dinosaur} Fossil
 tile.encased_fossil.name=Encased {dinosaur} Fossil
 tile.plant_fossil_block.name=Plant Fossil
@@ -379,6 +381,9 @@ tile.cultivate.name={color} Cultivator
 tile.cultivator.name=Cultivator
 
 tile.clear_glass.name=Clear Glass
+tile.clear_glass_pane.name=Clear Glass Pane
+tile.reinforced_glass.name=Reinforced Glass
+tile.reinforced_glass_pane.name=Reinforced Glass Pane
 
 tile.feeder.name=Feeder
 tile.bug_crate.name=Bug Farming Crate
@@ -566,6 +571,8 @@ key.vehicle_5.switch=Attempt to move to Seat 6
 key.vehicle_6.switch=Attempt to move to Seat 7
 key.vehicle_7.switch=Attempt to move to Seat 8
 key.vehicle_8.switch=Attempt to move to Seat 9
+key.vehicle_helicopter.up=Ascend
+key.vehicle_helicopter.down=Descend
 
 //Other =============
 message.tame.name=You have tamed a {dinosaur}

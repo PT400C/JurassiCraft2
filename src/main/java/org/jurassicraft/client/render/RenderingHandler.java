@@ -197,6 +197,9 @@ public enum RenderingHandler {
 
         registerBlockRenderer(MOSS, "moss");
         registerBlockRenderer(CLEAR_GLASS, "clear_glass");
+        registerBlockRenderer(CLEAR_GLASS_PANE, "clear_glass_pane");
+		registerBlockRenderer(REINFORCED_GLASS, "reinforced_glass");
+		registerBlockRenderer(REINFORCED_GLASS_PANE, "reinforced_glass_pane");
 
         registerBlockRenderer(BlockHandler.WILD_ONION, "wild_onion_plant");
         registerBlockRenderer(BlockHandler.GRACILARIA, "gracilaria_seaweed");
@@ -516,6 +519,7 @@ public enum RenderingHandler {
         ClientRegistry.bindTileEntitySpecialRenderer(FeederBlockEntity.class, new FeederRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(ElectricFencePoleBlockEntity.class, new ElectricFencePoleRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(CleaningStationBlockEntity.class, new CleaningStationRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(AncientItemHoldingBlockEntity.class, new AncientItemHoldingBlockRenderer());
 //        ClientRegistry.bindTileEntitySpecialRenderer(CultivatorBlockEntity.class, new CultivatorRenderer());
     }
 

@@ -2,8 +2,10 @@ package org.jurassicraft.client.render.block;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import org.jurassicraft.server.block.entity.CultivatorBlockEntity;

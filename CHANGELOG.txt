@@ -9,3 +9,9 @@
 +Revamped the tyrannosaurus (Model, sounds and textures)
 +Animations now support multiple variants
 +Added two additional poses to the tyrannosaurus skeleton
++Improved the helicopter's physics
++Added clear glass block panes
++Added reinforced glass block
++Added reinforced glass block panes
++Added Digsite
++Added paleontologist villager

@@ -71,8 +71,11 @@ public class BlockHandler
     public static final CultivatorBottomBlock CULTIVATOR_BOTTOM = new CultivatorBottomBlock();
 
     public static final DisplayBlock DISPLAY_BLOCK = new DisplayBlock();
-
+    
     public static final ClearGlassBlock CLEAR_GLASS = new ClearGlassBlock();
+    public static final ClearGlassPaneBlock CLEAR_GLASS_PANE = new ClearGlassPaneBlock();
+    public static final ReinforcedGlassBlock REINFORCED_GLASS = new ReinforcedGlassBlock();
+    public static final ReinforcedGlassPaneBlock REINFORCED_GLASS_PANE = new ReinforcedGlassPaneBlock();
 
     public static final FossilizedTrackwayBlock FOSSILIZED_TRACKWAY = new FossilizedTrackwayBlock();
     public static final NestFossilBlock NEST_FOSSIL = new NestFossilBlock(false);
@@ -155,6 +158,8 @@ public class BlockHandler
     public static PaleoBaleBlock PALEO_BALE_FERN = new PaleoBaleBlock(PaleoBaleBlock.Variant.FERN);
     public static PaleoBaleBlock PALEO_BALE_LEAVES = new PaleoBaleBlock(PaleoBaleBlock.Variant.LEAVES);
     public static PaleoBaleBlock PALEO_BALE_OTHER = new PaleoBaleBlock(PaleoBaleBlock.Variant.OTHER);
+    
+    public static final AncientItemHoldingBlock ANCIENT_ITEM_HOLDING_BLOCK = new AncientItemHoldingBlock();
 
     public static void init()
     {
@@ -231,6 +236,10 @@ public class BlockHandler
         registerBlock(PEAT_MOSS, "Peat Moss");
 
         registerBlock(CLEAR_GLASS, "Clear Glass");
+		registerBlock(CLEAR_GLASS_PANE, "Clear Glass Pane");
+
+		registerBlock(REINFORCED_GLASS, "Reinforced Glass");
+		registerBlock(REINFORCED_GLASS_PANE, "Reinforced Glass Pane");
 
         registerBlock(PLANKTON_SWARM, "Plankton Swarm");
         registerBlock(KRILL_SWARM, "Krill Swarm");
@@ -276,6 +285,8 @@ public class BlockHandler
         registerBlock(PALEO_BALE_CYCAD, "Paleo Bale Cycad");
         registerBlock(PALEO_BALE_FERN, "Paleo Bale Fern");
         registerBlock(PALEO_BALE_LEAVES, "Paleo Bale Leaves");
+        
+        registerBlock(AncientItemHoldingBlockEntity.class, ANCIENT_ITEM_HOLDING_BLOCK, "Ancient Item Holding Block");
     }
 
     public static void registerTreeType(TreeType type)
