@@ -21,6 +21,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.client.render.RenderingHandler;
 import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.block.entity.DisplayBlockEntity;
@@ -42,19 +44,6 @@ public class DisplayBlockItem extends Item {
         this.setHasSubtypes(true);
     }
 
-    @SideOnly(Side.CLIENT)
-    public void initModels(Collection<Dinosaur> dinos, RenderingHandler renderer) {
-        for (Dinosaur dino : dinos) {
-            int dex = EntityHandler.getDinosaurId(dino);
-            String dinoName = dino.getIdentifier().getResourcePath();
-            renderer.registerItemRenderer(this, getMetadata(dex, 0, false), "action_figure/action_figure_" + dinoName);
-            renderer.registerItemRenderer(this, getMetadata(dex, 1, false), "action_figure/action_figure_" + dinoName);
-            renderer.registerItemRenderer(this, getMetadata(dex, 2, false), "action_figure/action_figure_" + dinoName);
-            renderer.registerItemRenderer(this, getMetadata(dex, 1, true), "skeleton/fossil/skeleton_fossil_" + dinoName);
-            renderer.registerItemRenderer(this, getMetadata(dex, 2, true), "skeleton/fresh/skeleton_fresh_" + dinoName);
-        }
-    }
-
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         pos = pos.offset(side);
@@ -72,7 +61,7 @@ public class DisplayBlockItem extends Item {
                 DisplayBlockEntity tile = (DisplayBlockEntity) world.getTileEntity(pos);
 
                 if (tile != null) {
-                    tile.setDinosaur(this.getDinosaurID(stack), mode > 0 ? mode == 1 : world.rand.nextBoolean(), this.isSkeleton(stack));
+                    tile.setDinosaur(this.getDinosaurID(stack), mode > 0 ? mode == 1 : world.rand.nextBoolean(), this.isSkeleton(stack), this.getSkeletonVariant(stack));
                     tile.setRot(180 - (int) player.getRotationYawHead());
                     world.notifyBlockUpdate(pos, state, state, 0);
                     tile.markDirty();
@@ -117,24 +106,28 @@ public class DisplayBlockItem extends Item {
         if(this.isInCreativeTab(tab))
         for (Dinosaur dinosaur : dinosaurs) {
             if (dinosaur.shouldRegister()) {
-                subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), 0, false)));
+                subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), (byte) 0, 0, false)));
                 for (int variant = 1; variant < 3; variant++) {
-                    subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), variant, true)));
+                    subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), (byte) 0, variant, true)));
                 }
             }
         }
     }
 
-    public static int getMetadata(int dinosaur, int variant, boolean isSkeleton) {
-        return dinosaur << 4 | variant << 1 | (isSkeleton ? 1 : 0);
+    public static int getMetadata(int dinosaur, byte skeletonVariant, int variant, boolean isSkeleton) {
+        return dinosaur << 9 | skeletonVariant << 4 | variant << 1 | (isSkeleton ? 1 : 0);
     }
 
     public int getDinosaurID(ItemStack stack) {
-        return stack.getMetadata() >> 4 & 0xFFFF;
+        return stack.getMetadata() >> 9;
+    }
+    
+    public byte getSkeletonVariant(ItemStack stack) {
+        return (byte) ((stack.getMetadata() >> 4) & 0xF);
     }
 
     public int getVariant(ItemStack stack) {
-        return stack.getMetadata() >> 1 & 7;
+        return (stack.getMetadata() >> 1) & 0x3;
     }
 
     public boolean isSkeleton(ItemStack stack) {
@@ -144,13 +137,32 @@ public class DisplayBlockItem extends Item {
     public int changeMode(ItemStack stack) {
         int dinosaur = this.getDinosaurID(stack);
         boolean skeleton = this.isSkeleton(stack);
+        byte skeletonVariant = this.getSkeletonVariant(stack);
 
         int mode = this.getVariant(stack) + 1;
         mode %= 3;
 
-        stack.setItemDamage(getMetadata(dinosaur, mode, skeleton));
+        stack.setItemDamage(getMetadata(dinosaur, skeletonVariant, mode, skeleton));
 
         return mode;
+    }
+    
+    public int changeSkeletonVariant(ItemStack stack) {
+    	
+        int dinosaur = this.getDinosaurID(stack);
+        boolean skeleton = this.isSkeleton(stack);
+        int gender = this.getVariant(stack);
+        int variantNew = this.getSkeletonVariant(stack) + 1;
+        
+        variantNew %= 16;
+        
+        if(!(variantNew <= SkeletonTypes.VALUES.length && SkeletonTypes.VALUES[variantNew - 1].getClasses().contains(EntityHandler.getDinosaurById(dinosaur).getIdentifier().getResourcePath()))) {
+        	variantNew = 0;
+        }
+ 
+        stack.setItemDamage(getMetadata(dinosaur, (byte) variantNew, gender, skeleton));
+
+        return variantNew;
     }
 
     @Override
@@ -172,7 +184,13 @@ public class DisplayBlockItem extends Item {
                 player.sendMessage(new TextComponentString(LangUtils.translate(LangUtils.GENDER_CHANGE.get("actionfigure")).replace("{mode}", LangUtils.getGenderMode(mode))));
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        }else {
+        	 int oldVariant = this.getSkeletonVariant(stack);
+        	 int variant = this.changeSkeletonVariant(stack);
+             if (variant != oldVariant && world.isRemote) {
+            	 player.sendMessage(new TextComponentString(LangUtils.translate(LangUtils.SKELETON_CHANGE.get("variant")).replace("{mode}", LangUtils.getSkeletonMode(variant))));
+             }
+             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
-        return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 }

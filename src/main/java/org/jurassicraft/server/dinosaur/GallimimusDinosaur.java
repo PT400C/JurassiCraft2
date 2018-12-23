@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.GallimimusEntity;
 import org.jurassicraft.server.food.FoodType;
 import org.jurassicraft.server.period.TimePeriod;
@@ -40,6 +41,7 @@ public class GallimimusDinosaur extends Dinosaur {
                 .setBreeding(false, 2, 6, 20, false, true)
                 .setJumpHeight(3)
                 .setSpawn(25, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.DRY)
+                .setOverlays(OverlayType.EYELID)
                 .setRecipe(new String[][] {
                         { "", "", "", "neck_vertebrae", "skull" },
                         { "tail_vertebrae", "pelvis", "ribcage", "shoulder", "" },

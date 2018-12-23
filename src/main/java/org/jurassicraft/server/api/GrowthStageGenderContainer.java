@@ -1,10 +1,12 @@
 package org.jurassicraft.server.api;
 
 import org.jurassicraft.server.entity.GrowthStage;
+import org.jurassicraft.server.entity.OverlayType;
 
 public class GrowthStageGenderContainer {
-    public GrowthStage growthStage;
-    public boolean isMale;
+	
+    private GrowthStage growthStage;
+    private boolean isMale;
 
     public GrowthStageGenderContainer(GrowthStage stage, boolean isMale) {
         this.growthStage = stage;

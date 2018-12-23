@@ -6,6 +6,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.DinosaurEntity;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.SleepTime;
 import org.jurassicraft.server.entity.ai.util.MovementType;
 import org.jurassicraft.server.period.TimePeriod;
@@ -32,7 +33,6 @@ public class DinosaurMetadata {
     private boolean isMarineAnimal;
     private boolean isMammal;
     private int storage;
-    private int overlayCount;
     private Diet diet;
     private SleepTime sleepTime = SleepTime.DIURNAL;
     private String[] bones;
@@ -63,6 +63,10 @@ public class DinosaurMetadata {
     private boolean directBirth;
     private int jumpHeight;
     private String[][] recipe;
+    private OverlayType[] overlayTypes = new OverlayType[]{};
+    private int overlayCount;
+    private int eyeTime = 4;
+    
     public DinosaurMetadata(ResourceLocation identifier) {
         this.identifier = identifier;
     }
@@ -151,6 +155,14 @@ public class DinosaurMetadata {
         this.maximumAge = age;
         return this;
     }
+    public DinosaurMetadata setOverlayCount(int count) {
+        this.overlayCount = count;
+        return this;
+    }
+    public DinosaurMetadata setOverlays(OverlayType... types) {
+    	this.overlayTypes = types;
+    	return this;
+    }
     public DinosaurMetadata setAttackSpeed(double attackSpeed) {
         this.attackSpeed = attackSpeed;
         return this;
@@ -186,16 +198,16 @@ public class DinosaurMetadata {
         this.isMarineAnimal = marineAnimal;
         return this;
     }
+    public DinosaurMetadata setEyeTime(int eyeTime) {
+        this.eyeTime = eyeTime;
+        return this;
+    }
     public DinosaurMetadata setMammal(boolean isMammal) {
         this.isMammal = isMammal;
         return this;
     }
     public DinosaurMetadata setStorage(int storage) {
         this.storage = storage;
-        return this;
-    }
-    public DinosaurMetadata setOverlayCount(int count) {
-        this.overlayCount = count;
         return this;
     }
     public DinosaurMetadata setDiet(Diet diet) {
@@ -323,6 +335,9 @@ public class DinosaurMetadata {
     public boolean isMarineCreature() {
         return this.isMarineAnimal;
     }
+    public int getEyeTime() {
+        return this.eyeTime;
+    }
     public boolean isMammal() {
         return this.isMammal;
     }
@@ -342,9 +357,6 @@ public class DinosaurMetadata {
     public int getStorage() {
         return this.storage;
     }
-    public int getOverlayCount() {
-        return this.overlayCount;
-    }
     public Diet getDiet() {
         return this.diet;
     }
@@ -353,6 +365,12 @@ public class DinosaurMetadata {
     }
     public String[] getBones() {
         return this.bones;
+    }
+    public int getOverlayCount() {
+        return this.overlayCount;
+    }
+    public OverlayType[] getOverlays() {
+    	return this.overlayTypes;
     }
     public String getHeadCubeName() {
         return this.headCubeName;

@@ -5,6 +5,8 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+
+import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.DinosaurStatus;
@@ -23,6 +25,7 @@ public final class LangUtils
     public static final TranslateKey SET_ORDER = new TranslateKey("message.set_order.name");
     public static final TranslateKey ORDER_VALUE = new TranslateKey("order.%s.name");
     public static final TranslateKey GENDER_CHANGE = new TranslateKey("%s.genderchange.name");
+    public static final TranslateKey SKELETON_CHANGE = new TranslateKey("%s.skeletonchange.name");
     public static final TranslateKey GUI = new TranslateKey("gui.%s.name");
     public static final TranslateKey STATUS = new TranslateKey("status.%s.name");
     public static final TranslateKey ENTITY_NAME   = new TranslateKey("entity.%s.name");
@@ -97,6 +100,13 @@ public final class LangUtils
 
         return translate("gender." + modeString + ".name");
     }
+    
+    public static String getSkeletonMode(int variant) {
+        if(variant == 0)
+        	return "idle";
+        return SkeletonTypes.VALUES[variant - 1].getName();
+    }
+    
     public static String getPlantName(int plantId) {
         return getPlantName(PlantHandler.getPlantById(plantId));
     }

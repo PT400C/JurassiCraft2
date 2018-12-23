@@ -287,7 +287,7 @@ public class Loot {
                  	 }
             	 }else if(stack.getItem() instanceof DisplayBlockItem) {
             		 DisplayBlockItem s = (DisplayBlockItem) stack.getItem();
-                 		 stack.setItemDamage(s.getMetadata(EntityHandler.getDinosaurId(dinosaur), 0, false));
+                 		 stack.setItemDamage(s.getMetadata(EntityHandler.getDinosaurId(dinosaur), (byte) 0, 0, false));
                           return stack;
             	 }else {
             	 stack.setItemDamage(EntityHandler.getDinosaurId(dinosaur));

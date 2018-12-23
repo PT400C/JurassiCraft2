@@ -40,6 +40,7 @@ public abstract class EntityAnimator<ENTITY extends EntityLivingBase & Animatabl
     @Override
     public final void setRotationAngles(TabulaModel model, ENTITY entity, float limbSwing, float limbSwingAmount, float ticks, float rotationYaw, float rotationPitch, float scale) {
         this.getAnimationHelper(entity, (AnimatableModel) model, entity.shouldUseInertia()).performAnimations(entity, limbSwing, limbSwingAmount, ticks);
+        /*
         for(int i = 0;true;i++) {
             AdvancedModelRenderer cube = model.getCube("neck" + i++);
             if(cube == null) {
@@ -53,7 +54,7 @@ public abstract class EntityAnimator<ENTITY extends EntityLivingBase & Animatabl
 
             }
             break;
-        }
+        }*/
         this.performAnimations((AnimatableModel) model, entity, limbSwing, limbSwingAmount, ticks, rotationYaw, rotationPitch, scale);
     }
 

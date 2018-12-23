@@ -6,8 +6,8 @@ import org.jurassicraft.server.api.Animatable;
 import java.util.Map;
 
 public class OnLandAnimationPass extends AnimationPass {
-    public OnLandAnimationPass(Map<Animation, float[][]> poseSequences, PosedCuboid[][] poses, boolean useInertialTweens) {
-        super(poseSequences, poses, useInertialTweens);
+    public OnLandAnimationPass(Map<Animation, float[][][]> poseSequences, PosedCuboid[][] poses, Map<Animation, byte[]> poseCount, boolean useInertialTweens) {
+        super(poseSequences, poses, poseCount, useInertialTweens);
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.MussaurusEntity;
 import org.jurassicraft.server.period.TimePeriod;
 
@@ -45,6 +46,7 @@ public class MussaurusDinosaur extends Dinosaur {
                         { "tail_vertebrae", "ribcage", "shoulder", "neck_vertebrae", "skull" },
                         { "leg_bones", "leg_bones", "arm_bones", "arm_bones", "teeth" }
                 })
+                .setOverlays(OverlayType.EYELID)
                 .setSpawn(15, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.FOREST);
     }
 }

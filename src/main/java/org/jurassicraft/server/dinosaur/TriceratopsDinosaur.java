@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.TriceratopsEntity;
 import org.jurassicraft.server.period.TimePeriod;
 
@@ -40,6 +41,7 @@ public class TriceratopsDinosaur extends Dinosaur {
                 .setAttackBias(400.0)
                 .setBreeding(false, 2, 6, 48, false, true)
                 .setSpawn(10, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.SPARSE, BiomeDictionary.Type.FOREST)
+                .setOverlays(OverlayType.EYELID)
                 .setRecipe(new String[][] {
                         { "", "", "", "", "horn" },
                         { "tail_vertebrae", "pelvis", "ribcage", "neck_vertebrae", "skull" },

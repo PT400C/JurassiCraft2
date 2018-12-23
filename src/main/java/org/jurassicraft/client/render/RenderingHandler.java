@@ -348,8 +348,17 @@ public enum RenderingHandler {
         for (Dinosaur dinosaur : EntityHandler.getDinosaurs().values()) {
             int meta = EntityHandler.getDinosaurId(dinosaur);
             String formattedName = dinosaur.getIdentifier().getResourcePath();
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, 0, false), "action_figure/action_figure_" + formattedName);
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 0, false), "action_figure/action_figure_" + formattedName);
           
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 1, false), "action_figure/action_figure_" + formattedName);
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 2, false), "action_figure/action_figure_" + formattedName);
+            
+            for(int random = 0; random < 16; random++) {
+            
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) random, 1, true), "skeleton/fossil/skeleton_fossil_" + formattedName);
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) random, 2, true), "skeleton/fresh/skeleton_fresh_" + formattedName);
+            }
+            
             for (Map.Entry<String, FossilItem> entry : ItemHandler.FOSSILS.entrySet()) {
                 List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(entry.getKey());
                 if (dinosaursForType.contains(dinosaur)) {
@@ -432,8 +441,6 @@ public enum RenderingHandler {
 
     public void preInit() {
         TabulaModelHandler.INSTANCE.addDomain(JurassiCraft.MODID);
-        ItemHandler.DISPLAY_BLOCK_ITEM.initModels(EntityHandler.getDinosaurs().values(), this);
-
         registerRenderInfo(EntityHandler.BRACHIOSAURUS, new BrachiosaurusAnimator(), 1.5F);
         registerRenderInfo(EntityHandler.COELACANTH, new CoelacanthAnimator(), 0.0F);
 //        registerRenderInfo(EntityHandler.ALLIGATORGAR, new AlligatorGarAnimator(), 0.0F);

@@ -99,6 +99,8 @@ import org.jurassicraft.server.entity.ai.navigation.DinosaurJumpHelper;
 import org.jurassicraft.server.entity.ai.navigation.DinosaurMoveHelper;
 import org.jurassicraft.server.entity.ai.navigation.DinosaurPathNavigate;
 import org.jurassicraft.server.entity.ai.util.OnionTraverser;
+import org.jurassicraft.server.entity.dinosaur.MicroraptorEntity;
+import org.jurassicraft.server.entity.dinosaur.TyrannosaurusEntity;
 import org.jurassicraft.server.entity.item.DinosaurEggEntity;
 import org.jurassicraft.server.food.FoodHelper;
 import org.jurassicraft.server.food.FoodType;
@@ -113,6 +115,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -133,7 +136,9 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     private static final DataParameter<String> WATCHER_OWNER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.STRING);
     private static final DataParameter<Byte> WATCHER_CURRENT_ORDER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BYTE);
     private static final DataParameter<Boolean> WATCHER_IS_RUNNING = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
-
+    private static final DataParameter<Boolean> WATCHER_WAS_MOVED = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
+    
+    public HashMap<Animation, Byte> variants = new HashMap<>();
     private final InventoryDinosaur inventory;
     private final MetabolismContainer metabolism;
     protected Dinosaur dinosaur;
@@ -143,6 +148,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     protected Order order = Order.WANDER;
     private int growthSpeedOffset;
     private boolean isCarcass;
+    private boolean wasMoved;
     private int carcassHealth;
     private String genetics;
     private int geneticsQuality;
@@ -196,6 +202,10 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     private final LegSolver legSolver;
 
     private boolean isSkeleton;
+    
+    private byte skeletonVariant;
+
+	public boolean isRendered;
 
     public DinosaurEntity(World world) {
         super(world);
@@ -600,6 +610,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         this.dataManager.register(WATCHER_OWNER, "");
         this.dataManager.register(WATCHER_CURRENT_ORDER, (byte) 0);
         this.dataManager.register(WATCHER_IS_RUNNING, false);
+        this.dataManager.register(WATCHER_WAS_MOVED, this.wasMoved);
     }
 
     @Override
@@ -700,10 +711,37 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         }
 	    return !isEntityFreindly(entity);
     }
+    
+    @Override
+    public void setAnimationWithVariant(Animation newAnimation, byte variant) {
+        if (this.isSleeping()) {
+            newAnimation = EntityAnimation.SLEEPING.get();
+        }
+        if (this.isCarcass()) {
+            newAnimation = EntityAnimation.DYING.get();
+        }
+        Animation oldAnimation = this.animation;
+        if(!this.world.isRemote) {
+        	this.addVariant(newAnimation, (byte) variant);
+    	}
+        
+        this.animation = newAnimation;
+        if (oldAnimation != newAnimation) {
+            this.animationTick = 0;
+            this.animationLength = (int) this.dinosaur.getPoseHandler().getAnimationLength(newAnimation, this.getGrowthStage(), this.getAnimationVariant(newAnimation));
+            EntityHandler.sendSpecialAnimationMessage(this, newAnimation, this.getAnimationVariant(newAnimation));
+        
+        }
+    }
 
     @Override
     public void onLivingUpdate() {
         super.onLivingUpdate();
+        
+        if(this.isCarcass() && (this instanceof TyrannosaurusEntity ? this.dataManager.get(WATCHER_WAS_MOVED) : true) && !(this instanceof MicroraptorEntity)){
+        	this.motionX = 0;
+        	this.motionZ = 0;
+        }
 
         if (this.breedCooldown > 0) {
             this.breedCooldown--;
@@ -1309,6 +1347,17 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     public Animation getAnimation() {
         return this.animation;
     }
+    
+    @Override
+    public void addVariant(Animation animation, byte variant) {
+    	this.variants.put(animation, variant);
+    	
+    }
+    
+    @Override
+    public Class getEntityClass() {
+    	return this.getClass();
+    }
 
     @Override
     public void setAnimation(Animation newAnimation) {
@@ -1321,15 +1370,25 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         }
 
         Animation oldAnimation = this.animation;
-
+        byte variant = 0;
+        if(!this.world.isRemote) {
+        	if(EntityAnimation.getAnimation(newAnimation).getVariants(this.getEntityClass()) == 1) {
+        		variant = (byte) Math.round(Math.random());
+        	}else {
+        		variant = (byte) ((Math.random() * (EntityAnimation.getAnimation(newAnimation).getVariants(this.getEntityClass()) + 1)));
+        	}
+        	
+        	this.addVariant(newAnimation, (byte) variant);
+    	}
+        
         this.animation = newAnimation;
-
         if (oldAnimation != newAnimation) {
             this.animationTick = 0;
-            this.animationLength = (int) this.dinosaur.getPoseHandler().getAnimationLength(this.animation, this.getGrowthStage());
-
-            AnimationHandler.INSTANCE.sendAnimationMessage(this, newAnimation);
+            this.animationLength = (int) this.dinosaur.getPoseHandler().getAnimationLength(newAnimation, this.getGrowthStage(), this.getAnimationVariant(newAnimation));
+            EntityHandler.sendSpecialAnimationMessage(this, newAnimation, this.getAnimationVariant(newAnimation));
+        
         }
+            
     }
 
     @Override
@@ -1404,10 +1463,10 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     @Override
     public GrowthStage getGrowthStage() {
 
-        int percent = this.getAgePercentage();
         if (this.isSkeleton) {
             return GrowthStage.SKELETON;
         }
+        int percent = this.getAgePercentage();
         return percent > 75 ? GrowthStage.ADULT : percent > 50 ? GrowthStage.ADOLESCENT : percent > 25 ? GrowthStage.JUVENILE : GrowthStage.INFANT;
     }
 
@@ -1444,6 +1503,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         nbt.setInteger("CarcassHealth", this.carcassHealth);
         nbt.setInteger("BreedCooldown", this.breedCooldown);
         nbt.setInteger("PregnantTime", this.pregnantTime);
+        nbt.setBoolean("WasMoved", this.wasMoved);
 
         this.metabolism.writeToNBT(nbt);
 
@@ -1487,6 +1547,16 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         nbt.setInteger("TicksUntilDeath", ticksUntilDeath);
         return nbt;
     }
+    
+    @Override
+    public byte getAnimationVariant(Animation animation) {
+    	return this.variants.containsKey(animation) ? this.variants.get(animation) : 0;
+    }
+    
+    @Override
+    public HashMap<Animation, Byte> getVariants() {
+    	return this.variants;
+    }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
@@ -1505,6 +1575,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         this.order = Order.values()[nbt.getByte("Order")];
         this.breedCooldown = nbt.getInteger("BreedCooldown");
         this.pregnantTime = nbt.getInteger("PregnantTime");
+        this.wasMoved = nbt.getBoolean("WasMoved");
 
         this.metabolism.readFromNBT(nbt);
 
@@ -1682,7 +1753,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     }
 
     public boolean areEyelidsClosed() {
-    	return !this.getMetadata().isMarineCreature() && ((this.isCarcass || this.isSleeping) || this.ticksExisted % 100 < 4);
+    	return !this.getMetadata().isMarineCreature() && ((this.isCarcass || this.isSleeping) || this.ticksExisted % 100 < this.getMetadata().getEyeTime());
     }
 
     @Override
@@ -1956,6 +2027,14 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
 
     public void setSkeleton(boolean isSkeleton) {
         this.isSkeleton = isSkeleton;
+    }
+    
+    public void setSkeletonVariant(byte variant) {
+        this.skeletonVariant = variant;
+    }
+    
+    public byte getSkeletonVariant() {
+        return this.skeletonVariant;
     }
 
     public boolean canDinoSwim() {

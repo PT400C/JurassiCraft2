@@ -6,8 +6,8 @@ import org.jurassicraft.server.api.Animatable;
 import java.util.Map;
 
 public class MovementAnimationPass extends AnimationPass {
-    public MovementAnimationPass(Map<Animation, float[][]> poseSequences, PosedCuboid[][] poses, boolean useInertialTweens) {
-        super(poseSequences, poses, useInertialTweens);
+    public MovementAnimationPass(Map<Animation, float[][][]> poseSequences, PosedCuboid[][] poses, Map<Animation, byte[]> poseCount, boolean useInertialTweens) {
+        super(poseSequences, poses, poseCount, useInertialTweens);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MovementAnimationPass extends AnimationPass {
             } else if (this.isMoving(entity)) {
                 if (entity.isSwimming()) {
                     return this.animations.containsKey(EntityAnimation.SWIMMING.get()) ? EntityAnimation.SWIMMING.get() : EntityAnimation.WALKING.get();
-                } else {
+               } else {
                     if (entity.isRunning()) {
                         return EntityAnimation.RUNNING.get();
                     } else {

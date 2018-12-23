@@ -12,6 +12,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.AnimatableModel;
 import org.jurassicraft.client.model.animation.EntityAnimator;
+import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.client.render.entity.DinosaurRenderer;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
@@ -34,6 +35,7 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
     private TabulaModel eggModel;
     private ResourceLocation eggTexture;
     private float shadowSize = 0.65F;
+	private AnimatableModel skeletonModels[] = new AnimatableModel[16];
     
     static {
         try {
@@ -50,9 +52,20 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
         this.animator = animator;
         this.shadowSize = shadowSize;
         
-        for(GrowthStage stage : this.dinosaur.getSupportedStages()) {
-        	this.animatableModels.put(stage, new AnimatableModel(this.dinosaur.getModelContainer(stage), this.getModelAnimator(stage)));
-        }
+		for (GrowthStage stage : GrowthStage.values()) {
+			if (stage != GrowthStage.SKELETON) {
+				this.animatableModels.put(stage, new AnimatableModel(this.dinosaur.getModelContainer(stage), this.getModelAnimator(stage)));
+			} else {
+				this.skeletonModels[0] = new AnimatableModel(this.dinosaur.getSkeletonModel().get("idle"), null);
+
+				for (int x = 0; x < SkeletonTypes.VALUES.length; x++) {
+					if (!SkeletonTypes.VALUES[x].getClasses().contains(this.dinosaur.getIdentifier().getResourcePath()))
+						break;
+					this.skeletonModels[x + 1] = new AnimatableModel(this.dinosaur.getSkeletonModel().get(SkeletonTypes.VALUES[x].getName()), null);
+				}
+
+			}
+		}
 
         try {
         	
@@ -67,12 +80,14 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
         }
     }
 
-    public ModelBase getModel(GrowthStage stage) {
+    public ModelBase getModel(GrowthStage stage, byte variant) {
     	
     	if (!this.dinosaur.doesSupportGrowthStage(stage)) 
     		return this.getModelAdult();
+    	if(stage == GrowthStage.SKELETON)
+    		return this.skeletonModels[variant];
     	
-    	return getModelAdult();
+    	return this.animatableModels.get(stage);
     }
 
     public ModelBase getEggModel() {
@@ -84,9 +99,6 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
     }
 
     public EntityAnimator<?> getModelAnimator(GrowthStage stage) {
-        if (stage == GrowthStage.SKELETON) {
-            return null;
-        }
         return this.animator;
     }
 

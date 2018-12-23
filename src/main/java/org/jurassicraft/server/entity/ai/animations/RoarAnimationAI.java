@@ -1,5 +1,6 @@
 package org.jurassicraft.server.entity.ai.animations;
 
+import net.ilexiconn.llibrary.server.animation.Animation;
 import net.ilexiconn.llibrary.server.animation.IAnimatedEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import org.jurassicraft.client.model.animation.EntityAnimation;
@@ -17,13 +18,15 @@ public class RoarAnimationAI extends EntityAIBase {
 
     @Override
     public boolean shouldExecute() {
-        return !this.dinosaur.isBusy() && this.dinosaur.getAgePercentage() > 75 && this.dinosaur.getRNG().nextDouble() < 0.002;
+    	return !this.dinosaur.isBusy() && this.dinosaur.getAgePercentage() > 75 && this.dinosaur.getRNG().nextDouble() < 0.002;
     }
 
     @Override
     public void startExecuting() {
-        this.dinosaur.setAnimation(EntityAnimation.ROARING.get());
-        this.dinosaur.playSound(this.dinosaur.getSoundForAnimation(EntityAnimation.ROARING.get()), this.dinosaur.getSoundVolume() > 0.0F ? this.dinosaur.getSoundVolume() + 1.25F : 0.0F, this.dinosaur.getSoundPitch());
+    	Animation animation = EntityAnimation.ROARING.get();
+        this.dinosaur.setAnimation(animation);
+       
+        this.dinosaur.playSound(this.dinosaur.getSoundForAnimation(animation), this.dinosaur.getSoundVolume() > 0.0F ? this.dinosaur.getSoundVolume() + 1.25F : 0.0F, this.dinosaur.getSoundPitch());
     }
 
     @Override

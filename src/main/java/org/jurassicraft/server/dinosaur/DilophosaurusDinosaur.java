@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.SleepTime;
 import org.jurassicraft.server.entity.dinosaur.DilophosaurusEntity;
 import org.jurassicraft.server.period.TimePeriod;
@@ -40,6 +41,7 @@ public class DilophosaurusDinosaur extends Dinosaur {
 	                .setMaxHerdSize(10)
 	                .setAttackBias(1200.0)
 	                .setBreeding(false, 2, 4, 24, false, true)
+	                .setOverlays(OverlayType.EYELID)
 	                .setRecipe(new String[][] {
 	                        { "", "", "", "neck", "skull" },
 	                        { "tail_vertebrae", "pelvis", "ribcage", "shoulder", "tooth" },

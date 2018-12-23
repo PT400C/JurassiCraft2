@@ -2,12 +2,16 @@ package org.jurassicraft.client.render.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.client.render.entity.dinosaur.DinosaurRenderInfo;
@@ -15,6 +19,7 @@ import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.dinosaur.DinosaurMetadata;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.GrowthStage;
+import org.jurassicraft.server.entity.OverlayType;
 
 import java.awt.*;
 import java.util.Random;
@@ -27,13 +32,15 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
     public Random random;
 
     public DinosaurRenderer(DinosaurRenderInfo renderInfo, RenderManager renderManager) {
-        super(renderManager, renderInfo.getModel(GrowthStage.INFANT), renderInfo.getShadowSize());
+        super(renderManager, renderInfo.getModel(GrowthStage.INFANT, (byte) 0), renderInfo.getShadowSize());
+        
 
         this.dinosaur = renderInfo.getDinosaur();
         this.random = new Random();
         this.renderInfo = renderInfo;
-
-        this.addLayer(new LayerEyelid(this));
+        for(OverlayType type : this.dinosaur.getMetadata().getOverlays()) {
+        	this.addLayer(new LayerOverlay(this, type));
+        }
     }
 
     @Override
@@ -41,7 +48,6 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
     	DinosaurMetadata metadata = this.dinosaur.getMetadata();
         float scaleModifier = entity.getAttributes().getScaleModifier();
         float scale = (float) entity.interpolate(metadata.getScaleInfant(), metadata.getScaleAdult()) * scaleModifier;
-
         this.shadowSize = scale * this.renderInfo.getShadowSize();
 
         GlStateManager.translate(metadata.getOffsetX() * scale, metadata.getOffsetY() * scale, metadata.getOffsetZ() * scale);
@@ -69,11 +75,12 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
                 GlStateManager.scale(scale, scale, scale);
                 break;
         }
+
     }
 
     @Override
     public void doRender(DinosaurEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        this.mainModel = this.renderInfo.getModel(entity.getGrowthStage());
+        this.mainModel = this.renderInfo.getModel(entity.getGrowthStage(), (byte) entity.getSkeletonVariant());
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
@@ -92,27 +99,26 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
     }
 
     @SideOnly(Side.CLIENT)
-    public class LayerEyelid implements LayerRenderer<DinosaurEntity> {
+    public class LayerOverlay implements LayerRenderer<DinosaurEntity> {
         private final DinosaurRenderer renderer;
+        private final OverlayType type;
 
-        public LayerEyelid(DinosaurRenderer renderer) {
+        public LayerOverlay(DinosaurRenderer renderer, OverlayType type) {
             this.renderer = renderer;
+            this.type = type;
         }
 
         @Override
         public void doRenderLayer(DinosaurEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float age, float yaw, float pitch, float scale) {
             if (!entity.isInvisible()) {
-                if (entity.areEyelidsClosed()) {
-                    ResourceLocation texture = this.renderer.dinosaur.getEyelidTexture(entity);
-                    if (texture != null) {
-                        ITextureObject textureObject = Minecraft.getMinecraft().getTextureManager().getTexture(texture);
-                        if (textureObject != TextureUtil.MISSING_TEXTURE) {
-                            this.renderer.bindTexture(texture);
-
-                            this.renderer.getMainModel().render(entity, limbSwing, limbSwingAmount, age, yaw, pitch, scale);
-                            this.renderer.setLightmap(entity); //TODO: Make sure this works this.renderer.setLightmap(entity, partialTicks);
-                        }
-                    }
+            	boolean render = false;
+                if (entity.areEyelidsClosed() && type == OverlayType.EYELID) {
+                	renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
+                }else if(!entity.areEyelidsClosed() && type == OverlayType.EYE){
+                	renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
+                	
+                }else if(type != OverlayType.EYE && type != OverlayType.EYELID){
+                	renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
                 }
             }
         }
@@ -120,6 +126,19 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
         @Override
         public boolean shouldCombineTextures() {
             return true;
+        }
+        
+        private void renderOverlay(OverlayType type, DinosaurEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float age, float yaw, float pitch, float scale) {
+        	ResourceLocation texture = this.renderer.dinosaur.getOverlayTextures(type, entity);
+            if (texture != null) {
+                ITextureObject textureObject = Minecraft.getMinecraft().getTextureManager().getTexture(texture);
+                if (textureObject != TextureUtil.MISSING_TEXTURE) {
+                    this.renderer.bindTexture(texture);
+
+                    this.renderer.getMainModel().render(entity, limbSwing, limbSwingAmount, age, yaw, pitch, scale);
+                    this.renderer.setLightmap(entity); //TODO: Make sure this works this.renderer.setLightmap(entity, partialTicks);
+                }
+            }
         }
     }
 }

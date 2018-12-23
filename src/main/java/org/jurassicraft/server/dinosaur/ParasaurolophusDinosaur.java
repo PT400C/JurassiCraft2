@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.ParasaurolophusEntity;
 import org.jurassicraft.server.period.TimePeriod;
 
@@ -43,6 +44,7 @@ public class ParasaurolophusDinosaur extends Dinosaur {
                         { "hind_leg_bones", "hind_leg_bones", "", "shoulder_bone", "teeth" },
                         { "", "", "", "front_leg_bones", "front_leg_bones" }
                 })
+                .setOverlays(OverlayType.EYELID)
                 .setSpawn(15, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.FOREST);
     }
 }

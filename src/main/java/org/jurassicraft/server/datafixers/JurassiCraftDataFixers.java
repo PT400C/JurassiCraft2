@@ -10,7 +10,7 @@ import org.jurassicraft.JurassiCraft;
 import java.util.List;
 
 public class JurassiCraftDataFixers {
-    private static final int DATAFIXER_VERSION = 2;
+    private static final int DATAFIXER_VERSION = 3;
     private static final ModFixs modFixs = FMLCommonHandler.instance().getDataFixer().init(JurassiCraft.MODID, DATAFIXER_VERSION);
 
     public static void init() {
@@ -30,6 +30,18 @@ public class JurassiCraftDataFixers {
         		nbt.setString("id", "minecraft:iron_nugget");	
             return nbt;
         }));
+        
+		modFixs.registerFix(FixTypes.ITEM_INSTANCE, new DataFixerFactory(3, nbt -> {
+			if ("jurassicraft:display_block_item".equals(nbt.getString("id"))) {
+				int meta = nbt.getShort("Damage");
+				int dinosaurID = meta >> 4 & 0xFFFF;
+				int gender = meta >> 1 & 7;
+				boolean isSkeleton = (meta & 1) == 1;
+				nbt.setShort("Damage", (short) (dinosaurID << 9 | 0 << 4 | gender << 1 | (isSkeleton ? 1 : 0)));
+
+			}
+			return nbt;
+		}));
 
         modFixs.registerFix(FixTypes.ENTITY, new DataFixerFactory(1, compound -> {
             if("jurassicraft.mural".equals(compound.getString("id"))) {

@@ -10,9 +10,11 @@ import org.jurassicraft.server.entity.dinosaur.BrachiosaurusEntity;
 
 @SideOnly(Side.CLIENT)
 public class BrachiosaurusAnimator extends EntityAnimator<BrachiosaurusEntity> {
+	
     @Override
     protected void performAnimations(AnimatableModel model, BrachiosaurusEntity entity, float f, float f1, float ticks, float rotationYaw, float rotationPitch, float scale) {
-        AdvancedModelRenderer head = model.getCube("head");
+        
+    	AdvancedModelRenderer head = model.getCube("head");
 
         AdvancedModelRenderer neck1 = model.getCube("Neck 1");
         AdvancedModelRenderer neck2 = model.getCube("neck2");
@@ -20,8 +22,8 @@ public class BrachiosaurusAnimator extends EntityAnimator<BrachiosaurusEntity> {
         AdvancedModelRenderer neck4 = model.getCube("neck4");
         AdvancedModelRenderer neck5 = model.getCube("neck5");
         AdvancedModelRenderer neck6 = model.getCube("neck6");
-
         AdvancedModelRenderer neck7 = model.getCube("neck7");
+
         AdvancedModelRenderer tail1 = model.getCube("tail1");
         AdvancedModelRenderer tail2 = model.getCube("tail2");
         AdvancedModelRenderer tail3 = model.getCube("tail3");

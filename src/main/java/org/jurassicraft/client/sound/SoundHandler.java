@@ -48,8 +48,12 @@ public class SoundHandler {
     public static final SoundEvent TYRANNOSAURUS_BREATHING = create("tyrannosaurus_breathing");
     public static final SoundEvent TYRANNOSAURUS_DEATH = create("tyrannosaurus_death");
     public static final SoundEvent TYRANNOSAURUS_HURT = create("tyrannosaurus_hurt");
-    public static final SoundEvent TYRANNOSAURUS_ROAR = create("tyrannosaurus_roar");
+    public static final SoundEvent TYRANNOSAURUS_DRINKING = create("tyrannosaurus_drinking");
+    public static final SoundEvent TYRANNOSAURUS_CALL = create("tyrannosaurus_call");
+    public static final SoundEvent[] TYRANNOSAURUS_ROAR = createArray("tyrannosaurus_roar1", "tyrannosaurus_roar2", "tyrannosaurus_roar3");
+    public static final SoundEvent TYRANNOSAURUS_STOMP = create("tyrannosaurus_stomp");
     public static final SoundEvent TYRANNOSAURUS_LIVING = create("tyrannosaurus_living");
+    public static final SoundEvent TYRANNOSAURUS_ATTACK = create("tyrannosaurus_attack");
 
     public static final SoundEvent VELOCIRAPTOR_LIVING = create("velociraptor_living");
     public static final SoundEvent VELOCIRAPTOR_HURT = create("velociraptor_hurt");
@@ -82,6 +86,17 @@ public class SoundHandler {
         SoundEvent sound = new SoundEvent(new ResourceLocation(JurassiCraft.MODID, soundName));
         RegistryHandler.registerSound(sound, soundName);
         return sound;
+    }
+    
+    public static SoundEvent[] createArray(String... soundNames) {
+    	SoundEvent[] sounds = new SoundEvent[soundNames.length];
+    	for(int i = 0; i < soundNames.length; i++) {
+    		SoundEvent sound = new SoundEvent(new ResourceLocation(JurassiCraft.MODID, soundNames[i]));
+            RegistryHandler.registerSound(sound, soundNames[i]);
+            sounds[i] = sound;
+    	}
+        
+        return sounds;
     }
 
     public static List<SoundEvent> getSounds()

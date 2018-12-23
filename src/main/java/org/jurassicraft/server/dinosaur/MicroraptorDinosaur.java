@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.MicroraptorEntity;
 import org.jurassicraft.server.food.FoodType;
 import org.jurassicraft.server.period.TimePeriod;
@@ -50,6 +51,7 @@ public class MicroraptorDinosaur extends Dinosaur {
 	                        { "", "leg_bones", "leg_bones", "arm_bones", "" },
 	                        { "", "foot_bones", "foot_bones", "", "" }
 	                })
+	                .setOverlays(OverlayType.EYELID)
 	                .setSpawn(10, BiomeDictionary.Type.JUNGLE, BiomeDictionary.Type.FOREST, BiomeDictionary.Type.DENSE);
     }
 }

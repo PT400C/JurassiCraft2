@@ -16,17 +16,20 @@ import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.EntityHandler;
 
 public class DisplayBlockEntity extends TileEntity {
+	
     private DinosaurEntity entity;
     private int rotation;
 
     private boolean isMale;
+    private byte variant;
     private boolean isSkeleton;
 
     private SerializedData serializedData = new InvalidData();
 
-    public void setDinosaur(int dinosaurId, boolean isMale, boolean isSkeleton) {
+    public void setDinosaur(int dinosaurId, boolean isMale, boolean isSkeleton, byte variant) {
         this.isMale = isMale;
         this.isSkeleton = isSkeleton;
+        this.variant = variant;
         try {
             Dinosaur dinosaur = EntityHandler.getDinosaurById(dinosaurId);
             this.entity = dinosaur.construct(this.world);
@@ -53,6 +56,7 @@ public class DisplayBlockEntity extends TileEntity {
         this.rotation = nbt.getInteger("Rotation");
         this.isMale = !nbt.hasKey("IsMale") || nbt.getBoolean("IsMale");
         this.isSkeleton = nbt.getBoolean("IsSkeleton");
+        this.variant = nbt.getByte("Variant");
     }
 
     @Override
@@ -69,6 +73,7 @@ public class DisplayBlockEntity extends TileEntity {
         nbt.setInteger("Rotation", this.rotation);
         nbt.setBoolean("IsMale", this.isMale);
         nbt.setBoolean("IsSkeleton", this.isSkeleton);
+        nbt.setByte("Variant", this.variant);
 
         return nbt;
     }
@@ -105,6 +110,10 @@ public class DisplayBlockEntity extends TileEntity {
     public boolean isSkeleton() {
         return this.isSkeleton;
     }
+    
+    public byte getVariant() {
+        return this.variant;
+    }
 
     public int getRot() {
         return this.rotation;
@@ -137,6 +146,7 @@ public class DisplayBlockEntity extends TileEntity {
     private void initializeEntity(DinosaurEntity entity) {
         entity.setupDisplay(this.isMale);
         entity.setSkeleton(this.isSkeleton);
+        entity.setSkeletonVariant(this.variant);
         entity.setAnimation(EntityAnimation.IDLE.get());
     }
 

@@ -43,22 +43,22 @@ public class TileEntityFieldsMessage extends AbstractMessage<TileEntityFieldsMes
 	public void onClientReceived(Minecraft minecraft, TileEntityFieldsMessage message, EntityPlayer player, MessageContext messageContext) {
 
 		TileEntity tileEntity = player.world.getTileEntity(message.position);
-		ISyncable syncable = (ISyncable) tileEntity;
-		if (message.fieldBuffer != null) {
-			try {
-				syncable.packetDataHandler(message.fieldBuffer);
-			} catch (Exception e) {
-				e.printStackTrace();
+		if (tileEntity != null) {
+			ISyncable syncable = (ISyncable) tileEntity;
+			if (message.fieldBuffer != null) {
+				try {
+					syncable.packetDataHandler(message.fieldBuffer);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				message.fieldBuffer.release();
 			}
-			message.fieldBuffer.release();
 		}
 
 	}
 
     @Override
-    public void onServerReceived(MinecraftServer server, TileEntityFieldsMessage message, EntityPlayer player, MessageContext messageContext) {
-        
-    }
+    public void onServerReceived(MinecraftServer server, TileEntityFieldsMessage message, EntityPlayer player, MessageContext messageContext) {}
 
     @Override
     public void toBytes(ByteBuf buffer) {

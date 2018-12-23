@@ -23,6 +23,7 @@ import java.util.Map;
 
 @SideOnly(Side.CLIENT)
 public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
+	
     @Override
     public Render<? super PaddockSignEntity> createRenderFor(RenderManager manager) {
         return new Renderer(manager);
@@ -119,7 +120,7 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
                     buffer.pos(maxX, maxY, depth).tex(minTextureX, minTextureY).normal(0.0F, 0.0F, -1.0F).endVertex();
                     tessellator.draw();
 
-                    for (float i = minX; i < maxX; i += 0.125F) {
+                    for (float i = minX + 0.125F; i < maxX + 0.125F; i += 0.125F) {
                         maxTextureX = (centerWidth - i) / textureWidth;
                         minTextureX = (centerWidth - (i - pixelSize)) / textureWidth;
                         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
@@ -140,7 +141,7 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
                     minTextureX = (textureWidth - (x + 1) / pixelSize) / textureWidth;
 
                     for (float i = minY; i < maxY; i += 0.125F) {
-                        maxTextureY = (textureHeight - (i)) / (textureHeight);
+                        maxTextureY = (textureHeight - i) / (textureHeight);
                         minTextureY = (textureHeight - (i + 0.125F)) / (textureHeight);
                         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
                         buffer.pos(minX, i, 0.0F).tex(maxTextureX, maxTextureY + 0.5F).normal(0.0F, 0.0F, -1.0F).endVertex();

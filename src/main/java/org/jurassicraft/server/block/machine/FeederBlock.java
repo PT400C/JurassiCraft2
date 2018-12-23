@@ -13,6 +13,8 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -62,6 +64,7 @@ public class FeederBlock extends BlockContainer {
 
         if (tileentity instanceof FeederBlockEntity) {
             InventoryHelper.dropInventoryItems(world, pos, (FeederBlockEntity) tileentity);
+            world.updateComparatorOutputLevel(pos, this);
         }
 
         super.breakBlock(world, pos, state);
@@ -89,6 +92,18 @@ public class FeederBlock extends BlockContainer {
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
         return new FeederBlockEntity();
+    }
+    
+    @Override
+    public boolean hasComparatorInputOverride(IBlockState state)
+    {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos)
+    {
+        return Container.calcRedstoneFromInventory((IInventory) worldIn.getTileEntity(pos));
     }
 
     @Override

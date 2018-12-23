@@ -15,7 +15,10 @@ import net.minecraft.command.*;
 import net.minecraft.command.CommandResultStats.Type;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -24,6 +27,8 @@ import net.minecraft.world.World;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.animation.EntityAnimation;
 import org.jurassicraft.server.api.Animatable;
+import org.jurassicraft.server.entity.DinosaurEntity;
+import org.jurassicraft.server.entity.dinosaur.TyrannosaurusEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +59,7 @@ public class ForceAnimationCommand implements ICommand {
 
     @Override
     public String getUsage(ICommandSender parSender) {
-        return "animate <AnimID> [<entitySelector>]";
+        return "animate <AnimID> [<entitySelector>] <variant>";
     }
 
     @Override
@@ -65,13 +70,17 @@ public class ForceAnimationCommand implements ICommand {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         World world = sender.getEntityWorld();
+
         if (world.isRemote) {
-            JurassiCraft.getLogger().debug("Not processing on Client side");
+
+            
         } else {
+        	
             JurassiCraft.getLogger().debug("Processing on Server side");
             if (args.length < 1) {
                 throw new WrongUsageException("Missing the animation to set");
             }
+            
             String entitySelector = args.length < 2 ? "@e[c=1]" : args[1];
             List<? extends EntityLivingBase> entities = EntitySelector.matchEntities(new ProxySender(server, sender), entitySelector, EntityLivingBase.class);
 
@@ -83,11 +92,22 @@ public class ForceAnimationCommand implements ICommand {
                 if (entity instanceof Animatable) {
                     Animatable animatable = (Animatable) entity;
                     try {
-                        animatable.setAnimation(EntityAnimation.valueOf(args[0].toUpperCase(Locale.ENGLISH)).get());
+                    	if(args.length == 3) {
+                    		byte variant = (byte) Integer.parseInt(args[2]);
+                    	//	world.playSound((EntityPlayer) sender, entity.getPosition(), ((DinosaurEntity) entity).getSoundForAnimation(EntityAnimation.valueOf(args[0].toUpperCase(Locale.ENGLISH)).get()), SoundCategory.HOSTILE, 1, 1);
+                    	//	world.playSound(, 1, 1);
+                    	
+                    		sender.sendMessage(new TextComponentString("Animating entity " + entity.getEntityId() + " with animation type " + args[0] + " and variant " + variant));
+                    		animatable.setAnimationWithVariant(EntityAnimation.valueOf(args[0].toUpperCase(Locale.ENGLISH)).get(), variant);
+                    	}else {
+                    		sender.sendMessage(new TextComponentString("Animating entity " + entity.getEntityId() + " with animation type " + args[0]));
+                    		animatable.setAnimation(EntityAnimation.valueOf(args[0].toUpperCase(Locale.ENGLISH)).get());
+                    	}
                     } catch (IllegalArgumentException iae) {
                         throw new CommandException(args[0] + " is not a valid animation.");
                     }
-                    sender.sendMessage(new TextComponentString("Animating entity " + entity.getEntityId() + " with animation type " + args[0]));
+                	entity.playSound(((DinosaurEntity) entity).getSoundForAnimation(EntityAnimation.valueOf(args[0].toUpperCase(Locale.ENGLISH)).get()), 1, 1);
+                    
                 }
             }
         }

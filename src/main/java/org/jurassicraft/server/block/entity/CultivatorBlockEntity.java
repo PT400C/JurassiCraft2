@@ -195,7 +195,6 @@ public class CultivatorBlockEntity extends MachineBaseBlockEntity implements Tem
             }
         }
 
-        
     }
 
     private void consumeNutrients() {

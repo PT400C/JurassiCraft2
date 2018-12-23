@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.TyrannosaurusEntity;
 import org.jurassicraft.server.period.TimePeriod;
 
@@ -28,16 +29,17 @@ public class TyrannosaurusDinosaur extends Dinosaur {
                 .setMaximumAge(this.fromDays(60))
                 .setEyeHeight(0.6F, 3.8F)
                 .setSizeX(0.45F, 3.0F)
-                .setSizeY(0.8F, 4.0F)
+                .setSizeY(0.8F, 3.0F)
                 .setStorage(54)
                 .setDiet(Diet.CARNIVORE.get())
                 .setBones("arm_bones", "foot_bones", "leg_bones", "neck_vertebrae", "pelvis", "ribcage", "shoulder_bone", "skull", "tail_vertebrae", "tooth")
-                .setHeadCubeName("Head")
-                .setScale(2.4F, 0.35F)
+                .setHeadCubeName("head")
+                .setScale(2.8F, 0.35F)
                 .setMaxHerdSize(3)
                 .setAttackBias(1000.0)
                 .setBreeding(false, 2, 4, 60, false, true)
                 .setSpawn(5, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.FOREST)
+                .setOverlays(OverlayType.EYELID, OverlayType.EYE, OverlayType.CLAW, OverlayType.MOUTH, OverlayType.NOSTRILS, OverlayType.STRIPES, OverlayType.TEETH)
                 .setRecipe(new String[][] {
                         { "", "", "", "neck_vertebrae", "skull" },
                         { "tail_vertebrae", "pelvis", "ribcage", "shoulder_bone", "tooth" },

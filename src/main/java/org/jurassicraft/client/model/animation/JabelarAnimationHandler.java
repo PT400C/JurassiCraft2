@@ -14,6 +14,7 @@ import org.jurassicraft.server.tabula.TabulaModelHelper;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author jabelar
@@ -27,10 +28,10 @@ public class JabelarAnimationHandler<ENTITY extends EntityLivingBase & Animatabl
     private final AnimationPass MOVEMENT_PASS;
     private final AnimationPass ON_LAND_PASS;
 
-    public JabelarAnimationHandler(ENTITY entity, AnimatableModel model, PosedCuboid[][] poses, Map<Animation, float[][]> poseSequences, boolean useInertialTweens) {
-        this.DEFAULT_PASS = new AnimationPass(poseSequences, poses, useInertialTweens);
-        this.MOVEMENT_PASS = new MovementAnimationPass(poseSequences, poses, useInertialTweens);
-        this.ON_LAND_PASS = new OnLandAnimationPass(poseSequences, poses, useInertialTweens);
+    public JabelarAnimationHandler(ENTITY entity, AnimatableModel model, PosedCuboid[][] poses, Map<Animation, float[][][]> poseSequences, Map<Animation, byte[]> poseCount, boolean useInertialTweens) {
+    	this.DEFAULT_PASS = new AnimationPass(poseSequences, poses, poseCount, useInertialTweens);
+        this.MOVEMENT_PASS = new MovementAnimationPass(poseSequences, poses, poseCount, useInertialTweens);
+        this.ON_LAND_PASS = new OnLandAnimationPass(poseSequences, poses, poseCount, useInertialTweens);
 
         this.init(entity, model);
     }

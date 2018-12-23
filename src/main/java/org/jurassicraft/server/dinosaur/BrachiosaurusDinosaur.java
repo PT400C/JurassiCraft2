@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.GrowthStage;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.BrachiosaurusEntity;
 import org.jurassicraft.server.period.TimePeriod;
 
@@ -38,6 +39,8 @@ public class BrachiosaurusDinosaur extends Dinosaur {
 	                .setAttackBias(1200.0)
 	                .setMaxHerdSize(4)
 	                .setBreeding(false, 4, 8, 72, true, false)
+	                .setOverlays(OverlayType.EYELID)
+	                .setEyeTime(20)
 	                .setRecipe(new String[][] {
 	                        { "", "", "", "", "skull" },
 	                        { "", "", "", "neck_vertebrae", "tooth" },

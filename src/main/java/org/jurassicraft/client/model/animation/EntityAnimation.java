@@ -1,6 +1,22 @@
 package org.jurassicraft.client.model.animation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import org.jurassicraft.server.entity.dinosaur.TyrannosaurusEntity;
+
+import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.server.animation.Animation;
+import net.ilexiconn.llibrary.server.animation.IAnimatedEntity;
+import net.ilexiconn.llibrary.server.network.AnimationMessage;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.WorldServer;
 
 public enum EntityAnimation {
     IDLE(false, false, false),
@@ -16,7 +32,7 @@ public enum EntityAnimation {
     MATING(false, false),
     SLEEPING(true, false),
     RESTING(true, true),
-    ROARING,
+    ROARING(new IdentifierContainer(TyrannosaurusEntity.class, 2)),
     SPEAK(false, false),
     LOOKING_LEFT,
     LOOKING_RIGHT,
@@ -42,19 +58,34 @@ public enum EntityAnimation {
     private boolean hold;
     private boolean doesBlockMovement;
     private boolean useInertia;
+    private Map<Class, Integer> variants;
 
+    EntityAnimation(boolean hold, boolean blockMovement, IdentifierContainer... variants) {
+        this(hold, blockMovement, true, variants);
+    }
+    
     EntityAnimation(boolean hold, boolean blockMovement) {
-        this(hold, blockMovement, true);
+        this(hold, blockMovement, true, new IdentifierContainer[0]);
+    }
+    
+    EntityAnimation(boolean hold, boolean blockMovement, boolean useInertia) {
+    	this(hold, blockMovement, useInertia, new IdentifierContainer[0]);
     }
 
-    EntityAnimation(boolean hold, boolean blockMovement, boolean useInertia) {
+    EntityAnimation(boolean hold, boolean blockMovement, boolean useInertia, IdentifierContainer... variants) {
         this.hold = hold;
         this.doesBlockMovement = blockMovement;
         this.useInertia = useInertia;
+        this.variants = Arrays.stream(variants).collect(Collectors.toMap(IdentifierContainer::getName, IdentifierContainer::getVariant));
+    
     }
 
+    EntityAnimation(IdentifierContainer... variants) {
+        this(false, true, variants);
+    }
+    
     EntityAnimation() {
-        this(false, true);
+        this(false, true, new IdentifierContainer[0]);
     }
 
     public static Animation[] getAnimations() {
@@ -88,6 +119,14 @@ public enum EntityAnimation {
     public boolean shouldHold() {
         return this.hold;
     }
+    
+    public boolean hasVariants(Class name) {
+    	return this.variants.containsKey(name) ? this.variants.get(name) > 0 : false;
+    }
+    
+    public int getVariants(Class name) {
+    	return this.variants.containsKey(name) ? this.variants.get(name) : 0;
+    }
 
     public boolean doesBlockMovement() {
         return this.doesBlockMovement;
@@ -96,4 +135,25 @@ public enum EntityAnimation {
     public boolean useInertia() {
         return this.useInertia;
     }
+    
+}
+
+class IdentifierContainer {
+	
+	private final Class name;
+	private final int variants;
+	
+	public IdentifierContainer(Class name, int variants) {
+		this.name = name;
+		this.variants = variants;
+	}
+	
+	public Class getName(){
+		return this.name;
+	}
+	
+	public int getVariant(){
+		return this.variants;
+	}
+	
 }

@@ -39,6 +39,8 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
+import java.util.HashMap;
+
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.animation.EntityAnimation;
 import org.jurassicraft.client.model.animation.PoseHandler;
@@ -62,6 +64,7 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
     private Variant variant = Variant.JURASSIC_PARK;
     private boolean milked;
     private boolean inLava;
+    private byte animationVariant = 0;
 
     public GoatEntity(World world) {
         super(world);
@@ -98,6 +101,12 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
     }
 
     @Override
+    public void addVariant(Animation animation, byte variant) {
+    	//TODO: IMPLEMENT!
+    	
+    }
+    
+    @Override
     protected void entityInit() {
         super.entityInit();
         this.dataManager.register(WATCHER_IS_RUNNING, false);
@@ -114,6 +123,11 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
     public boolean isCarcass() {
         return false;
     }
+    
+    @Override
+	public byte getAnimationVariant(Animation animation) {
+		return (byte) 0;
+	}
 
     @Override
     public boolean isMoving() {
@@ -205,8 +219,8 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
         this.animation = newAnimation;
         if (oldAnimation != newAnimation) {
             this.animationTick = 0;
-            this.animationLength = (int) this.getPoseHandler().getAnimationLength(this.animation, this.getGrowthStage());
-            AnimationHandler.INSTANCE.sendAnimationMessage(this, newAnimation);
+            this.animationLength = (int) this.getPoseHandler().getAnimationLength(this.animation, this.getGrowthStage(), this.getAnimationVariant(newAnimation));
+            EntityHandler.sendSpecialAnimationMessage(this, newAnimation, (byte) 0);
         }
     }
 
@@ -375,4 +389,22 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
         JURASSIC_PARK,
         JPOG
     }
+
+	@Override
+	public HashMap<Animation, Byte> getVariants() {
+		// TODO IMPLEMENT!
+		return new HashMap<>();
+	}
+
+	@Override
+	public void setAnimationWithVariant(Animation animation, byte variant) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Class getEntityClass() {
+		return this.getClass();
+	}
+
 }

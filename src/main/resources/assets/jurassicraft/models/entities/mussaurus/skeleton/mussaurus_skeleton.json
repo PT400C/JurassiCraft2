@@ -1,11 +1,15 @@
 {
 	"version": 0,
 	"poses": {
-		"IDLE": [
-		  {
-			"pose": "mussaurus_skeleton_idle",
-			"time": 1
-		  }
-		]
+		"IDLE": {
+			"variants": {
+				"0": [
+					{
+						"pose": "mussaurus_skeleton_idle",
+						"time": 1
+					}
+				]
+			}
+		}
 	}
 }

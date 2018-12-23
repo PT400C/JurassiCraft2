@@ -1,55 +1,114 @@
 package org.jurassicraft.client.model.animation.entity;
 
+import java.util.HashMap;
+
+import org.apache.commons.lang3.BooleanUtils;
 import org.jurassicraft.client.model.AnimatableModel;
+import org.jurassicraft.client.model.animation.EntityAnimation;
 import org.jurassicraft.client.model.animation.EntityAnimator;
+import org.jurassicraft.client.sound.SoundHandler;
+import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.dinosaur.TyrannosaurusEntity;
 
 import net.ilexiconn.llibrary.client.model.tools.AdvancedModelRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TyrannosaurusAnimator extends EntityAnimator<TyrannosaurusEntity> {
+	
+	private HashMap<TyrannosaurusEntity, AnimState> states = new HashMap<>();
+	
     @Override
     protected void performAnimations(AnimatableModel model, TyrannosaurusEntity entity, float f, float f1, float ticks, float rotationYaw, float rotationPitch, float scale) {
-        AdvancedModelRenderer waist = model.getCube("Body 1");
-        AdvancedModelRenderer stomach = model.getCube("Body 2");
-        AdvancedModelRenderer chest = model.getCube("Body 3");
+    	
+    	if(!entity.isDead && !entity.isCarcass()) {
+    	if(!states.containsKey(entity))
+    		states.put(entity, new AnimState(0, FootStatus.EQUAL, 0, 0, FootStatus.EQUAL, 0));
+    	}else if(states.containsKey(entity)) {
+    		states.remove(entity);
+    	}
+    	AdvancedModelRenderer waist = model.getCube("bodyHips");
+        AdvancedModelRenderer stomach = model.getCube("bodyBack");
+        AdvancedModelRenderer chest = model.getCube("bodyShoulders");
+        
+        AdvancedModelRenderer neck1 = model.getCube("neck1");
+        AdvancedModelRenderer neck2 = model.getCube("neck2");
+        AdvancedModelRenderer neck3 = model.getCube("neck3");
+        AdvancedModelRenderer neck4 = model.getCube("neck4");
+        AdvancedModelRenderer neck5 = model.getCube("neck5");
+        AdvancedModelRenderer neck6 = model.getCube("neck6");
+        AdvancedModelRenderer neck7 = model.getCube("neck7");
+        AdvancedModelRenderer throat1 = model.getCube("throat1");
+        AdvancedModelRenderer throat2 = model.getCube("throat2");
+        AdvancedModelRenderer throat3 = model.getCube("throat3");
+        
+        AdvancedModelRenderer head = model.getCube("head");
 
-        AdvancedModelRenderer neck1 = model.getCube("Neck1");
-        AdvancedModelRenderer neck2 = model.getCube("Neck2");
-        AdvancedModelRenderer neck3 = model.getCube("Neck3");
-        AdvancedModelRenderer neck4 = model.getCube("Neck4");
-        AdvancedModelRenderer neck5 = model.getCube("Neck5");
+        AdvancedModelRenderer tail1 = model.getCube("tail1");
+        AdvancedModelRenderer tail2 = model.getCube("tail2");
+        AdvancedModelRenderer tail3 = model.getCube("tail3");
+        AdvancedModelRenderer tail4 = model.getCube("tail4");
+        AdvancedModelRenderer tail5 = model.getCube("tail5");
+        AdvancedModelRenderer tail6 = model.getCube("tail6");
+        AdvancedModelRenderer tail7 = model.getCube("tail7");
+        AdvancedModelRenderer tail8 = model.getCube("tail8");
+        AdvancedModelRenderer tail9 = model.getCube("tail9");
+        
+        AdvancedModelRenderer handLeft = model.getCube("handLeft");
+        AdvancedModelRenderer lowerArmLeft = model.getCube("bicepLeft");
 
-        AdvancedModelRenderer head = model.getCube("Head");
-
-        AdvancedModelRenderer tail1 = model.getCube("Tail 1");
-        AdvancedModelRenderer tail2 = model.getCube("Tail 2");
-        AdvancedModelRenderer tail3 = model.getCube("Tail 3");
-        AdvancedModelRenderer tail4 = model.getCube("Tail 4");
-        AdvancedModelRenderer tail5 = model.getCube("Tail 5");
-        AdvancedModelRenderer tail6 = model.getCube("Tail 6");
-        AdvancedModelRenderer tail7 = model.getCube("Tail 7");
-
-        AdvancedModelRenderer handLeft = model.getCube("Hand LEFT");
-        AdvancedModelRenderer lowerArmLeft = model.getCube("Lower Arm LEFT");
-
-        AdvancedModelRenderer handRight = model.getCube("Hand Right");
-        AdvancedModelRenderer lowerArmRight = model.getCube("Lower Arm Right");
-
-        AdvancedModelRenderer leftThigh = model.getCube("Left Thigh");
-        AdvancedModelRenderer rightThigh = model.getCube("Right Thigh");
-
-        AdvancedModelRenderer[] tailParts = new AdvancedModelRenderer[] { tail7, tail6, tail5, tail4, tail3, tail2, tail1 };
-        AdvancedModelRenderer[] bodyParts = new AdvancedModelRenderer[] { head, neck5, neck4, neck3, neck2, neck1, chest, stomach, waist };
+        AdvancedModelRenderer handRight = model.getCube("handRight");
+        AdvancedModelRenderer lowerArmRight = model.getCube("bicepRight");
+        
+        AdvancedModelRenderer leftThigh = model.getCube("thighLeft");
+        AdvancedModelRenderer rightThigh = model.getCube("thighRight");
+        
+        AdvancedModelRenderer[] feet = new AdvancedModelRenderer[] {model.getCube("footLeft"), model.getCube("footRight")};
+        
+        AdvancedModelRenderer[] tailParts = new AdvancedModelRenderer[] { tail9, tail8, tail7, tail6, tail5, tail4, tail3, tail2, tail1 };
+        AdvancedModelRenderer[] bodyParts = new AdvancedModelRenderer[] { head, throat3, throat2, throat1, neck7, neck6, neck5, neck4, neck3, neck2, neck1, chest, stomach, waist };
         AdvancedModelRenderer[] leftArmParts = new AdvancedModelRenderer[] { handLeft, lowerArmLeft };
         AdvancedModelRenderer[] rightArmParts = new AdvancedModelRenderer[] { handRight, lowerArmRight };
 
         float delta = Minecraft.getMinecraft().getRenderPartialTicks();
-        AdvancedModelRenderer leftCalf = model.getCube("Left Calf 1");
-        AdvancedModelRenderer rightCalf = model.getCube("Right Calf 1");
+        
+		if (!entity.isDead && !entity.isCarcass()) {
+
+			AnimState statt = this.states.get(entity);
+			FootStatus[] tempStatus = new FootStatus[2];
+			for (int i = 0; i < feet.length; i++) {
+
+				boolean isLeft = !BooleanUtils.toBoolean(i);
+
+				if (feet[i].rotateAngleX > statt.getAngle(isLeft)) {
+					tempStatus[i] = FootStatus.UP;
+				} else if (feet[i].rotateAngleX < statt.getAngle(isLeft)) {
+
+					tempStatus[i] = FootStatus.DOWN;
+
+				} else {
+					tempStatus[i] = statt.getStatus(isLeft);
+				}
+
+				if (tempStatus[i] != statt.getStatus(isLeft)) {
+
+					if (tempStatus[i] == FootStatus.DOWN && feet[i].rotateAngleX > 0.5 && (statt.getTicks(isLeft) + 10) <= ticks) {
+						statt.setTicks(isLeft, ticks);
+						if(entity.onGround && !entity.isInWater() && (entity.getAnimation() == EntityAnimation.IDLE.get() || entity.getAnimation() == EntityAnimation.WALKING.get() || entity.getAnimation() == EntityAnimation.RUNNING.get() || entity.getAnimation() == EntityAnimation.ROARING.get() || entity.getAnimation() == EntityAnimation.DRINKING.get() || entity.getAnimation() == EntityAnimation.RESTING.get() || entity.getAnimation() == EntityAnimation.INJURED.get())) 
+						Minecraft.getMinecraft().player.world.playSound(entity.posX, entity.posY, entity.posZ, SoundHandler.TYRANNOSAURUS_STOMP, SoundCategory.HOSTILE, (float) entity.interpolate(0.1F, 1.0F), entity.getSoundPitch(), false);
+					}
+					statt.setStatus(isLeft, tempStatus[i]);
+				}
+				statt.setAngle(isLeft, feet[i].rotateAngleX);
+			}
+
+		}
+        
+        AdvancedModelRenderer leftCalf = model.getCube("calfLeft");
+        AdvancedModelRenderer rightCalf = model.getCube("calfRight");
         LegArticulator.articulateBiped(entity, entity.legSolver, waist, leftThigh, leftCalf, rightThigh, rightCalf, 0.4F, 0.4F, delta);
 
         float globalSpeed = 0.5F;
@@ -67,7 +126,7 @@ public class TyrannosaurusAnimator extends EntityAnimator<TyrannosaurusEntity> {
         model.chainWave(leftArmParts, -0.1F, 0.2F, 4, ticks, 0.25F);
         model.chainWave(tailParts, 0.1F, -0.1F, 2, ticks, 0.1F);
 
-        model.faceTarget(rotationYaw, rotationPitch, 1.5F, chest, neck1, neck5, head);
+        model.faceTarget(rotationYaw, rotationPitch, 1.5F, chest, neck1, neck7, head);
 
         entity.tailBuffer.applyChainSwingBuffer(tailParts);
     }

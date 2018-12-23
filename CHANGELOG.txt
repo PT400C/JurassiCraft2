@@ -6,3 +6,6 @@
 *Fixed Growth Serum issues
 *Fixed an incompatibility with Chisels & Bits
 +Added cleaning animation to cleaning station
++Revamped the tyrannosaurus (Model, sounds and textures)
++Animations now support multiple variants
++Added two additional poses to the tyrannosaurus skeleton

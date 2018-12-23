@@ -499,6 +499,7 @@ gender.random.name=Random
 gender.name=Gender
 spawnegg.genderchange.name=This egg will now spawn a {mode} gender.
 actionfigure.genderchange.name=This action figure will now spawn a {mode} gender.
+variant.skeletonchange.name=This skeleton will now be in the {mode} pose.
 amber.mosquito.name=Mosquito
 amber.aphid.name=Aphid
 

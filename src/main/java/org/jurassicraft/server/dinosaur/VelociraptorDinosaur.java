@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.SleepTime;
 import org.jurassicraft.server.entity.dinosaur.VelociraptorEntity;
 import org.jurassicraft.server.period.TimePeriod;
@@ -44,6 +45,7 @@ public class VelociraptorDinosaur extends Dinosaur {
                 .setBreeding(false, 1, 7, 28, false, true)
                 .setJumpHeight(3)
                 .setSpawn(10, BiomeDictionary.Type.JUNGLE, BiomeDictionary.Type.FOREST, BiomeDictionary.Type.DENSE)
+                .setOverlays(OverlayType.EYELID)
                 .setRecipe(new String[][] {
                         { "", "", "neck_vertebrae", "skull" },
                         { "tail_vertebrae", "ribcage", "shoulder_bone", "tooth" },

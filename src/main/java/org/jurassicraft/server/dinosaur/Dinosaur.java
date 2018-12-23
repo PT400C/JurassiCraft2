@@ -1,5 +1,14 @@
 package org.jurassicraft.server.dinosaur;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -7,41 +16,55 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.vecmathimpl.Matrix4d;
 import javax.vecmathimpl.Vector3d;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.AnimatableModel;
 import org.jurassicraft.client.model.animation.PoseHandler;
+import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.server.api.GrowthStageGenderContainer;
 import org.jurassicraft.server.api.Hybrid;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.GrowthStage;
+import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.SleepTime;
 import org.jurassicraft.server.entity.ai.util.MovementType;
 import org.jurassicraft.server.period.TimePeriod;
 import org.jurassicraft.server.tabula.TabulaModelHelper;
 import org.jurassicraft.server.util.LangUtils;
 
+import com.google.common.io.Files;
+import com.sun.deploy.uitoolkit.impl.fx.ui.resources.ResourceManager;
+
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaModelContainer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 public abstract class Dinosaur implements Comparable<Dinosaur> {
+
 	private final Map<GrowthStage, List<ResourceLocation>> overlays = new EnumMap<>(GrowthStage.class);
     private final Map<GrowthStage, ResourceLocation> maleTextures = new EnumMap<>(GrowthStage.class);
     private final Map<GrowthStage, ResourceLocation> femaleTextures = new EnumMap<>(GrowthStage.class);
-    private final Map<GrowthStageGenderContainer, ResourceLocation> eyelidTextures = new HashMap<>();
     private final Map<GrowthStage, TabulaModelContainer> models = new EnumMap<>(GrowthStage.class);
+    private Map<String, TabulaModelContainer> skeletonModels = new HashMap<>();
+    private final Map<OverlayType, Map<GrowthStageGenderContainer, ResourceLocation>> overlayTextures = new HashMap<>();
     private final DinosaurMetadata metadata;
-
     private boolean shouldRegister = true;
     private PoseHandler<?> poseHandler;
     
@@ -120,9 +143,20 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     }
 
     public void init() {
+
+    	for(OverlayType type : this.metadata.getOverlays()) {
+    		
+    		if(this.overlayTextures.get(type) == null)
+            	this.overlayTextures.put(type, new HashMap<>());
+    	}
+
         for (GrowthStage stage : GrowthStage.VALUES) {
             if (this.doesSupportGrowthStage(stage)) {
-            	this.setModelContainer(stage, this.parseModel(stage.getKey()));
+            	if(stage == GrowthStage.SKELETON) {
+            		this.skeletonModels = this.getSkeletonModels();
+            	}else {
+            		this.setModelContainer(stage, this.parseModel(stage.getKey()));
+            	}
             } else {
             	this.setModelContainer(stage, this.getModelContainer(GrowthStage.ADULT));
             }
@@ -133,26 +167,45 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         String name = identifier.getResourcePath();
         String textureRoot = "textures/entities/" + name + "/";
 
-        for (GrowthStage growthStage : GrowthStage.values()) {
-        	String growthStageName = growthStage.getKey();
+		if (FMLCommonHandler.instance().getSide().equals(Side.CLIENT)) {
 
-            if (!this.doesSupportGrowthStage(growthStage)) {
-            	growthStageName = GrowthStage.ADULT.getKey();
-            }
+			for (GrowthStage growthStage : GrowthStage.values()) {
+				String growthStageName = growthStage.getKey();
 
-            this.maleTextures.put(growthStage, new ResourceLocation(domain, textureRoot + name + "_male_" + growthStageName + ".png"));
-            this.femaleTextures.put(growthStage, new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + ".png"));
-            this.eyelidTextures.put(new GrowthStageGenderContainer(growthStage, true), new ResourceLocation(JurassiCraft.MODID, textureRoot + name + "_male_" + growthStageName + "_eyelid.png"));
-            this.eyelidTextures.put(new GrowthStageGenderContainer(growthStage, false), new ResourceLocation(JurassiCraft.MODID, textureRoot + name + "_female_" + growthStageName + "_eyelid.png"));
+				if (!this.doesSupportGrowthStage(growthStage)) {
+					growthStageName = GrowthStage.ADULT.getKey();
+				}
 
-            List<ResourceLocation> overlaysForGrowthStage = new ArrayList<>();
+				this.maleTextures.put(growthStage, new ResourceLocation(domain, textureRoot + name + "_male_" + growthStageName + ".png"));
+				this.femaleTextures.put(growthStage, new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + ".png"));
 
-            for (int i = 1; i <= this.metadata.getOverlayCount(); i++) {
-                overlaysForGrowthStage.add(new ResourceLocation(JurassiCraft.MODID, textureRoot + name + "_overlay_" + growthStageName + "_" + i + ".png"));
-            }
+				for (OverlayType type : this.metadata.getOverlays()) {
 
-            this.overlays.put(growthStage, overlaysForGrowthStage);
-        }
+					Map<GrowthStageGenderContainer, ResourceLocation> overlay = this.overlayTextures.get(type);
+					ResourceLocation female = new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + "_" + type.toString() + ".png");
+					ResourceLocation male = new ResourceLocation(domain, textureRoot + name + "_male_" + growthStageName + "_" + type.toString() + ".png");
+					try {
+						Minecraft.getMinecraft().getResourceManager().getResource(female).getInputStream();
+						Minecraft.getMinecraft().getResourceManager().getResource(male).getInputStream();
+
+						overlay.put(new GrowthStageGenderContainer(growthStage, false), female);
+						overlay.put(new GrowthStageGenderContainer(growthStage, true), male);
+						this.overlayTextures.put(type, overlay);
+
+					} catch (IOException e) {
+					}
+				}
+
+				List<ResourceLocation> overlaysForGrowthStage = new ArrayList<>();
+
+				for (int i = 1; i <= this.metadata.getOverlayCount(); i++) {
+					overlaysForGrowthStage.add(new ResourceLocation(JurassiCraft.MODID,
+							textureRoot + name + "_overlay_" + growthStageName + "_" + i + ".png"));
+				}
+
+				this.overlays.put(growthStage, overlaysForGrowthStage);
+			}
+		}
 
         this.poseHandler = new PoseHandler(this);
     }
@@ -163,7 +216,6 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         String domain = identifier.getResourceDomain();
         String path = identifier.getResourcePath();
         ResourceLocation location = new ResourceLocation(domain, "models/entities/" + path + "/" + growthStage + "/" + path + "_" + growthStage + "_idle");
-
         try {
         	return TabulaModelHelper.loadTabulaModel(location);
         } catch (Exception e) {
@@ -171,6 +223,36 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         }
 
         return null;
+    }
+    
+    @Nonnull
+    protected HashMap<String, TabulaModelContainer> getSkeletonModels() {
+    	HashMap<String, TabulaModelContainer> models = new HashMap<>();
+        ResourceLocation identifier = this.getIdentifier();
+        String domain = identifier.getResourceDomain();
+        String path = identifier.getResourcePath();
+        ResourceLocation location = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_idle");
+        try {
+        	models.put("idle", TabulaModelHelper.loadTabulaModel(location));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        
+		for (SkeletonTypes type : SkeletonTypes.VALUES) {
+
+			if (type.getClasses().contains(path)) {
+				ResourceLocation furtherLocation = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_" + type.getName());
+				try {
+					models.put(type.getName(), TabulaModelHelper.loadTabulaModel(furtherLocation));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+        return models;
     }
 
     public ResourceLocation getMaleTexture(GrowthStage stage) {
@@ -207,8 +289,8 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         return this.overlays.containsKey(stage) ? this.overlays.get(stage).get(overlay) : null;
     }
 
-    public ResourceLocation getEyelidTexture(DinosaurEntity entity) {
-        return this.eyelidTextures.get(new GrowthStageGenderContainer(entity.getGrowthStage(), entity.isMale()));
+    public ResourceLocation getOverlayTextures(OverlayType type, DinosaurEntity entity) {
+        return this.overlayTextures.get(type).get(new GrowthStageGenderContainer(entity.getGrowthStage(), entity.isMale()));
     }
 
     @Override
@@ -249,6 +331,11 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         if (model == null) {
             return this.models.get(GrowthStage.ADULT);
         }
+        return model;
+    }
+    
+    public Map<String, TabulaModelContainer> getSkeletonModel() {
+    	Map<String, TabulaModelContainer> model = this.skeletonModels;
         return model;
     }
 
@@ -292,9 +379,6 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     public String getLocalizedName() {
         ResourceLocation identifier = this.metadata.getIdentifier();
         return I18n.translateToLocal("entity." + identifier.getResourceDomain() + "." + identifier.getResourcePath() + ".name");
-       // System.out.println("TEST: "+I18n.translateToLocal("entity." + identifier.getResourceDomain() + "." + identifier.getResourcePath() + ".name"));
-      //  return "Tyrannosaurus";
-        //return I18n.format("entity." + identifier.getResourceDomain() + "." + identifier.getResourcePath() + ".name");
     }
 
     public enum DinosaurType {
