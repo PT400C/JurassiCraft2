@@ -498,6 +498,7 @@ gender.random.name=Aleatorio
 gender.name=Género
 spawnegg.genderchange.name=Este Huevo se Generará en Género {mode}.
 actionfigure.genderchange.name=Esta Figura de Acción se Generará en Género {mode}.
+variant.skeletonchange.name=Este esqueleto ahora estará en la pose de {mode}.
 amber.mosquito.name=Mosquito
 amber.aphid.name=Áfido
 
