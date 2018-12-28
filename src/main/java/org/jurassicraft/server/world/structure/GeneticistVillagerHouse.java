@@ -33,6 +33,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
+	
     public static final int WIDTH = 8;
     public static final int HEIGHT = 6;
     public static final int DEPTH = 14;
@@ -98,8 +99,8 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
             this.boundingBox.offset(0, ((this.averageGroundLvl - this.boundingBox.maxY) + HEIGHT) - 1, 0);
 
         }
-        int ox = (this.rotation == Rotation.CLOCKWISE_90 && this.mirror == Mirror.NONE) ? 14 : 1;
-		int oz = (this.rotation == Rotation.NONE && this.mirror == Mirror.LEFT_RIGHT) ? 14 : 1;
+        int ox = (this.rotation == Rotation.CLOCKWISE_90 && this.mirror == Mirror.NONE) ? 14 : -1;
+		int oz = (this.rotation == Rotation.NONE && this.mirror == Mirror.LEFT_RIGHT) ? 14 : -1;
 		BlockPos lowerCorner = new BlockPos(this.boundingBox.minX + ox, this.boundingBox.minY, this.boundingBox.minZ + oz);
 		settings.setBoundingBox(new StructureBoundingBox(this.boundingBox.minX + ox, this.boundingBox.minY, this.boundingBox.minZ + oz, this.boundingBox.maxX + ox, this.boundingBox.maxZ, this.boundingBox.maxZ + oz));
         template.addBlocksToWorldChunk(world, lowerCorner, settings);
@@ -134,7 +135,6 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
                     break;
                 case "BaseStairs":
                     world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, this.coordBaseMode)));
-                    System.out.println(this.rotation + "  " + this.mirror + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ());
                     dataBlocksClone.remove(pos);
                     break;
                 case "Wall":
@@ -189,10 +189,12 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
                     world.setBlockState(pos, this.biomeDoor().getDefaultState().withProperty(BlockDoor.FACING, this.coordBaseMode).withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER).withRotation(this.rotation).withMirror(this.mirror));
                     break;
                 case "Torch":
-                    world.setBlockState(pos, Blocks.TORCH.getDefaultState());
+                	if(!this.isZombieInfested)
+                		world.setBlockState(pos, Blocks.TORCH.getDefaultState());
                     break;
                 case "TorchDoor":
-                    world.setBlockState(pos, Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, this.coordBaseMode));
+                	if(!this.isZombieInfested)
+                		world.setBlockState(pos, Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, this.coordBaseMode));
                     break;
             }
         });
