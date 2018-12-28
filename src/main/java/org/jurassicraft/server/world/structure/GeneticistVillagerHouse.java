@@ -23,6 +23,8 @@ import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.block.BlockHandler;
+import org.jurassicraft.server.block.OrientedBlock;
+import org.jurassicraft.server.block.machine.CleaningStationBlock;
 import org.jurassicraft.server.world.loot.Loot;
 
 import java.util.List;
@@ -34,10 +36,6 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
     public static final int WIDTH = 8;
     public static final int HEIGHT = 6;
     public static final int DEPTH = 14;
-
-    public static final int OFFSET_X = -4;
-    public static final int OFFSET_Y = 0;
-    public static final int OFFSET_Z = -13;
 
     public static final IBlockState[] MACHINES = new IBlockState[] { BlockHandler.DNA_EXTRACTOR.getDefaultState(), BlockHandler.DNA_SEQUENCER.getDefaultState(), BlockHandler.DNA_COMBINATOR_HYBRIDIZER.getDefaultState(), BlockHandler.DNA_SYNTHESIZER.getDefaultState(), BlockHandler.EMBRYONIC_MACHINE.getDefaultState() };
 
@@ -67,19 +65,19 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
         } else {
             switch (facing) {
                 case SOUTH:
-                    this.mirror = Mirror.LEFT_RIGHT;
+                    this.mirror = Mirror.NONE;
                     this.rotation = Rotation.NONE;
                     break;
                 case WEST:
-                    this.mirror = Mirror.LEFT_RIGHT;
+                    this.mirror = Mirror.NONE;
                     this.rotation = Rotation.CLOCKWISE_90;
                     break;
                 case EAST:
-                    this.mirror = Mirror.NONE;
+                    this.mirror = Mirror.LEFT_RIGHT;
                     this.rotation = Rotation.CLOCKWISE_90;
                     break;
                 default:
-                    this.mirror = Mirror.NONE;
+                    this.mirror = Mirror.LEFT_RIGHT;
                     this.rotation = Rotation.NONE;
             }
         }
@@ -89,10 +87,7 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
     public boolean addComponentParts(World world, Random random, StructureBoundingBox bounds) {
         MinecraftServer server = world.getMinecraftServer();
         TemplateManager templateManager = world.getSaveHandler().getStructureTemplateManager();
-        PlacementSettings settings = new PlacementSettings()
-                .setRotation(this.rotation)
-                .setMirror(this.mirror)
-                .setIgnoreEntities(true);
+        PlacementSettings settings = new PlacementSettings().setRotation(this.rotation).setMirror(this.mirror).setIgnoreEntities(true);
         Template template = templateManager.getTemplate(server, STRUCTURE);
         if (this.averageGroundLvl < 0) {
             this.averageGroundLvl = this.getAverageGroundLevel(world, bounds);
@@ -101,19 +96,12 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
             }
             settings.setIgnoreEntities(false);
             this.boundingBox.offset(0, ((this.averageGroundLvl - this.boundingBox.maxY) + HEIGHT) - 1, 0);
-            boolean invert = this.mirror == Mirror.LEFT_RIGHT;
-            switch (this.coordBaseMode) {
-                case SOUTH:
-                    this.boundingBox.offset(OFFSET_X, 0, -OFFSET_Z);
-                    break;
-                case WEST:
-                case EAST:
-                    this.boundingBox.offset(invert ? 0 : -OFFSET_Z, 0, OFFSET_X);
-                    break;
-            }
+
         }
-        BlockPos lowerCorner = new BlockPos(this.boundingBox.minX, this.boundingBox.minY, this.boundingBox.minZ);
-        settings.setBoundingBox(this.boundingBox);
+        int ox = (this.rotation == Rotation.CLOCKWISE_90 && this.mirror == Mirror.NONE) ? 14 : 1;
+		int oz = (this.rotation == Rotation.NONE && this.mirror == Mirror.LEFT_RIGHT) ? 14 : 1;
+		BlockPos lowerCorner = new BlockPos(this.boundingBox.minX + ox, this.boundingBox.minY, this.boundingBox.minZ + oz);
+		settings.setBoundingBox(new StructureBoundingBox(this.boundingBox.minX + ox, this.boundingBox.minY, this.boundingBox.minZ + oz, this.boundingBox.maxX + ox, this.boundingBox.maxZ, this.boundingBox.maxZ + oz));
         template.addBlocksToWorldChunk(world, lowerCorner, settings);
         this.count++;
         Map<BlockPos, String> dataBlocks = template.getDataBlocks(lowerCorner, settings);
@@ -121,13 +109,18 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
         dataBlocks.forEach((pos, type) -> {
             switch (type) {
                 case "GeneticistChest":
-                    world.setBlockState(pos, Blocks.CHEST.getDefaultState().withRotation(this.rotation.add(Rotation.CLOCKWISE_90)).withMirror(this.mirror));
+                    world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, rotate(this.coordBaseMode, this.mirror == Mirror.LEFT_RIGHT ? true : false)));
                     ((TileEntityChest) world.getTileEntity(pos)).setLootTable(Loot.GENETICIST_HOUSE_CHEST, random.nextLong());
                     dataBlocksClone.remove(pos);
                     break;
                 case "GeneticistMachine":
                     if (random.nextInt(4) == 0) {
-                        world.setBlockState(pos, MACHINES[random.nextInt(MACHINES.length)].withRotation(this.rotation.add(Rotation.CLOCKWISE_90)).withMirror(this.mirror));
+                    	IBlockState machine = MACHINES[random.nextInt(MACHINES.length)];
+                    	if(machine.getBlock() instanceof OrientedBlock) {
+                            world.setBlockState(pos, machine.withProperty(((OrientedBlock) machine.getBlock()).FACING, rotate(this.coordBaseMode, this.mirror == Mirror.LEFT_RIGHT ? true : false)));
+                    	}else {
+                    		world.setBlockState(pos, machine);
+                    	}
                     }
                     dataBlocksClone.remove(pos);
                     break;
@@ -140,7 +133,8 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
                     dataBlocksClone.remove(pos);
                     break;
                 case "BaseStairs":
-                    world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState().withRotation(this.rotation).withMirror(this.mirror)));
+                    world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, this.coordBaseMode)));
+                    System.out.println(this.rotation + "  " + this.mirror + " " + pos.getX() + " " + pos.getY() + " " + pos.getZ());
                     dataBlocksClone.remove(pos);
                     break;
                 case "Wall":
@@ -189,16 +183,16 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
         dataBlocksClone.forEach((pos, type) -> {
             switch (type) {
                 case "Door":
-                    world.setBlockState(pos, this.biomeDoor().getDefaultState().withRotation(this.rotation).withMirror(this.mirror));
+                    world.setBlockState(pos, this.biomeDoor().getDefaultState().withProperty(BlockDoor.FACING, this.coordBaseMode));
                     break;
                 case "DoorTop":
-                    world.setBlockState(pos, this.biomeDoor().getDefaultState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER).withRotation(this.rotation).withMirror(this.mirror));
+                    world.setBlockState(pos, this.biomeDoor().getDefaultState().withProperty(BlockDoor.FACING, this.coordBaseMode).withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER).withRotation(this.rotation).withMirror(this.mirror));
                     break;
                 case "Torch":
                     world.setBlockState(pos, Blocks.TORCH.getDefaultState());
                     break;
                 case "TorchDoor":
-                    world.setBlockState(pos, Blocks.TORCH.getDefaultState().withRotation(this.rotation).withMirror(this.mirror));
+                    world.setBlockState(pos, Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, this.coordBaseMode));
                     break;
             }
         });
@@ -234,5 +228,38 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
             StructureBoundingBox bounds = StructureBoundingBox.getComponentToAddBoundingBox(minX, minY, minZ, 0, 0, 0, WIDTH, HEIGHT, DEPTH, facing);
             return StructureComponent.findIntersecting(pieces, bounds) == null ? new GeneticistVillagerHouse(startPiece, componentType, bounds, facing) : null;
         }
+    }
+    
+    public EnumFacing rotate(EnumFacing facing, boolean clockwise)
+    {
+    	if(!clockwise) {
+        switch (facing)
+        {
+            case NORTH:
+                return EnumFacing.EAST;
+            case EAST:
+                return EnumFacing.SOUTH;
+            case SOUTH:
+                return EnumFacing.WEST;
+            case WEST:
+                return EnumFacing.NORTH;
+            default:
+                throw new IllegalStateException("Rotation failed while generation for: " + facing);
+        }
+    	}
+    	switch (facing)
+        {
+             case NORTH:
+                 return EnumFacing.WEST;
+             case EAST:
+                 return EnumFacing.NORTH;
+             case SOUTH:
+                 return EnumFacing.EAST;
+             case WEST:
+                 return EnumFacing.SOUTH;
+             default:
+                 throw new IllegalStateException("Rotation failed while generation for: " + facing + " which is clockwise");
+        }
+    	
     }
 }

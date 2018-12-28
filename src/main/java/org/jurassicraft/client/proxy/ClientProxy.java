@@ -85,7 +85,7 @@ public class ClientProxy extends ServerProxy {
 		RenderingHandler.INSTANCE.postInit();
 
 		new Thread(() -> {
-			List<String> patrons = WebUtils.readPastebinAsList("fgJQkCMa");
+			List<String> patrons = WebUtils.readPastebinAsList("G8AVxw6A");
 			if (patrons != null) {
 				for (String patron : patrons) {
 					PATRONS.add(UUID.fromString(patron));

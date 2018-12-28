@@ -23,6 +23,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -60,8 +61,8 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 	private ItemStack cleanedItemResult = ItemStack.EMPTY;
 
 	private String customName;
-
-	private boolean prevIsCleaning;
+    private boolean isCleaning = false;
+	private boolean prevIsCleaning = false;
 	public float cleaningRotation = 0;
 	public float rotationAmount = 0;
 	private float prevCleaningRotation;
@@ -110,6 +111,10 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack) {
+		boolean send = false;
+		if(!this.world.isRemote && index == 0 && ItemStack.EMPTY == stack)
+			send = true;
+		
 		boolean flag = !stack.isEmpty() && stack.isItemEqual(this.slots.get(index)) && ItemStack.areItemStackTagsEqual(stack, this.slots.get(index));
 		this.slots.set(index, stack);
 
@@ -122,6 +127,8 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 			this.cleanTime = 0;
 			this.markDirty();
 		}
+		if(send)
+			JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
 	}
 
 	@Override
@@ -261,16 +268,18 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 			if (this.cleaningStationWaterTime == 0) {
 				this.cleanTime = 0;
 			}
+			
+			this.isCleaning = this.isCleaning();
 
-			if (this.isCleaning() != prevIsCleaning) {
-				prevIsCleaning = this.cleanTime > 0;
+			if (this.isCleaning != prevIsCleaning) {
+				prevIsCleaning = this.isCleaning;
 				JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
 			}
 		}else {
 			updateRotation();
 		}
 
-		if (this.world.isRemote && this.isCleaning()) {
+		if (this.world.isRemote && this.isCleaning) {
 			this.spawnClientWaterParticles();
 		}
 
@@ -346,11 +355,13 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 						slot.grow(this.cleanedItemResult.getCount());
 					}
 
-					this.slots.get(0).shrink(1);
+					ItemStack shrinked = this.slots.get(0).copy();
+					shrinked.shrink(1);
+					this.setInventorySlotContents(0, shrinked);
 					this.cleanedItemResult = ItemStack.EMPTY;
 
 					if (this.slots.get(0).getCount() <= 0) {
-						this.slots.set(0, ItemStack.EMPTY);
+						this.setInventorySlotContents(0, ItemStack.EMPTY);
 					}
 
 					this.world.markChunkDirty(this.pos, this);
@@ -367,7 +378,8 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 
 	@Override
 	public NonNullList getSyncFields(NonNullList fields) {
-		fields.add(this.getField(2));
+		fields.add(this.isCleaning);
+		fields.add(this.slots.get(0));
 		return fields;
 	}
 
@@ -516,8 +528,9 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 
 	@Override
 	public void packetDataHandler(ByteBuf fields) {
-		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-			setField(2, fields.readInt());
+		if (FMLCommonHandler.instance().getSide().isClient()) {
+			this.isCleaning = fields.readBoolean();
+			this.setInventorySlotContents(0, ByteBufUtils.readItemStack(fields));
 		}
 	}
 	
@@ -526,7 +539,7 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 		this.prevCleaningRotation = this.cleaningRotation;
 		if(!Minecraft.getMinecraft().isGamePaused()) {
 
-			if(this.isCleaning()) {
+			if(this.isCleaning) {
 				this.rotationAmount += 0.008f;
 				this.rotationAmount *= 1.01f;
 			}else {

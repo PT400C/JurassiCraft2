@@ -48,6 +48,7 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 	private Mirror mirror;
 	private Rotation rotation;
 	private int structureType;
+	private int villagerCount = 0;
 
 	public FossilDigsite() {
 	}
@@ -100,7 +101,6 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 			if (this.averageGroundLvl < 0) {
 				return true;
 			}
-			settings.setIgnoreEntities(false);
 		}
 		this.boundingBox.offset(0, ((this.averageGroundLvl - this.boundingBox.maxY) + /*height*/13), 0);
 
@@ -151,9 +151,12 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 
 	private void spawnPaleontologist(World world, Random random) {
 		if (random.nextInt(2) == 0) {
-			EntityVillager paleontologist = new EntityVillager(world, VillagerRegistry.getId(VillagerHandler.PALEONTOLOGIST));
-			paleontologist.setPosition(boundingBox.minX + (boundingBox.maxX - boundingBox.minX) / 2, boundingBox.minY + 3, boundingBox.minZ + (boundingBox.maxZ - boundingBox.minZ) / 2);
-			world.spawnEntity(paleontologist);
+			if (this.villagerCount < 2) {
+				EntityVillager paleontologist = new EntityVillager(world, VillagerRegistry.getId(VillagerHandler.PALEONTOLOGIST));
+				paleontologist.setPosition(boundingBox.minX + (boundingBox.maxX - boundingBox.minX) / 2, boundingBox.minY + 3, boundingBox.minZ + (boundingBox.maxZ - boundingBox.minZ) / 2);
+				world.spawnEntity(paleontologist);
+				this.villagerCount++;
+			}
 		}
 	}
 

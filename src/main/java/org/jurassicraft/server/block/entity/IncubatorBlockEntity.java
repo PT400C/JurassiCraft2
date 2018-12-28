@@ -10,20 +10,25 @@ import org.jurassicraft.server.api.IncubatorEnvironmentItem;
 import org.jurassicraft.server.container.IncubatorContainer;
 import org.jurassicraft.server.item.DinosaurEggItem;
 import org.jurassicraft.server.item.ItemHandler;
+import org.jurassicraft.server.message.TileEntityFieldsMessage;
 
 import com.google.common.primitives.Ints;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
@@ -242,7 +247,7 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 		return false;
 	}
 	
-	IItemHandler handlerPull = new SidedInvWrapper(this, null) {
+	IItemHandler handlerPull = new IncubatorWrapper(this, this, null) {
 
 		@Override
 		@Nonnull
@@ -250,7 +255,9 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 			if (Ints.asList(INPUTS).contains(slot)) {
 				ItemStack stackInSlot = inv.getStackInSlot(slot);
 				if (stackInSlot != null && stackInSlot.getItem() == ItemHandler.HATCHED_EGG) {
-					return super.extractItem(slot, amount, simulate);
+					ItemStack extract = super.extractItem(slot, amount, simulate);
+					JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(this.getTile().getSyncFields(NonNullList.create()), this.getTile()));
+					return extract;
 				}
 
 			}
@@ -258,4 +265,49 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 
 		}
 	};
+	
+	@Override
+	public void packetDataHandler(ByteBuf fields) {
+		if (FMLCommonHandler.instance().getSide().isClient()) {
+			for (int slot = 0; slot < 5; slot++) {
+				this.setInventorySlotContents(slot, ByteBufUtils.readItemStack(fields));
+			}
+		}
+	}
+	
+	@Override
+	public void setInventorySlotContents(int index, ItemStack stack) {
+		boolean send = false;
+		if (!this.world.isRemote && index >= 0 && index <= 4 && this.slots.get(index).getItem() != stack.getItem()) {
+			send = true;
+		}
+		super.setInventorySlotContents(index, stack);
+
+		if (send) {
+			JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+		}
+	}
+	
+	@Override
+	public NonNullList getSyncFields(NonNullList fields) {
+		for (int slot = 0; slot < 5; slot++) {
+			fields.add(this.slots.get(slot));
+		}
+		return fields;
+	}
+	
+	private class IncubatorWrapper extends SidedInvWrapper {
+		
+		private final IncubatorBlockEntity tile;
+
+		public IncubatorWrapper(IncubatorBlockEntity tile, ISidedInventory inv, EnumFacing side) {
+			super(inv, side);
+			this.tile = tile;
+		}
+		
+		public IncubatorBlockEntity getTile() {
+			return this.tile;
+		}
+		
+	}
 }

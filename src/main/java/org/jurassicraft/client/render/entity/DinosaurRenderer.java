@@ -2,6 +2,7 @@ package org.jurassicraft.client.render.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -11,6 +12,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,14 +28,13 @@ import java.util.Random;
 
 @SideOnly(Side.CLIENT)
 public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
+	
     public Dinosaur dinosaur;
     public DinosaurRenderInfo renderInfo;
-
     public Random random;
 
     public DinosaurRenderer(DinosaurRenderInfo renderInfo, RenderManager renderManager) {
         super(renderManager, renderInfo.getModel(GrowthStage.INFANT, (byte) 0), renderInfo.getShadowSize());
-        
 
         this.dinosaur = renderInfo.getDinosaur();
         this.random = new Random();
@@ -134,9 +135,7 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
                 ITextureObject textureObject = Minecraft.getMinecraft().getTextureManager().getTexture(texture);
                 if (textureObject != TextureUtil.MISSING_TEXTURE) {
                     this.renderer.bindTexture(texture);
-
                     this.renderer.getMainModel().render(entity, limbSwing, limbSwingAmount, age, yaw, pitch, scale);
-                    this.renderer.setLightmap(entity); //TODO: Make sure this works this.renderer.setLightmap(entity, partialTicks);
                 }
             }
         }
