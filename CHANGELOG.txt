@@ -1,19 +1,4 @@
-*Revamped the way the JurassiCraft vehicle seats work
-*Fixed a breaking crash with the dinosaur's inventories
-*Vines are burnable and sound like vines again
-+Pushing/Pulling items with hoppers in JC machines is now supported
-*Fixed syncing issues of the cultivator
-*Fixed Growth Serum issues
-*Fixed an incompatibility with Chisels & Bits
-+Added cleaning animation to cleaning station
-+Revamped the tyrannosaurus (Model, sounds and textures)
-+Animations now support multiple variants
-+Added two additional poses to the tyrannosaurus skeleton
-+Improved the helicopter's physics
-+Added clear glass block panes
-+Added reinforced glass block
-+Added reinforced glass block panes
-+Added Digsite
-+Added paleontologist villager
-+Revamped paddock signs
-*Fixed car music ability
+*Fixed generation issues with the Digsite and Geneticist Villager House
++The machine inventories are now properly updated when changed by a hopper
+*Fixed an skeleton glitch for the Brachiosaurus
+*Fixed a Tyrannosaurus teeth rendering issue
