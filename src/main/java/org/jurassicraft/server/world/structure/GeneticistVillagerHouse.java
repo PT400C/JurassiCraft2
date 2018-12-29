@@ -108,6 +108,7 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
         Map<BlockPos, String> dataBlocks = template.getDataBlocks(lowerCorner, settings);
         Map<BlockPos, String> dataBlocksClone = dataBlocks.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         dataBlocks.forEach((pos, type) -> {
+        	IBlockState base = this.getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState());
             switch (type) {
                 case "GeneticistChest":
                     world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, rotate(this.coordBaseMode, this.mirror == Mirror.LEFT_RIGHT ? true : false)));
@@ -130,15 +131,31 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
                     dataBlocksClone.remove(pos);
                     break;
                 case "Base":
-                    world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState()));
+                    world.setBlockState(pos, base);
+                    this.clearCurrentPositionBlocksUpwards(world, new BlockPos(pos.getX(), pos.getY() + 7, pos.getZ()), bounds);
+                    this.replaceAirAndLiquidDownwards(world, base, new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ()), bounds);
                     dataBlocksClone.remove(pos);
                     break;
                 case "BaseStairs":
                     world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, this.coordBaseMode)));
+                    this.clearCurrentPositionBlocksUpwards(world, new BlockPos(pos.getX(), pos.getY() + 7, pos.getZ()), bounds);
+                    this.replaceAirAndLiquidDownwards(world, base, new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ()), bounds);
                     dataBlocksClone.remove(pos);
                     break;
                 case "Wall":
                     world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.PLANKS.getDefaultState()));
+                    dataBlocksClone.remove(pos);
+                    break;
+                case "BaseWood":
+                    world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.PLANKS.getDefaultState()));
+                    this.clearCurrentPositionBlocksUpwards(world, new BlockPos(pos.getX(), pos.getY() + 7, pos.getZ()), bounds);
+                    this.replaceAirAndLiquidDownwards(world, base, new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ()), bounds);
+                    dataBlocksClone.remove(pos);
+                    break;
+                case "Hay":
+                    world.setBlockState(pos, this.getBiomeSpecificBlockState(Blocks.HAY_BLOCK.getDefaultState()));
+                    this.clearCurrentPositionBlocksUpwards(world, new BlockPos(pos.getX(), pos.getY() + 7, pos.getZ()), bounds);
+                    this.replaceAirAndLiquidDownwards(world, base, new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ()), bounds);
                     dataBlocksClone.remove(pos);
                     break;
                 case "Fence":
@@ -231,6 +248,24 @@ public class GeneticistVillagerHouse extends StructureVillagePieces.Village {
             return StructureComponent.findIntersecting(pieces, bounds) == null ? new GeneticistVillagerHouse(startPiece, componentType, bounds, facing) : null;
         }
     }
+
+	public void clearCurrentPositionBlocksUpwards(World world, BlockPos pos, StructureBoundingBox boundingBox) {
+		if (boundingBox.isVecInside(pos)) {
+			while (!world.isAirBlock(pos) && pos.getY() < 255) {
+				world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
+				pos = pos.up();
+			}
+		}
+	}
+	
+	public void replaceAirAndLiquidDownwards(World world, IBlockState blockstate, BlockPos pos, StructureBoundingBox boundingBox) {
+		if (boundingBox.isVecInside(pos)) {
+			while ((world.isAirBlock(pos) || world.getBlockState(pos).getMaterial().isLiquid()) && pos.getY() > 1) {
+				world.setBlockState(pos, blockstate, 2);
+				pos = pos.down();
+			}
+		}
+	}
     
     public EnumFacing rotate(EnumFacing facing, boolean clockwise)
     {
