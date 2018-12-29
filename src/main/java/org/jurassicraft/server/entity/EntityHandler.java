@@ -131,9 +131,8 @@ public class EntityHandler {
     }
 
     private static void initDinosaurs() {
-        for (Map.Entry<Integer, Dinosaur> entry : DINOSAURS.entrySet()) {
-            Dinosaur dinosaur = entry.getValue();
-
+        for (Dinosaur dinosaur : DINOSAURS.values()) {
+        	
             dinosaurProgress.step(dinosaur.getIdentifier().toString());
 
             dinosaur.init();
@@ -162,8 +161,7 @@ public class EntityHandler {
     }
     
     public static void reinitSpawns() {
-        for (Map.Entry<Integer, Dinosaur> entry : DINOSAURS.entrySet()) {
-            Dinosaur dinosaur = entry.getValue();
+        for (Dinosaur dinosaur : DINOSAURS.values()) {
             DinosaurMetadata metadata = dinosaur.getMetadata();
             Class<? extends DinosaurEntity> clazz = metadata.getDinosaurClass();
             EntityRegistry.removeSpawn(clazz, metadata.isMarineCreature() ? EnumCreatureType.WATER_CREATURE : EnumCreatureType.CREATURE, metadata.getSpawnBiomes());
@@ -226,8 +224,7 @@ public class EntityHandler {
     public static List<Dinosaur> getRegisteredDinosaurs() {
         List<Dinosaur> dinosaurs = new LinkedList<>();
 
-        for (Map.Entry<Integer, Dinosaur> entry : EntityHandler.DINOSAURS.entrySet()) {
-            Dinosaur dinosaur = entry.getValue();
+        for (Dinosaur dinosaur : EntityHandler.DINOSAURS.values()) {
 
             if (dinosaur.shouldRegister()) {
                 dinosaurs.add(dinosaur);
@@ -239,8 +236,7 @@ public class EntityHandler {
 
     public static List<Dinosaur> getPrehistoricDinosaurs() {
         List<Dinosaur> dinosaurs = new LinkedList<>();
-        for (Map.Entry<Integer, Dinosaur> entry : EntityHandler.DINOSAURS.entrySet()) {
-            Dinosaur dinosaur = entry.getValue();
+        for (Dinosaur dinosaur : EntityHandler.DINOSAURS.values()) {
             if (dinosaur.shouldRegister() && !(dinosaur instanceof Hybrid)) {
                 dinosaurs.add(dinosaur);
             }
@@ -253,8 +249,7 @@ public class EntityHandler {
     }
 
     public static Dinosaur getDinosaurByClass(Class<? extends DinosaurEntity> clazz) {
-        for (Map.Entry<Integer, Dinosaur> entry : EntityHandler.DINOSAURS.entrySet()) {
-            Dinosaur dinosaur = entry.getValue();
+        for (Dinosaur dinosaur : EntityHandler.DINOSAURS.values()) {
 
             if (dinosaur.getMetadata().getDinosaurClass().equals(clazz)) {
                 return dinosaur;

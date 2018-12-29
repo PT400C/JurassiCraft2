@@ -299,9 +299,7 @@ public class ItemHandler {
     public static void init() {
         registerItem(FOSSILIZED_EGG, "Fossilized Egg");
 
-        for (Map.Entry<Integer, Dinosaur> entry : EntityHandler.getDinosaurs().entrySet()) {
-            Dinosaur dinosaur = entry.getValue();
-
+        for (Dinosaur dinosaur : EntityHandler.getDinosaurs().values()) {
             String[] boneTypes = dinosaur.getMetadata().getBones();
 
             for (String boneType : boneTypes) {

@@ -108,6 +108,9 @@ public class DisplayBlockItem extends Item {
             if (dinosaur.shouldRegister()) {
                 subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), (byte) 0, 0, false)));
                 for (int variant = 1; variant < 3; variant++) {
+                	//1 = Fresh
+                	//2 = Fossilized
+                	
                     subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), (byte) 0, variant, true)));
                 }
             }

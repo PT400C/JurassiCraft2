@@ -281,8 +281,8 @@ public enum RenderingHandler {
 
         registerItemRenderer(INGEN_JOURNAL);
 
-        for (Entry<Integer, Dinosaur> entry : EntityHandler.getDinosaurs().entrySet()) {
-            registerItemRenderer(SPAWN_EGG, entry.getKey(), "dino_spawn_egg");
+        for (Integer id : EntityHandler.getDinosaurs().keySet()) {
+            registerItemRenderer(SPAWN_EGG, id, "dino_spawn_egg");
         }
 
         registerItemRenderer(PADDOCK_SIGN);
@@ -362,19 +362,19 @@ public enum RenderingHandler {
             registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) random, 2, true), "skeleton/fresh/skeleton_fresh_" + formattedName);
             }
             
-            for (Map.Entry<String, FossilItem> entry : ItemHandler.FOSSILS.entrySet()) {
-                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(entry.getKey());
+            ItemHandler.FOSSILS.forEach((type, item) -> {
+                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(type);
                 if (dinosaursForType.contains(dinosaur)) {
-                    registerItemRenderer(entry.getValue(), meta, "bones/" + formattedName + "_" + entry.getKey());
+                    registerItemRenderer(item, meta, "bones/" + formattedName + "_" + type);
                 }
-            }
+            });
 
-            for (Map.Entry<String, FossilItem> entry : FRESH_FOSSILS.entrySet()) {
-                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(entry.getKey());
+            ItemHandler.FRESH_FOSSILS.forEach((type, item) -> {
+                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(type);
                 if (dinosaursForType.contains(dinosaur)) {
-                    registerItemRenderer(entry.getValue(), meta, "fresh_bones/" + formattedName + "_" + entry.getKey());
+                    registerItemRenderer(item, meta, "fresh_bones/" + formattedName + "_" + type);
                 }
-            }
+            });
 
             registerItemRenderer(DNA, meta, "dna/dna_" + formattedName);
             registerItemRenderer(DINOSAUR_MEAT, meta, "meat/meat_" + formattedName);
@@ -474,8 +474,8 @@ public enum RenderingHandler {
         BlockColors blockColors = mc.getBlockColors();
         blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos != null ? BiomeColorHelper.getGrassColorAtPos(access, pos) : 0xFFFFFF, MOSS);
 
-        for (Map.Entry<TreeType, AncientLeavesBlock> entry : ANCIENT_LEAVES.entrySet()) {
-            blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos == null ? ColorizerFoliage.getFoliageColorBasic() : BiomeColorHelper.getFoliageColorAtPos(access, pos), entry.getValue());
+        for (AncientLeavesBlock block : ANCIENT_LEAVES.values()) {
+            blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos == null ? ColorizerFoliage.getFoliageColorBasic() : BiomeColorHelper.getFoliageColorAtPos(access, pos), block);
         }
 
         blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos == null ? ColorizerFoliage.getFoliageColorBasic() : BiomeColorHelper.getFoliageColorAtPos(access, pos), MOSS);
@@ -486,8 +486,8 @@ public enum RenderingHandler {
         if(JurassiCraftConfig.VEHICLES.tourRailBlockEnabled)
             itemColors.registerItemColorHandler((stack, tintIndex) -> tintIndex == 1 ? ((TourRailBlock)((ItemBlock)stack.getItem()).getBlock()).getSpeedType().getColor() : -1, BlockHandler.TOUR_RAIL_SLOW, BlockHandler.TOUR_RAIL_MEDIUM, BlockHandler.TOUR_RAIL_FAST);
 
-        for (Map.Entry<TreeType, AncientLeavesBlock> entry : ANCIENT_LEAVES.entrySet()) {
-            itemColors.registerItemColorHandler((stack, tintIndex) -> ColorizerFoliage.getFoliageColorBasic(), entry.getValue());
+        for (AncientLeavesBlock block : ANCIENT_LEAVES.values()) {
+            itemColors.registerItemColorHandler((stack, tintIndex) -> ColorizerFoliage.getFoliageColorBasic(), block);
         }
 
         itemColors.registerItemColorHandler((stack, tintIndex) -> {
