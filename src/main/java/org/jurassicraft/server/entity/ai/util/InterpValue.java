@@ -21,19 +21,12 @@ public class InterpValue implements INBTSerializable<NBTTagCompound> {
 
     private static final List<InterpValue> INSTANCES = Lists.newArrayList();
     private static final List<InterpValue> MARKED_REMOVE = Lists.newArrayList();
-
     private final Supplier<Boolean> supplier;
-
     private double speed;
     private double target;
     private double current;
     private double previousCurrent;
     private boolean initilized;
-
-    @Deprecated
-    public InterpValue(double speed) {
-        this(() -> true, speed);
-    }
 
     public InterpValue(Entity entity, double speed) {
         this(entity::isEntityAlive, speed);
@@ -107,9 +100,11 @@ public class InterpValue implements INBTSerializable<NBTTagCompound> {
         Side side = FMLCommonHandler.instance().getSide();
         if((event instanceof ClientTickEvent && side.isClient()) || (event instanceof ServerTickEvent && side.isServer())) {
             synchronized (INSTANCES) {
-            	INSTANCES.forEach(InterpValue::tickInterp);
-            	MARKED_REMOVE.forEach(INSTANCES::remove);
-            	MARKED_REMOVE.clear();
+            	synchronized (MARKED_REMOVE) {
+            		INSTANCES.forEach(InterpValue::tickInterp);
+                	MARKED_REMOVE.forEach(INSTANCES::remove);
+                	MARKED_REMOVE.clear();
+				}
             }
         }
     }
