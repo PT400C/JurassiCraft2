@@ -262,7 +262,6 @@ public enum RenderingHandler {
 
         registerItemRenderer(TRACKER);
         registerItemRenderer(PLANT_CELLS_PETRI_DISH);
-        registerItemRenderer(HELICOPTER);
         registerItemRenderer(PLANT_CELLS);
         registerItemRenderer(GROWTH_SERUM);
         registerItemRenderer(BREEDING_WAND);
@@ -343,24 +342,22 @@ public enum RenderingHandler {
         registerItemRenderer(CAR_TIRE, "car_tire");
         registerItemRenderer(CAR_WINDSCREEN, "car_windscreen");
         registerItemRenderer(UNFINISHED_CAR, "unfinished_car");
-        registerItemRenderer(JEEP_WRANGLER, "jeep_wrangler");
-        registerItemRenderer(FORD_EXPLORER, "ford_explorer");
+        
+		for (int x = 0; x < VEHICLE_ITEM.variants.length; x++) {
+			registerItemRenderer(VEHICLE_ITEM, x, VEHICLE_ITEM.variants[x]);
+			registerItemRenderer(VEHICLE_ITEM, x, VEHICLE_ITEM.variants[x]);
+			registerItemRenderer(VEHICLE_ITEM, x, VEHICLE_ITEM.variants[x]);
+		}
 
         registerItemRenderer(MURAL, "mural");
 
         for (Dinosaur dinosaur : EntityHandler.getDinosaurs().values()) {
             int meta = EntityHandler.getDinosaurId(dinosaur);
             String formattedName = dinosaur.getIdentifier().getResourcePath();
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 0, false), "action_figure/action_figure_" + formattedName);
-          
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 1, false), "action_figure/action_figure_" + formattedName);
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 2, false), "action_figure/action_figure_" + formattedName);
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, false, false), "action_figure/action_figure_" + formattedName);
             
-            for(int random = 0; random < 16; random++) {
-            
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) random, 1, true), "skeleton/fossil/skeleton_fossil_" + formattedName);
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) random, 2, true), "skeleton/fresh/skeleton_fresh_" + formattedName);
-            }
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, true, true), "skeleton/fossil/skeleton_fossil_" + formattedName);
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, false, true), "skeleton/fresh/skeleton_fresh_" + formattedName);
             
             ItemHandler.FOSSILS.forEach((type, item) -> {
                 List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(type);

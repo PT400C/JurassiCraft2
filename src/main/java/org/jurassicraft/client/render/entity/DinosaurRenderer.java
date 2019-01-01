@@ -90,7 +90,7 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
         if (!this.dinosaur.doesSupportGrowthStage(growthStage)) {
             growthStage = GrowthStage.ADULT;
         }
-        return entity.isMale() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage);
+        return growthStage == GrowthStage.SKELETON ? (entity.getIsFossile() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage)) : (entity.isMale() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage));
     }
 
     @Override
@@ -128,17 +128,17 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
             return true;
         }
         
-        private void renderOverlay(OverlayType type, DinosaurEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float age, float yaw, float pitch, float scale) {
-        	ResourceLocation texture = this.renderer.dinosaur.getOverlayTextures(type, entity);
-            if (texture != null) {
-                ITextureObject textureObject = Minecraft.getMinecraft().getTextureManager().getTexture(texture);
-                if (textureObject != TextureUtil.MISSING_TEXTURE) {
-                    this.renderer.bindTexture(texture);
+		private void renderOverlay(OverlayType type, DinosaurEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float age, float yaw, float pitch, float scale) {
 
-                    this.renderer.getMainModel().render(entity, limbSwing, limbSwingAmount, age, yaw, pitch, scale);
-                    this.renderer.setLightmap(entity); //TODO: Make sure this works this.renderer.setLightmap(entity, partialTicks);
-                }
-            }
-        }
+			ResourceLocation texture = this.renderer.dinosaur.getOverlayTextures(type, entity);
+			if (texture != null) {
+				ITextureObject textureObject = Minecraft.getMinecraft().getTextureManager().getTexture(texture);
+				if (textureObject != TextureUtil.MISSING_TEXTURE) {
+					this.renderer.bindTexture(texture);
+					this.renderer.getMainModel().render(entity, limbSwing, limbSwingAmount, age, yaw, pitch, scale);
+				}
+			}
+
+		}
     }
 }

@@ -20,7 +20,7 @@ public class JurassiCraftDecorationsTab extends CreativeTabs {
         this.metas = new int[registeredDinosaurs.size()];
 
         for (int i = 0; i < registeredDinosaurs.size(); i++) {
-            this.metas[i] = DisplayBlockItem.getMetadata(EntityHandler.getDinosaurId(registeredDinosaurs.get(i)), (byte) 0, 0, false);
+            this.metas[i] = DisplayBlockItem.getMetadata(EntityHandler.getDinosaurId(registeredDinosaurs.get(i)), false, false);
         }
     }
 

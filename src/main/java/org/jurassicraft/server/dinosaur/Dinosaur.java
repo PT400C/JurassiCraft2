@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
@@ -28,9 +29,9 @@ import org.apache.commons.io.IOUtils;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.AnimatableModel;
 import org.jurassicraft.client.model.animation.PoseHandler;
-import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.server.api.GrowthStageGenderContainer;
 import org.jurassicraft.server.api.Hybrid;
+import org.jurassicraft.server.api.SkeletonOverlayContainer;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.GrowthStage;
@@ -57,12 +58,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public abstract class Dinosaur implements Comparable<Dinosaur> {
 
-	private final Map<GrowthStage, List<ResourceLocation>> overlays = new EnumMap<>(GrowthStage.class);
     private final Map<GrowthStage, ResourceLocation> maleTextures = new EnumMap<>(GrowthStage.class);
     private final Map<GrowthStage, ResourceLocation> femaleTextures = new EnumMap<>(GrowthStage.class);
     private final Map<GrowthStage, TabulaModelContainer> models = new EnumMap<>(GrowthStage.class);
-    private Map<String, TabulaModelContainer> skeletonModels = new HashMap<>();
+    private final Map<String, TabulaModelContainer> skeletonModels = new HashMap<>();
     private final Map<OverlayType, Map<GrowthStageGenderContainer, ResourceLocation>> overlayTextures = new HashMap<>();
+    private final Map<OverlayType, Map<SkeletonOverlayContainer, ResourceLocation>> skeletonOverlays = new HashMap<>();
     private final DinosaurMetadata metadata;
     private boolean shouldRegister = true;
     private PoseHandler<?> poseHandler;
@@ -147,12 +148,14 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     		
     		if(this.overlayTextures.get(type) == null)
             	this.overlayTextures.put(type, new HashMap<>());
+    		if(this.skeletonOverlays.get(type) == null)
+            	this.skeletonOverlays.put(type, new HashMap<>());
     	}
 
         for (GrowthStage stage : GrowthStage.VALUES) {
             if (this.doesSupportGrowthStage(stage)) {
             	if(stage == GrowthStage.SKELETON) {
-            		this.skeletonModels = this.getSkeletonModels();
+            		this.getSkeletonModels().entrySet().stream().forEach(entry -> this.skeletonModels.put(entry.getKey(), entry.getValue()));
             	}else {
             		this.setModelContainer(stage, this.parseModel(stage.getKey()));
             	}
@@ -179,30 +182,53 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
 				this.femaleTextures.put(growthStage, new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + ".png"));
 
 				for (OverlayType type : this.metadata.getOverlays()) {
+					if (growthStage != GrowthStage.SKELETON) {
+						Map<GrowthStageGenderContainer, ResourceLocation> overlay = this.overlayTextures.get(type);
+						ResourceLocation female = new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + "_" + type.toString() + ".png");
+						ResourceLocation male = new ResourceLocation(domain, textureRoot + name + "_male_" + growthStageName + "_" + type.toString() + ".png");
 
-					Map<GrowthStageGenderContainer, ResourceLocation> overlay = this.overlayTextures.get(type);
-					ResourceLocation female = new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + "_" + type.toString() + ".png");
-					ResourceLocation male = new ResourceLocation(domain, textureRoot + name + "_male_" + growthStageName + "_" + type.toString() + ".png");
-					try {
-						Minecraft.getMinecraft().getResourceManager().getResource(female).getInputStream();
-						Minecraft.getMinecraft().getResourceManager().getResource(male).getInputStream();
+						try {
+							Minecraft.getMinecraft().getResourceManager().getResource(female).getInputStream();
+							Minecraft.getMinecraft().getResourceManager().getResource(male).getInputStream();
 
-						overlay.put(new GrowthStageGenderContainer(growthStage, false), female);
-						overlay.put(new GrowthStageGenderContainer(growthStage, true), male);
-						this.overlayTextures.put(type, overlay);
+							overlay.put(new GrowthStageGenderContainer(growthStage, false), female);
+							overlay.put(new GrowthStageGenderContainer(growthStage, true), male);
+							this.overlayTextures.put(type, overlay);
 
-					} catch (IOException e) {
+						} catch (IOException e) {
+						}
+					} else {
+						Map<SkeletonOverlayContainer, ResourceLocation> overlay = this.skeletonOverlays.get(type);
+						ResourceLocation fresh = new ResourceLocation(domain, textureRoot + name + "_fresh_skeleton_" + type.toString() + ".png");
+						ResourceLocation fossilized = new ResourceLocation(domain, textureRoot + name + "_fossilized_skeleton_" + type.toString() + ".png");
+
+						try {
+							Minecraft.getMinecraft().getResourceManager().getResource(fresh).getInputStream();
+							Minecraft.getMinecraft().getResourceManager().getResource(fossilized).getInputStream();
+							if (!type.isGenderSpecific()) {
+
+								overlay.put(new SkeletonOverlayContainer(false, false), fresh);
+								overlay.put(new SkeletonOverlayContainer(true, false), fossilized);
+								overlay.put(new SkeletonOverlayContainer(false, true), fresh);
+								overlay.put(new SkeletonOverlayContainer(true, true), fossilized);
+								this.skeletonOverlays.put(type, overlay);
+							} else {
+
+								if (type.getGenderSpec() == 0b1) {
+									overlay.put(new SkeletonOverlayContainer(false, true), fresh);
+									overlay.put(new SkeletonOverlayContainer(true, true), fossilized);
+								} else {
+									overlay.put(new SkeletonOverlayContainer(false, false), fresh);
+									overlay.put(new SkeletonOverlayContainer(true, false), fossilized);
+								}
+								this.skeletonOverlays.put(type, overlay);
+							}
+
+						} catch (IOException e) {
+						}
+
 					}
 				}
-
-				List<ResourceLocation> overlaysForGrowthStage = new ArrayList<>();
-
-				for (int i = 1; i <= this.metadata.getOverlayCount(); i++) {
-					overlaysForGrowthStage.add(new ResourceLocation(JurassiCraft.MODID,
-							textureRoot + name + "_overlay_" + growthStageName + "_" + i + ".png"));
-				}
-
-				this.overlays.put(growthStage, overlaysForGrowthStage);
 			}
 		}
 
@@ -238,15 +264,13 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
 		}
         
         
-		for (SkeletonTypes type : SkeletonTypes.VALUES) {
+		for (String type : this.getMetadata().skeletonPoses()) {
 
-			if (type.getClasses().contains(path)) {
-				ResourceLocation furtherLocation = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_" + type.getName());
-				try {
-					models.put(type.getName(), TabulaModelHelper.loadTabulaModel(furtherLocation));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			ResourceLocation furtherLocation = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_" + type);
+			try {
+				models.put(type, TabulaModelHelper.loadTabulaModel(furtherLocation));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 
 		}
@@ -283,13 +307,14 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     public int compareTo(Dinosaur dinosaur) {
     	return this.getIdentifier().compareTo(dinosaur.getIdentifier());
     }
-
-    public ResourceLocation getOverlayTexture(GrowthStage stage, int overlay) {
-        return this.overlays.containsKey(stage) ? this.overlays.get(stage).get(overlay) : null;
-    }
-
+    
     public ResourceLocation getOverlayTextures(OverlayType type, DinosaurEntity entity) {
-        return this.overlayTextures.get(type).get(new GrowthStageGenderContainer(entity.getGrowthStage(), entity.isMale()));
+    	boolean isMale = entity.isMale();
+    	if (entity.getGrowthStage() == GrowthStage.SKELETON) {
+    		return this.skeletonOverlays.get(type).get(new SkeletonOverlayContainer(entity.getIsFossile(), isMale));
+    	}else {
+    		return this.overlayTextures.get(type).get(new GrowthStageGenderContainer(entity.getGrowthStage(), isMale));
+    	}    
     }
 
     @Override

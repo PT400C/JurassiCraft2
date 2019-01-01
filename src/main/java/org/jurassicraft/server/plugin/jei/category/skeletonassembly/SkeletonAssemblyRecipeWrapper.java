@@ -41,7 +41,7 @@ public class SkeletonAssemblyRecipeWrapper implements IRecipeWrapper {
         }
         ingredients.setInputs(ItemStack.class, inputs);
 
-        ItemStack output = new ItemStack(ItemHandler.DISPLAY_BLOCK_ITEM, 1, DisplayBlockItem.getMetadata(id, (byte) 0, this.input.fresh ? 2 : 1, true));
+        ItemStack output = new ItemStack(ItemHandler.DISPLAY_BLOCK_ITEM, 1, DisplayBlockItem.getMetadata(id, !this.input.fresh, true));
         ingredients.setOutput(ItemStack.class, output);
     }
 

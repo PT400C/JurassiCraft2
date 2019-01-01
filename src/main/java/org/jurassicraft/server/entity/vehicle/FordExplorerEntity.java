@@ -6,6 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
@@ -54,7 +55,7 @@ public class FordExplorerEntity extends VehicleEntity {
 
     @Override
     public void dropItems() {
-        this.dropItem(ItemHandler.FORD_EXPLORER, 1);
+    	this.entityDropItem(new ItemStack(ItemHandler.VEHICLE_ITEM, 1, 0), 0);
     }
 
     @Override

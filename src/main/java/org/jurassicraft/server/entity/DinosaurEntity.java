@@ -8,6 +8,7 @@ import net.ilexiconn.llibrary.server.animation.Animation;
 import net.ilexiconn.llibrary.server.animation.AnimationHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityBodyHelper;
@@ -46,8 +47,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
@@ -204,6 +207,8 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     private boolean isSkeleton;
     
     private byte skeletonVariant;
+    
+    private boolean isFossile;
 
 	public boolean isRendered;
 
@@ -1262,12 +1267,16 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                     player.displayGUIChest(this.inventory);
                 } else {
                     if (this.world.isRemote) {
-                        player.sendMessage(new TextComponentTranslation("message.too_young.name"));
+                    	TextComponentString denied = new TextComponentString(LangUtils.translate("message.too_young.name"));
+                    	denied.getStyle().setColor(TextFormatting.RED);
+        				Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, denied);
                     }
                 }
             } else {
                 if (this.world.isRemote) {
-                    player.sendMessage(new TextComponentTranslation("message.not_owned.name"));
+                	TextComponentString denied = new TextComponentString(LangUtils.translate("message.not_owned.name"));
+                	denied.getStyle().setColor(TextFormatting.RED);
+    				Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, denied);
                 }
             }
         } else {
@@ -1275,7 +1284,9 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 if (this.isOwner(player)) {
                 	JurassiCraft.NETWORK_WRAPPER.sendToServer(new BiPacketOrder(this));
                 } else {
-                    player.sendMessage(new TextComponentTranslation("message.not_owned.name"));
+                	TextComponentString denied = new TextComponentString(LangUtils.translate("message.not_owned.name"));
+                	denied.getStyle().setColor(TextFormatting.RED);
+    				Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, denied);
                 }
             } else if (!stack.isEmpty()&& (this.metabolism.isThirsty() || this.metabolism.isHungry())) {
                 if (!this.world.isRemote) {
@@ -1753,7 +1764,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     }
 
     public boolean areEyelidsClosed() {
-    	return !this.getMetadata().isMarineCreature() && ((this.isCarcass || this.isSleeping) || this.ticksExisted % 100 < this.getMetadata().getEyeTime());
+    	return this.ticksExisted == 4 ? false : !this.getMetadata().isMarineCreature() && ((this.isCarcass || this.isSleeping) || this.ticksExisted % 100 < this.getMetadata().getEyeTime());
     }
 
     @Override
@@ -1845,7 +1856,9 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 EntityPlayer player = this.world.getPlayerEntityByUUID(this.owner);
 
                 if (player != null) {
-                    player.sendMessage(new TextComponentString(LangUtils.translate(LangUtils.SET_ORDER).replace("{order}", LangUtils.translate(LangUtils.ORDER_VALUE.get(order.name().toLowerCase(Locale.ENGLISH))))));
+                	TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.SET_ORDER).replace("{order}", LangUtils.translate(LangUtils.ORDER_VALUE.get(order.name().toLowerCase(Locale.ENGLISH)))));
+    				change.getStyle().setColor(TextFormatting.GOLD);
+    				Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, change);
                 }
             }
 
@@ -2035,6 +2048,14 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     
     public byte getSkeletonVariant() {
         return this.skeletonVariant;
+    }
+    
+    public void setIsFossile(boolean isFossile) {
+        this.isFossile = isFossile;
+    }
+    
+    public boolean getIsFossile() {
+        return this.isFossile;
     }
 
     public boolean canDinoSwim() {

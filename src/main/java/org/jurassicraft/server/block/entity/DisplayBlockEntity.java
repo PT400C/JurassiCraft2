@@ -19,17 +19,18 @@ public class DisplayBlockEntity extends TileEntity {
 	
     private DinosaurEntity entity;
     private int rotation;
-
+    private boolean isFossile;
     private boolean isMale;
     private byte variant;
     private boolean isSkeleton;
 
     private SerializedData serializedData = new InvalidData();
 
-    public void setDinosaur(int dinosaurId, boolean isMale, boolean isSkeleton, byte variant) {
+    public void setDinosaur(int dinosaurId, boolean isMale, boolean isSkeleton, boolean isFossile, byte variant) {
         this.isMale = isMale;
         this.isSkeleton = isSkeleton;
         this.variant = variant;
+        this.isFossile = isFossile;
         try {
             Dinosaur dinosaur = EntityHandler.getDinosaurById(dinosaurId);
             this.entity = dinosaur.construct(this.world);
@@ -57,6 +58,7 @@ public class DisplayBlockEntity extends TileEntity {
         this.isMale = !nbt.hasKey("IsMale") || nbt.getBoolean("IsMale");
         this.isSkeleton = nbt.getBoolean("IsSkeleton");
         this.variant = nbt.getByte("Variant");
+        this.isFossile = nbt.getBoolean("IsFossile");
     }
 
     @Override
@@ -74,6 +76,7 @@ public class DisplayBlockEntity extends TileEntity {
         nbt.setBoolean("IsMale", this.isMale);
         nbt.setBoolean("IsSkeleton", this.isSkeleton);
         nbt.setByte("Variant", this.variant);
+        nbt.setBoolean("IsFossile", this.isFossile);
 
         return nbt;
     }
@@ -109,6 +112,10 @@ public class DisplayBlockEntity extends TileEntity {
 
     public boolean isSkeleton() {
         return this.isSkeleton;
+    }
+    
+    public boolean isFossile() {
+        return this.isFossile;
     }
     
     public byte getVariant() {
@@ -147,6 +154,7 @@ public class DisplayBlockEntity extends TileEntity {
         entity.setupDisplay(this.isMale);
         entity.setSkeleton(this.isSkeleton);
         entity.setSkeletonVariant(this.variant);
+        entity.setIsFossile(this.isFossile);
         entity.setAnimation(EntityAnimation.IDLE.get());
     }
 

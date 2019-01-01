@@ -9,20 +9,12 @@
       {
         "item": "jurassicraft:display_block_item",
         "data": 0
-      },
-      {
-        "item": "jurassicraft:display_block_item",
-        "data": 2
-      },
-      {
-        "item": "jurassicraft:display_block_item",
-        "data": 4
       }
     ]
   },
   "result": {
     "item": "jurassicraft:display_block_item",
-    "data": 48
+    "data": 12
   }
 }
     

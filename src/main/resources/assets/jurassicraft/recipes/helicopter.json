@@ -1,6 +1,6 @@
 {
   "type":"minecraft:crafting_shaped",
-  "group":"jurassicraft:helicopter",
+  "group":"jurassicraft:vehicle_item",
   "pattern":[
     "ABC",
     "DEF",
@@ -9,31 +9,31 @@
   "key":{
     "A":{
       "item":"jurassicraft:car_tire",
-      "data":0
+      "data": 0
     },
     "B":{
       "item":"jurassicraft:iron_blades",
-      "data":0
+      "data": 0
     },
     "C":{
       "item":"minecraft:dye",
-      "data":2
+      "data": 2
     },
     "D":{
       "item":"minecraft:iron_block",
-      "data":0
+      "data": 0
     },
     "E":{
       "item":"jurassicraft:engine_system",
-      "data":0
+      "data": 0
     },
     "F":{
       "item":"jurassicraft:car_windscreen",
-      "data":0
+      "data": 0
     }
   },
   "result":{
-    "item":"jurassicraft:helicopter",
-    "data":0
+    "item":"jurassicraft:vehicle_item",
+    "data": 2
   }
 }
