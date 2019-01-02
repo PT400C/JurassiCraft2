@@ -1,1 +1,2 @@
 *Fixed a rare crash related to vehicles and dinosaurs
+*Fixed overlapping textures for the Brachiosaurus skeleton model
