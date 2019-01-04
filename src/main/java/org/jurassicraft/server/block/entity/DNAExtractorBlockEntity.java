@@ -8,6 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.container.DNAExtractorContainer;
@@ -17,10 +20,13 @@ import org.jurassicraft.server.genetics.DinoDNA;
 import org.jurassicraft.server.genetics.GeneticsHelper;
 import org.jurassicraft.server.genetics.PlantDNA;
 import org.jurassicraft.server.item.ItemHandler;
+import org.jurassicraft.server.message.TileEntityFieldsMessage;
 import org.jurassicraft.server.plant.Plant;
 import org.jurassicraft.server.plant.PlantHandler;
 
 import com.google.common.primitives.Ints;
+
+import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 import java.util.Random;
@@ -129,6 +135,7 @@ public class DNAExtractorBlockEntity extends MachineBaseBlockEntity {
 
             this.decreaseStackSize(0);
             this.decreaseStackSize(1);
+            JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
         }
     }
 
@@ -186,6 +193,30 @@ public class DNAExtractorBlockEntity extends MachineBaseBlockEntity {
     public String getName() {
         return this.hasCustomName() ? this.customName : "container.dna_extractor";
     }
+    
+	@Override
+	public void packetDataHandler(ByteBuf fields) {
+		if (FMLCommonHandler.instance().getSide().isClient()) {
+			this.setInventorySlotContents(0, ByteBufUtils.readItemStack(fields));
+		}
+	}
+	
+	@Override
+	public void setInventorySlotContents(int index, ItemStack stack) {
+		boolean send = false;
+		if (!this.world.isRemote && index == 0 && this.slots.get(0).getItem() != stack.getItem()) {
+			send = true;
+		}
+		super.setInventorySlotContents(index, stack);
+		if (send)
+			JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+	}
+	
+	@Override
+	public NonNullList getSyncFields(NonNullList fields) {
+		fields.add(this.slots.get(0));
+		return fields;
+	}
 
     @Override
     public boolean isEmpty() {

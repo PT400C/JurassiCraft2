@@ -5,6 +5,9 @@ import net.minecraft.block.BlockLog;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -48,6 +51,7 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 	private Mirror mirror;
 	private Rotation rotation;
 	private int structureType;
+	private int villagerCount = 0;
 
 	public FossilDigsite() {
 	}
@@ -100,7 +104,6 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 			if (this.averageGroundLvl < 0) {
 				return true;
 			}
-			settings.setIgnoreEntities(false);
 		}
 		this.boundingBox.offset(0, ((this.averageGroundLvl - this.boundingBox.maxY) + /*height*/13), 0);
 
@@ -124,6 +127,8 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 		int ox = (this.rotation == Rotation.CLOCKWISE_90 && this.mirror == Mirror.NONE) ? sizeRot : 0;
 		int oz = (this.rotation == Rotation.NONE && this.mirror == Mirror.LEFT_RIGHT) ? sizeRot : 0;
 		BlockPos lowerCorner = new BlockPos(this.boundingBox.minX + ox, this.boundingBox.minY, this.boundingBox.minZ + oz);
+		if(lowerCorner.getY() <= 0)
+			return false;
 		settings.setBoundingBox(new StructureBoundingBox(this.boundingBox.minX + ox, this.boundingBox.minY, this.boundingBox.minZ + oz, this.boundingBox.maxX + ox, this.boundingBox.maxZ, this.boundingBox.maxZ + oz));
 
 		Map<BlockPos, String> dataBlocks2 = template.getDataBlocks(lowerCorner, settings);
@@ -151,9 +156,20 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 
 	private void spawnPaleontologist(World world, Random random) {
 		if (random.nextInt(2) == 0) {
-			EntityVillager paleontologist = new EntityVillager(world, VillagerRegistry.getId(VillagerHandler.PALEONTOLOGIST));
-			paleontologist.setPosition(boundingBox.minX + (boundingBox.maxX - boundingBox.minX) / 2, boundingBox.minY + 3, boundingBox.minZ + (boundingBox.maxZ - boundingBox.minZ) / 2);
-			world.spawnEntity(paleontologist);
+			if (this.villagerCount < 2) {
+				Entity paleontologist = null;
+				if(this.isZombieInfested) {
+					paleontologist = new EntityZombieVillager(world);
+					((EntityZombieVillager) paleontologist).setProfession(VillagerRegistry.getId(VillagerHandler.PALEONTOLOGIST));
+				}else {
+					paleontologist = new EntityVillager(world, VillagerRegistry.getId(VillagerHandler.PALEONTOLOGIST));
+				}
+				
+				paleontologist.setPosition(boundingBox.minX + (boundingBox.maxX - boundingBox.minX) / 2, boundingBox.minY + 3, boundingBox.minZ + (boundingBox.maxZ - boundingBox.minZ) / 2);
+				
+				world.spawnEntity(paleontologist);
+				this.villagerCount++;
+			}
 		}
 	}
 
@@ -254,7 +270,8 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 		dataBlocksClone.forEach((pos, type) -> {
 			switch (type) {
 			case "Torch":
-				world.setBlockState(pos, Blocks.TORCH.getDefaultState(), 2);
+				if(!this.isZombieInfested)
+					world.setBlockState(pos, Blocks.TORCH.getDefaultState(), 2);
 				break;
 			}
 			

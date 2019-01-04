@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.SoundCategory;
@@ -121,7 +122,7 @@ public class HelicopterEntity extends VehicleEntity {
 
 	@Override
 	public void dropItems() {
-		this.dropItem(ItemHandler.HELICOPTER, 1);
+		this.entityDropItem(new ItemStack(ItemHandler.VEHICLE_ITEM, 1, 2), 0);
 	}
 
 	@Override

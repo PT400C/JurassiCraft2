@@ -49,18 +49,16 @@ public class VisitorCentreGenerator extends StructureGenerator {
         Template template = templateManager.getTemplate(server, STRUCTURE);
         template.addBlocksToWorldChunk(world, position, settings);
         Map<BlockPos, String> dataBlocks = template.getDataBlocks(position, settings);
-        for (Map.Entry<BlockPos, String> entry : dataBlocks.entrySet()) {
-            String type = entry.getValue();
-            BlockPos dataPos = entry.getKey();
-            ResourceLocation lootTable = LOOT_TABLES.get(type);
-            if (lootTable != null) {
-                world.setBlockToAir(dataPos);
-                TileEntity tile = world.getTileEntity(dataPos.down());
-                if (tile instanceof TileEntityChest) {
-                    ((TileEntityChest) tile).setLootTable(lootTable, random.nextLong());
-                }
-            }
-        }
+		dataBlocks.forEach((pos, type) -> {
+			ResourceLocation lootTable = LOOT_TABLES.get(type);
+			if (lootTable != null) {
+				world.setBlockToAir(pos);
+				TileEntity tile = world.getTileEntity(pos.down());
+				if (tile instanceof TileEntityChest) {
+					((TileEntityChest) tile).setLootTable(lootTable, random.nextLong());
+				}
+			}
+		});
     }
 
     @Nullable

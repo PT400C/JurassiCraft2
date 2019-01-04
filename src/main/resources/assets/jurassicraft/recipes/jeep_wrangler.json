@@ -1,6 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "jurassicraft:jeep_wrangler",
+  "group": "jurassicraft:vehicle_item",
   "pattern": [
     "ABA",
     "CDB",
@@ -25,7 +25,7 @@
     }
   },
   "result": {
-    "item": "jurassicraft:jeep_wrangler",
-    "data": 0
+    "item": "jurassicraft:vehicle_item",
+    "data": 1
   }
 }

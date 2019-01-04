@@ -247,7 +247,7 @@ public class SkeletonAssemblyContainer extends Container {
         }
 
         public ItemStack getResult() {
-            int metadata = DisplayBlockItem.getMetadata(EntityHandler.getDinosaurId(this.dinosaur), (byte) 0, this.fresh ? 2 : 1, true);
+            int metadata = DisplayBlockItem.getMetadata(EntityHandler.getDinosaurId(this.dinosaur), !this.fresh, true);
             return new ItemStack(ItemHandler.DISPLAY_BLOCK_ITEM, 1, metadata);
         }
 

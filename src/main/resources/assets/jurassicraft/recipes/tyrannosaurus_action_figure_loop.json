@@ -8,15 +8,7 @@
     "#": [
       {
         "item": "jurassicraft:display_block_item",
-        "data": 320
-      },
-      {
-        "item": "jurassicraft:display_block_item",
-        "data": 322
-      },
-      {
-        "item": "jurassicraft:display_block_item",
-        "data": 324
+        "data": 80
       }
     ]
   },

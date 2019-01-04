@@ -1,6 +1,8 @@
 package org.jurassicraft.server.datafixers;
 
 import com.google.common.collect.Lists;
+
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraftforge.common.util.ModFixs;
@@ -10,7 +12,8 @@ import org.jurassicraft.JurassiCraft;
 import java.util.List;
 
 public class JurassiCraftDataFixers {
-    private static final int DATAFIXER_VERSION = 3;
+	
+    private static final int DATAFIXER_VERSION = 4;
     private static final ModFixs modFixs = FMLCommonHandler.instance().getDataFixer().init(JurassiCraft.MODID, DATAFIXER_VERSION);
 
     public static void init() {
@@ -42,8 +45,56 @@ public class JurassiCraftDataFixers {
 			}
 			return nbt;
 		}));
+		
+		modFixs.registerFix(FixTypes.ITEM_INSTANCE, new DataFixerFactory(4, nbt -> {
+			if ("jurassicraft:display_block_item".equals(nbt.getString("id"))) {
+				int meta = nbt.getShort("Damage");
+				int dinosaurID = meta >> 9;
+				int gender = (meta >> 1) & 0x3;
+				byte skeletonVariant = (byte) ((meta >> 4) & 0xF);
+				boolean isSkeleton = (meta & 1) == 1;
+				nbt.setShort("Damage", (short) (dinosaurID << 2 | ((gender == 1 ? 1 : 0) << 1) | (isSkeleton ? 1 : 0)));
+		    	nbt.setByte("Type", skeletonVariant);
 
-        modFixs.registerFix(FixTypes.ENTITY, new DataFixerFactory(1, compound -> {
+			}
+			return nbt;
+		}));
+		
+		modFixs.registerFix(FixTypes.BLOCK_ENTITY, new DataFixerFactory(4, nbt -> {
+			if ("jurassicraft:display_block".equals(nbt.getString("id"))) {
+				nbt.setBoolean("IsFossile", nbt.getBoolean("IsMale"));
+			}
+			return nbt;
+		}));
+		
+		modFixs.registerFix(FixTypes.ITEM_INSTANCE, new DataFixerFactory(4, nbt -> {
+			if ("jurassicraft:jeep_wrangler".equals(nbt.getString("id"))) {
+				nbt.setString("id", "jurassicraft:vehicle_item");
+				nbt.setShort("Damage", (short) 1);
+
+			}
+			return nbt;
+		}));
+		
+		modFixs.registerFix(FixTypes.ITEM_INSTANCE, new DataFixerFactory(4, nbt -> {
+			if ("jurassicraft:helicopter".equals(nbt.getString("id"))) {
+				nbt.setString("id", "jurassicraft:vehicle_item");
+				nbt.setShort("Damage", (short) 2);
+
+			}
+			return nbt;
+		}));
+		
+		modFixs.registerFix(FixTypes.ITEM_INSTANCE, new DataFixerFactory(4, nbt -> {
+			if ("jurassicraft:ford_explorer".equals(nbt.getString("id"))) {
+				nbt.setString("id", "jurassicraft:vehicle_item");
+				nbt.setShort("Damage", (short) 0);
+
+			}
+			return nbt;
+		}));
+
+        modFixs.registerFix(FixTypes.ENTITY, new DataFixerFactory(2, compound -> {
             if("jurassicraft.mural".equals(compound.getString("id"))) {
                 compound.setString("id", "jurassicraft:entities.mural");
             }

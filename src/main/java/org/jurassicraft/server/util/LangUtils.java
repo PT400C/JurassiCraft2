@@ -5,8 +5,6 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-
-import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.DinosaurStatus;
@@ -101,10 +99,8 @@ public final class LangUtils
         return translate("gender." + modeString + ".name");
     }
     
-    public static String getSkeletonMode(int variant) {
-        if(variant == 0)
-        	return "idle";
-        return SkeletonTypes.VALUES[variant - 1].getName();
+    public static String getSkeletonMode(Dinosaur dinosaur, int variant) {
+        return dinosaur.getMetadata().skeletonPoses()[variant];
     }
     
     public static String getPlantName(int plantId) {

@@ -3,12 +3,17 @@ package org.jurassicraft.server.item;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketChat;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -16,13 +21,13 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.client.render.RenderingHandler;
 import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.block.entity.DisplayBlockEntity;
@@ -38,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class DisplayBlockItem extends Item {
+	
     public DisplayBlockItem() {
         super();
         this.setCreativeTab(TabHandler.DECORATIONS);
@@ -48,7 +54,7 @@ public class DisplayBlockItem extends Item {
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         pos = pos.offset(side);
         ItemStack stack = player.getHeldItem(hand);
-        if (!player.world.isRemote && player.canPlayerEdit(pos, side, stack)) {
+        if (!player.world.isRemote && player.canPlayerEdit(pos, side, stack) && !player.isSneaking()) {
             Block block = BlockHandler.DISPLAY_BLOCK;
 
             if (block.canPlaceBlockAt(world, pos)) {
@@ -56,12 +62,12 @@ public class DisplayBlockItem extends Item {
                 world.setBlockState(pos, block.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, 0, player));
                 block.onBlockPlacedBy(world, pos, state, player, stack);
 
-                int mode = this.getVariant(stack);
+                int mode = this.getGenderType(stack);
                 world.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundCategory.BLOCKS, (SoundType.WOOD.getVolume() + 1.0F) / 2.0F, SoundType.WOOD.getPitch() * 0.8F);
                 DisplayBlockEntity tile = (DisplayBlockEntity) world.getTileEntity(pos);
 
                 if (tile != null) {
-                    tile.setDinosaur(this.getDinosaurID(stack), mode > 0 ? mode == 1 : world.rand.nextBoolean(), this.isSkeleton(stack), this.getSkeletonVariant(stack));
+                    tile.setDinosaur(this.getDinosaurID(stack), mode > 0 ? mode == 1 : world.rand.nextBoolean(), this.isSkeleton(stack), this.isFossilized(stack), this.getSkeletonType(stack));
                     tile.setRot(180 - (int) player.getRotationYawHead());
                     world.notifyBlockUpdate(pos, state, state, 0);
                     tile.markDirty();
@@ -70,18 +76,25 @@ public class DisplayBlockItem extends Item {
                     }
                 }
             }
+        }else if(player.isSneaking()) {
+        	int mode = this.changeMode(stack);
+			if (world.isRemote) {
+				TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.GENDER_CHANGE.get("actionfigure")).replace("{mode}", LangUtils.getGenderMode(mode)));
+				change.getStyle().setColor(TextFormatting.GOLD);
+				Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, change);
+			}
         }
 
         return EnumActionResult.SUCCESS;
     }
     
     private Boolean getGender(World world, ItemStack stack){
-    	Boolean type = null;
-    	if(world != null) {
-    	int mode = this.getVariant(stack);
-    	type = (mode > 0 ? mode == 1 : null);
-    	}
-    	return type;
+		Boolean type = null;
+		if (world != null) {
+			int mode = this.getGenderType(stack);
+			type = (mode > 0 ? mode == 1 : null);
+		}
+		return type;
     }
 
     @Override
@@ -90,7 +103,7 @@ public class DisplayBlockItem extends Item {
         if (!this.isSkeleton(stack)) {
             return LangUtils.translate("item.action_figure.name").replace("{dino}", dinoName);
         }
-        return LangUtils.translate("item.skeleton." + (this.getVariant(stack) == 1 ? "fossil" : "fresh") + ".name").replace("{dino}", dinoName);
+        return LangUtils.translate("item.skeleton." + (this.isFossilized(stack) == true ? "fossil" : "fresh") + ".name").replace("{dino}", dinoName);
     }
 
     public Dinosaur getDinosaur(ItemStack stack) {
@@ -101,96 +114,120 @@ public class DisplayBlockItem extends Item {
     @SideOnly(Side.CLIENT)
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subtypes) {
         List<Dinosaur> dinosaurs = new LinkedList<>(EntityHandler.getDinosaurs().values());
-
         Collections.sort(dinosaurs);
+        
         if(this.isInCreativeTab(tab))
         for (Dinosaur dinosaur : dinosaurs) {
             if (dinosaur.shouldRegister()) {
-                subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), (byte) 0, 0, false)));
-                for (int variant = 1; variant < 3; variant++) {
-                    subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), (byte) 0, variant, true)));
-                }
+                subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), false, false)));
+                subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), true, true)));
+                subtypes.add(new ItemStack(this, 1, getMetadata(EntityHandler.getDinosaurId(dinosaur), false, true)));
             }
         }
     }
 
-    public static int getMetadata(int dinosaur, byte skeletonVariant, int variant, boolean isSkeleton) {
-        return dinosaur << 9 | skeletonVariant << 4 | variant << 1 | (isSkeleton ? 1 : 0);
+    public static int getMetadata(int dinosaur, boolean isFossilized, boolean isSkeleton) {
+    	return dinosaur << 2 | ((isFossilized ? 1 : 0) << 1) | (isSkeleton ? 1 : 0);
     }
 
     public int getDinosaurID(ItemStack stack) {
-        return stack.getMetadata() >> 9;
+        return stack.getMetadata() >> 2;
     }
     
-    public byte getSkeletonVariant(ItemStack stack) {
-        return (byte) ((stack.getMetadata() >> 4) & 0xF);
+    public boolean isFossilized(ItemStack stack) {
+    	return (stack.getMetadata() >> 1 & 1) == 1;
     }
-
-    public int getVariant(ItemStack stack) {
-        return (stack.getMetadata() >> 1) & 0x3;
-    }
-
+    
     public boolean isSkeleton(ItemStack stack) {
         return (stack.getMetadata() & 1) == 1;
     }
+    
+    public byte getGenderType(ItemStack stack) {
+    	
+    	if(stack.hasTagCompound() && stack.getTagCompound().hasKey("Gender")) {
+    		return stack.getTagCompound().getByte("Gender");
+    	}else {
+    		return 0;
+    	}
+    }
+    
+    public byte getSkeletonType(ItemStack stack) {
+    	
+    	if(stack.hasTagCompound() && stack.getTagCompound().hasKey("Type")) {
+    		return stack.getTagCompound().getByte("Type");
+    	}else {
+    		return 0;
+    	}
+    }
+    
+    public void setGenderType(ItemStack stack, byte type) {
+    	NBTTagCompound nbt = stack.getTagCompound();
+    	if(nbt == null) {
+			nbt = new NBTTagCompound();
+			stack.setTagCompound(nbt);
+    	}
+    	nbt.setByte("Gender", type);
+    }
+    
+    public void setSkeletonType(ItemStack stack, byte type) {
+    	NBTTagCompound nbt = stack.getTagCompound();
+    	if(nbt == null) {
+			nbt = new NBTTagCompound();
+			stack.setTagCompound(nbt);
+    	}
+    	nbt.setByte("Type", type);
+    }
 
     public int changeMode(ItemStack stack) {
-        int dinosaur = this.getDinosaurID(stack);
-        boolean skeleton = this.isSkeleton(stack);
-        byte skeletonVariant = this.getSkeletonVariant(stack);
-
-        int mode = this.getVariant(stack) + 1;
+        int mode = this.getGenderType(stack) + 1;
         mode %= 3;
-
-        stack.setItemDamage(getMetadata(dinosaur, skeletonVariant, mode, skeleton));
-
+        this.setGenderType(stack, (byte) mode);
         return mode;
     }
     
     public int changeSkeletonVariant(ItemStack stack) {
     	
         int dinosaur = this.getDinosaurID(stack);
-        boolean skeleton = this.isSkeleton(stack);
-        int gender = this.getVariant(stack);
-        int variantNew = this.getSkeletonVariant(stack) + 1;
+        int newVariant = this.getSkeletonType(stack) + 1;
         
-        variantNew %= 16;
+        newVariant %= 16;
+        if(!(newVariant < EntityHandler.getDinosaurById(dinosaur).getMetadata().skeletonPoses().length)){
+        	newVariant = 0;
+        }
         
-        if(!(variantNew <= SkeletonTypes.VALUES.length && SkeletonTypes.VALUES[variantNew - 1].getClasses().contains(EntityHandler.getDinosaurById(dinosaur).getIdentifier().getResourcePath()))) {
-        	variantNew = 0;
-        }
- 
-        stack.setItemDamage(getMetadata(dinosaur, (byte) variantNew, gender, skeleton));
-
-        return variantNew;
+        setSkeletonType(stack, (byte) newVariant);
+        return newVariant;
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, World world, List<String> lore, ITooltipFlag tooltipFlag) {
-        if (!this.isSkeleton(stack)) {
-        	Boolean type = getGender(world, stack);
-        	lore.add(TextFormatting.GOLD + LangUtils.translate("gender.name") +": "+ LangUtils.getGenderMode(type != null ? (type == true ? 1 : 2) : 0));
-            lore.add(TextFormatting.BLUE + LangUtils.translate("lore.change_gender.name"));
-        }
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, World world, List<String> lore, ITooltipFlag tooltipFlag) {
+		
+		Boolean type = getGender(world, stack);
+		lore.add(TextFormatting.GOLD + LangUtils.translate("gender.name") + ": " + LangUtils.getGenderMode(type != null ? (type == true ? 1 : 2) : 0));
+		lore.add(TextFormatting.WHITE + LangUtils.translate("lore.change_gender.name"));
+		Dinosaur dinosaur = EntityHandler.getDinosaurById(this.getDinosaurID(stack));
+		
+		if (this.isSkeleton(stack) && dinosaur.getMetadata().skeletonPoses().length > 1) {
+			lore.add(TextFormatting.YELLOW + LangUtils.translate("pose.name") + ": " + LangUtils.getSkeletonMode(dinosaur, this.getSkeletonType(stack)));
+			lore.add(TextFormatting.WHITE + LangUtils.translate("lore.change_variant.name"));
+		}
+	}
 
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-    	ItemStack stack = player.getHeldItem(hand);
-        if (!this.isSkeleton(stack)) {
-            int mode = this.changeMode(stack);
-            if (world.isRemote) {
-                player.sendMessage(new TextComponentString(LangUtils.translate(LangUtils.GENDER_CHANGE.get("actionfigure")).replace("{mode}", LangUtils.getGenderMode(mode))));
-            }
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
-        }else {
-        	 int oldVariant = this.getSkeletonVariant(stack);
-        	 int variant = this.changeSkeletonVariant(stack);
-             if (variant != oldVariant && world.isRemote) {
-            	 player.sendMessage(new TextComponentString(LangUtils.translate(LangUtils.SKELETON_CHANGE.get("variant")).replace("{mode}", LangUtils.getSkeletonMode(variant))));
-             }
-             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
-        }
-    }
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		ItemStack stack = player.getHeldItem(hand);
+		if (this.isSkeleton(stack)) {
+			if (player.isSneaking()) {
+				int oldVariant = this.getSkeletonType(stack);
+				int variant = this.changeSkeletonVariant(stack);
+				if (variant != oldVariant && !world.isRemote) {
+					TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.SKELETON_CHANGE.get("variant")).replace("{mode}", LangUtils.getSkeletonMode(EntityHandler.getDinosaurById(this.getDinosaurID(stack)), variant)));
+					change.getStyle().setColor(TextFormatting.YELLOW);
+					Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, change);
+				}
+			}
+		}
+		return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+	}
 }

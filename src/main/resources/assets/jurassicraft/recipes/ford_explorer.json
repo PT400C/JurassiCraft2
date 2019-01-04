@@ -1,6 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "jurassicraft:ford_explorer",
+  "group": "jurassicraft:vehicle_item",
   "pattern": [
     "RWG",
     "LCR",
@@ -31,6 +31,7 @@
     }
   },
   "result": {
-    "item": "jurassicraft:ford_explorer"
+    "item": "jurassicraft:vehicle_item",
+    "data": 0
   }
 }

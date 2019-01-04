@@ -38,6 +38,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 public class ClientEventHandler {
+	
     private static final Minecraft MC = Minecraft.getMinecraft();
     private static final ResourceLocation PATREON_BADGE = new ResourceLocation(JurassiCraft.MODID, "textures/items/patreon_badge.png");
 
@@ -128,10 +129,10 @@ public class ClientEventHandler {
             GlStateManager.rotate(-ClientUtils.interpolate(this.isGUI ? player.renderYawOffset : player.prevRenderYawOffset, player.renderYawOffset, LLibrary.PROXY.getPartialTicks()), 0.0F, 1.0F, 0.0F);
 
             if (player.isSneaking()) {
-                GlStateManager.translate(0.0F, -0.2F, 0.0F);
+                GlStateManager.translate(0.0F, -0.3F, 0.0F);
                 GlStateManager.rotate((float) Math.toDegrees(-renderer.getMainModel().bipedBody.rotateAngleY), 0.0F, 1.0F, 0.0F);
                 GlStateManager.rotate((float) Math.toDegrees(0.5F), 1.0F, 0.0F, 0.0F);
-                GlStateManager.translate(0.0F, -0.15F, -0.68F);
+                GlStateManager.translate(0.0F, -0.15F, -0.665F);
             } else {
                 renderer.getMainModel().bipedBody.postRender(0.0625F);
                 GlStateManager.rotate((float) Math.toDegrees(-renderer.getMainModel().bipedBody.rotateAngleY) * 2.0F, 0.0F, 1.0F, 0.0F);

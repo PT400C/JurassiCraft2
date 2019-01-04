@@ -12,7 +12,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.AnimatableModel;
 import org.jurassicraft.client.model.animation.EntityAnimator;
-import org.jurassicraft.client.model.animation.SkeletonTypes;
 import org.jurassicraft.client.render.entity.DinosaurRenderer;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
@@ -56,12 +55,9 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
 			if (stage != GrowthStage.SKELETON) {
 				this.animatableModels.put(stage, new AnimatableModel(this.dinosaur.getModelContainer(stage), this.getModelAnimator(stage)));
 			} else {
-				this.skeletonModels[0] = new AnimatableModel(this.dinosaur.getSkeletonModel().get("idle"), null);
-
-				for (int x = 0; x < SkeletonTypes.VALUES.length; x++) {
-					if (!SkeletonTypes.VALUES[x].getClasses().contains(this.dinosaur.getIdentifier().getResourcePath()))
-						break;
-					this.skeletonModels[x + 1] = new AnimatableModel(this.dinosaur.getSkeletonModel().get(SkeletonTypes.VALUES[x].getName()), null);
+				
+				for (int i = 0; i < dinosaur.getMetadata().skeletonPoses().length; i++) {
+					this.skeletonModels[i] = new AnimatableModel(this.dinosaur.getSkeletonModel().get(dinosaur.getMetadata().skeletonPoses()[i]), null);
 				}
 
 			}
