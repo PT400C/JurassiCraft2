@@ -1,5 +1,6 @@
 package org.jurassicraft.server.block.entity;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
@@ -8,13 +9,19 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.api.SequencableItem;
 import org.jurassicraft.server.container.DNASequencerContainer;
 import org.jurassicraft.server.item.ItemHandler;
+import org.jurassicraft.server.message.TileEntityFieldsMessage;
 
 import com.google.common.primitives.Ints;
+
+import io.netty.buffer.ByteBuf;
 
 import java.util.Random;
 
@@ -65,6 +72,7 @@ public class DNASequencerBlockEntity extends MachineBaseBlockEntity {
 
         this.decreaseStackSize(tissue);
         this.decreaseStackSize(tissue + 1);
+        JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
     }
 
     @Override
@@ -113,13 +121,11 @@ public class DNASequencerBlockEntity extends MachineBaseBlockEntity {
 		
 		if (Ints.asList(INPUTS).contains(slotID)) {
 			if (slotID % 2 == 0) {
-				if (itemstack != null && SequencableItem.getSequencableItem(itemstack) != null && this.getStackInSlot(slotID).getCount() == 0
-						&& SequencableItem.getSequencableItem(itemstack).isSequencable(itemstack)) {
+				if (itemstack != null && SequencableItem.getSequencableItem(itemstack) != null && this.getStackInSlot(slotID).getCount() == 0 && SequencableItem.getSequencableItem(itemstack).isSequencable(itemstack)) {
 					return true;
 				}
 			} else {
-				if (itemstack != null && itemstack.getItem() == ItemHandler.STORAGE_DISC
-						&& (itemstack.getTagCompound() == null || !itemstack.getTagCompound().hasKey("DNAQuality")) && this.getStackInSlot(slotID).getCount() == 0) {
+				if (itemstack != null && itemstack.getItem() == ItemHandler.STORAGE_DISC && (itemstack.getTagCompound() == null || !itemstack.getTagCompound().hasKey("DNAQuality")) && this.getStackInSlot(slotID).getCount() == 0) {
 					return true;
 				}
 			}
@@ -153,6 +159,39 @@ public class DNASequencerBlockEntity extends MachineBaseBlockEntity {
     public String getName() {
         return this.hasCustomName() ? this.customName : "container.dna_sequencer";
     }
+    
+	@Override
+	public void packetDataHandler(ByteBuf fields) {
+		if (FMLCommonHandler.instance().getSide().isClient()) {
+			for (int slot : this.getSlotsForFace(EnumFacing.UP)) {
+				if (slot % 2 == 0) {
+					this.setInventorySlotContents(slot, ByteBufUtils.readItemStack(fields));
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void setInventorySlotContents(int index, ItemStack stack) {
+		boolean send = false;
+		if (!this.world.isRemote && index % 2 == 0 && this.slots.get(index).getItem() != stack.getItem()) {
+			send = true;
+		}
+		super.setInventorySlotContents(index, stack);
+
+		if (send)
+			JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+	}
+	
+	@Override
+	public NonNullList getSyncFields(NonNullList fields) {
+		for (int slot : this.getSlotsForFace(EnumFacing.UP)) {
+			if (slot % 2 == 0) {
+				fields.add(this.slots.get(slot));
+			}
+		}
+		return fields;
+	}
 
 	@Override
 	public boolean isEmpty() {
