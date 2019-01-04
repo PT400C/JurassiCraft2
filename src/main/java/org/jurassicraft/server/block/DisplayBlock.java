@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -144,8 +145,13 @@ public class DisplayBlock extends BlockContainer {
     }
 
     public ItemStack getItemFromTile(DisplayBlockEntity tile) {
-        int metadata = DisplayBlockItem.getMetadata(EntityHandler.getDinosaurId(tile.getEntity().getDinosaur()), tile.getVariant(), tile.isMale() ? 1 : 2, tile.isSkeleton());
-        return new ItemStack(ItemHandler.DISPLAY_BLOCK_ITEM, 1, metadata);
+        int metadata = DisplayBlockItem.getMetadata(EntityHandler.getDinosaurId(tile.getEntity().getDinosaur()), tile.isFossile(), tile.isSkeleton());
+        ItemStack stack = new ItemStack(ItemHandler.DISPLAY_BLOCK_ITEM, 1, metadata);
+        NBTTagCompound nbt = new NBTTagCompound();
+		stack.setTagCompound(nbt);
+		nbt.setByte("Type", tile.getVariant());
+		nbt.setByte("Gender", (byte) (tile.isMale() ? 1 : 2));
+        return stack;
     }
 
     @Override

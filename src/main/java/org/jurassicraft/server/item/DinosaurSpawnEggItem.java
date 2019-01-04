@@ -2,6 +2,7 @@ package org.jurassicraft.server.item;
 
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -22,6 +23,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -84,7 +86,9 @@ public class DinosaurSpawnEggItem extends Item {
     	if(player.isSneaking()) {
             int mode = this.changeMode(stack);
             if (world.isRemote) {
-                player.sendMessage(new TextComponentString(LangUtils.translate(LangUtils.GENDER_CHANGE.get("spawnegg")).replace("{mode}", LangUtils.getGenderMode(mode))));
+            	TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.GENDER_CHANGE.get("spawnegg")).replace("{mode}", LangUtils.getGenderMode(mode)));
+				change.getStyle().setColor(TextFormatting.GOLD);
+				Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, change);
             }
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
@@ -202,7 +206,8 @@ public class DinosaurSpawnEggItem extends Item {
     	int mode = this.getMode(stack);
     	Boolean type = (mode > 0 ? mode == 1 : null);
     	lore.add(TextFormatting.GOLD + LangUtils.translate("gender.name") +": "+ LangUtils.getGenderMode(type != null ? (type == true ? 1 : 2) : 0));
-        lore.add(TextFormatting.BLUE + I18n.format("lore.baby_dino.name"));
-        lore.add(TextFormatting.YELLOW + I18n.format("lore.change_gender.name"));
+    	lore.add(TextFormatting.WHITE + I18n.format("lore.change_gender2.name"));
+    	lore.add(TextFormatting.YELLOW + I18n.format("lore.baby_dino.name"));
+        
     }
 }

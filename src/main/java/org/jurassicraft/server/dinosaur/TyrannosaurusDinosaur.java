@@ -34,12 +34,13 @@ public class TyrannosaurusDinosaur extends Dinosaur {
                 .setDiet(Diet.CARNIVORE.get())
                 .setBones("arm_bones", "foot_bones", "leg_bones", "neck_vertebrae", "pelvis", "ribcage", "shoulder_bone", "skull", "tail_vertebrae", "tooth")
                 .setHeadCubeName("head")
-                .setScale(2.8F, 0.35F)
+                .setScale(2.5F, 0.35F)
                 .setMaxHerdSize(3)
                 .setAttackBias(1000.0)
                 .setBreeding(false, 2, 4, 60, false, true)
+                .setSkeletonPoses("idle", "death", "attacking")
                 .setSpawn(5, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.FOREST)
-                .setOverlays(OverlayType.EYELID, OverlayType.EYE, OverlayType.CLAW, OverlayType.MOUTH, OverlayType.NOSTRILS, OverlayType.STRIPES, OverlayType.TEETH)
+                .setOverlays(OverlayType.EYELID, OverlayType.EYE, OverlayType.CLAW, OverlayType.MOUTH, OverlayType.NOSTRILS, OverlayType.STRIPES, OverlayType.TEETH, OverlayType.MALE_PARTS)
                 .setRecipe(new String[][] {
                         { "", "", "", "neck_vertebrae", "skull" },
                         { "tail_vertebrae", "pelvis", "ribcage", "shoulder_bone", "tooth" },

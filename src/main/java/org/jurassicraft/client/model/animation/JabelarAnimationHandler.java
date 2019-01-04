@@ -68,8 +68,8 @@ public class JabelarAnimationHandler<ENTITY extends EntityLivingBase & Animatabl
     private AdvancedModelRenderer[] getParts(AnimatableModel model) {
         AdvancedModelRenderer[] parts = new AdvancedModelRenderer[model.getIdentifierCubes().size()];
         int i = 0;
-        for (Map.Entry<String, AdvancedModelRenderer> part : model.getIdentifierCubes().entrySet()) {
-            parts[i++] = part.getValue();
+        for (AdvancedModelRenderer part : model.getIdentifierCubes().values()) {
+            parts[i++] = part;
         }
         return parts;
     }

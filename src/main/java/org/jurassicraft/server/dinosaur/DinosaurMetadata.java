@@ -37,6 +37,7 @@ public class DinosaurMetadata {
     private SleepTime sleepTime = SleepTime.DIURNAL;
     private String[] bones;
     private int maximumAge;
+    private String[] skeletonPoses = new String[] {"idle"};
     private String headCubeName;
     private MovementType movementType = MovementType.NEAR_SURFACE;
     private Dinosaur.BirthType birthType = Dinosaur.BirthType.EGG_LAYING;
@@ -153,6 +154,10 @@ public class DinosaurMetadata {
     }
     public DinosaurMetadata setMaximumAge(int age) {
         this.maximumAge = age;
+        return this;
+    }
+    public DinosaurMetadata setSkeletonPoses(String... poses) {
+        this.skeletonPoses = poses;
         return this;
     }
     public DinosaurMetadata setOverlayCount(int count) {
@@ -325,6 +330,9 @@ public class DinosaurMetadata {
     }
     public int getMaximumAge() {
         return this.maximumAge;
+    }
+    public String[] skeletonPoses() {
+        return this.skeletonPoses;
     }
     public double getAttackSpeed() {
         return this.attackSpeed;

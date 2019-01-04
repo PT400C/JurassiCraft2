@@ -262,7 +262,6 @@ public enum RenderingHandler {
 
         registerItemRenderer(TRACKER);
         registerItemRenderer(PLANT_CELLS_PETRI_DISH);
-        registerItemRenderer(HELICOPTER);
         registerItemRenderer(PLANT_CELLS);
         registerItemRenderer(GROWTH_SERUM);
         registerItemRenderer(BREEDING_WAND);
@@ -281,8 +280,8 @@ public enum RenderingHandler {
 
         registerItemRenderer(INGEN_JOURNAL);
 
-        for (Entry<Integer, Dinosaur> entry : EntityHandler.getDinosaurs().entrySet()) {
-            registerItemRenderer(SPAWN_EGG, entry.getKey(), "dino_spawn_egg");
+        for (Integer id : EntityHandler.getDinosaurs().keySet()) {
+            registerItemRenderer(SPAWN_EGG, id, "dino_spawn_egg");
         }
 
         registerItemRenderer(PADDOCK_SIGN);
@@ -343,38 +342,36 @@ public enum RenderingHandler {
         registerItemRenderer(CAR_TIRE, "car_tire");
         registerItemRenderer(CAR_WINDSCREEN, "car_windscreen");
         registerItemRenderer(UNFINISHED_CAR, "unfinished_car");
-        registerItemRenderer(JEEP_WRANGLER, "jeep_wrangler");
-        registerItemRenderer(FORD_EXPLORER, "ford_explorer");
+        
+		for (int x = 0; x < VEHICLE_ITEM.variants.length; x++) {
+			registerItemRenderer(VEHICLE_ITEM, x, VEHICLE_ITEM.variants[x]);
+			registerItemRenderer(VEHICLE_ITEM, x, VEHICLE_ITEM.variants[x]);
+			registerItemRenderer(VEHICLE_ITEM, x, VEHICLE_ITEM.variants[x]);
+		}
 
         registerItemRenderer(MURAL, "mural");
 
         for (Dinosaur dinosaur : EntityHandler.getDinosaurs().values()) {
             int meta = EntityHandler.getDinosaurId(dinosaur);
             String formattedName = dinosaur.getIdentifier().getResourcePath();
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 0, false), "action_figure/action_figure_" + formattedName);
-          
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 1, false), "action_figure/action_figure_" + formattedName);
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) 0, 2, false), "action_figure/action_figure_" + formattedName);
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, false, false), "action_figure/action_figure_" + formattedName);
             
-            for(int random = 0; random < 16; random++) {
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, true, true), "skeleton/fossil/skeleton_fossil_" + formattedName);
+            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, false, true), "skeleton/fresh/skeleton_fresh_" + formattedName);
             
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) random, 1, true), "skeleton/fossil/skeleton_fossil_" + formattedName);
-            registerItemRenderer(DISPLAY_BLOCK_ITEM, DISPLAY_BLOCK_ITEM.getMetadata(meta, (byte) random, 2, true), "skeleton/fresh/skeleton_fresh_" + formattedName);
-            }
-            
-            for (Map.Entry<String, FossilItem> entry : ItemHandler.FOSSILS.entrySet()) {
-                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(entry.getKey());
+            ItemHandler.FOSSILS.forEach((type, item) -> {
+                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(type);
                 if (dinosaursForType.contains(dinosaur)) {
-                    registerItemRenderer(entry.getValue(), meta, "bones/" + formattedName + "_" + entry.getKey());
+                    registerItemRenderer(item, meta, "bones/" + formattedName + "_" + type);
                 }
-            }
+            });
 
-            for (Map.Entry<String, FossilItem> entry : FRESH_FOSSILS.entrySet()) {
-                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(entry.getKey());
+            ItemHandler.FRESH_FOSSILS.forEach((type, item) -> {
+                List<Dinosaur> dinosaursForType = FossilItem.fossilDinosaurs.get(type);
                 if (dinosaursForType.contains(dinosaur)) {
-                    registerItemRenderer(entry.getValue(), meta, "fresh_bones/" + formattedName + "_" + entry.getKey());
+                    registerItemRenderer(item, meta, "fresh_bones/" + formattedName + "_" + type);
                 }
-            }
+            });
 
             registerItemRenderer(DNA, meta, "dna/dna_" + formattedName);
             registerItemRenderer(DINOSAUR_MEAT, meta, "meat/meat_" + formattedName);
@@ -474,8 +471,8 @@ public enum RenderingHandler {
         BlockColors blockColors = mc.getBlockColors();
         blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos != null ? BiomeColorHelper.getGrassColorAtPos(access, pos) : 0xFFFFFF, MOSS);
 
-        for (Map.Entry<TreeType, AncientLeavesBlock> entry : ANCIENT_LEAVES.entrySet()) {
-            blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos == null ? ColorizerFoliage.getFoliageColorBasic() : BiomeColorHelper.getFoliageColorAtPos(access, pos), entry.getValue());
+        for (AncientLeavesBlock block : ANCIENT_LEAVES.values()) {
+            blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos == null ? ColorizerFoliage.getFoliageColorBasic() : BiomeColorHelper.getFoliageColorAtPos(access, pos), block);
         }
 
         blockColors.registerBlockColorHandler((state, access, pos, tintIndex) -> pos == null ? ColorizerFoliage.getFoliageColorBasic() : BiomeColorHelper.getFoliageColorAtPos(access, pos), MOSS);
@@ -486,8 +483,8 @@ public enum RenderingHandler {
         if(JurassiCraftConfig.VEHICLES.tourRailBlockEnabled)
             itemColors.registerItemColorHandler((stack, tintIndex) -> tintIndex == 1 ? ((TourRailBlock)((ItemBlock)stack.getItem()).getBlock()).getSpeedType().getColor() : -1, BlockHandler.TOUR_RAIL_SLOW, BlockHandler.TOUR_RAIL_MEDIUM, BlockHandler.TOUR_RAIL_FAST);
 
-        for (Map.Entry<TreeType, AncientLeavesBlock> entry : ANCIENT_LEAVES.entrySet()) {
-            itemColors.registerItemColorHandler((stack, tintIndex) -> ColorizerFoliage.getFoliageColorBasic(), entry.getValue());
+        for (AncientLeavesBlock block : ANCIENT_LEAVES.values()) {
+            itemColors.registerItemColorHandler((stack, tintIndex) -> ColorizerFoliage.getFoliageColorBasic(), block);
         }
 
         itemColors.registerItemColorHandler((stack, tintIndex) -> {

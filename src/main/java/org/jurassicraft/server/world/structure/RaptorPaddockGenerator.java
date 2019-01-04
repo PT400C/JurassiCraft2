@@ -31,17 +31,15 @@ public class RaptorPaddockGenerator extends StructureGenerator {
         Template template = templateManager.getTemplate(server, STRUCTURE);
         Map<BlockPos, String> dataBlocks = template.getDataBlocks(position, settings);
         template.addBlocksToWorldChunk(world, position, settings);
-        for (Map.Entry<BlockPos, String> entry : dataBlocks.entrySet()) {
-            String type = entry.getValue();
-            BlockPos dataPos = entry.getKey();
+        dataBlocks.forEach((pos, type) -> {
             if (type.equals("Chest")) {
-                world.setBlockState(dataPos, Blocks.AIR.getDefaultState(), 3);
-                TileEntity tile = world.getTileEntity(dataPos.down());
+                world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+                TileEntity tile = world.getTileEntity(pos.down());
                 if (tile instanceof TileEntityChest) {
                     ((TileEntityChest) tile).setLootTable(LootTableList.CHESTS_VILLAGE_BLACKSMITH, random.nextLong()); //TODO Proper loottable
                 }
             }
-        }
+        });
     }
 
     @Override

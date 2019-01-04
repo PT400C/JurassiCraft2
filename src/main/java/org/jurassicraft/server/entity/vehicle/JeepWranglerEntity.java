@@ -2,6 +2,7 @@ package org.jurassicraft.server.entity.vehicle;
 
 import org.jurassicraft.server.item.ItemHandler;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 public class JeepWranglerEntity extends VehicleEntity {
@@ -12,7 +13,7 @@ public class JeepWranglerEntity extends VehicleEntity {
 
     @Override
     public void dropItems() {
-        this.dropItem(ItemHandler.JEEP_WRANGLER, 1);
+    	this.entityDropItem(new ItemStack(ItemHandler.VEHICLE_ITEM, 1, 1), 0);
     }
 
     @Override

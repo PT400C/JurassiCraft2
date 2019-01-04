@@ -14,6 +14,7 @@ Collin
 NeusFear     
 SanAndreasP     
 Shrek5InTheatres2019     
+Compaszer     
 PT400C     
 
 ### Modelers / Texturers

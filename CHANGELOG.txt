@@ -2,5 +2,7 @@
 *Fixed overlapping textures for the Brachiosaurus skeleton model
 *Fixed generation issues with the Digsite and Geneticist Villager House
 +The machine inventories are now properly updated when changed by a hopper
-*Fixed an skeleton glitch for the Brachiosaurus
+*Fixed an skeleton glitch for the Brachiosaurus and Dilophosaurus
 *Fixed a Tyrannosaurus teeth rendering issue
+*Most of the temporal messages now use the player's actionbar instead of the chat
++Added gender-specific elements to the T. Rex skeletons

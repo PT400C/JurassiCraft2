@@ -91,7 +91,7 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
         if (!this.dinosaur.doesSupportGrowthStage(growthStage)) {
             growthStage = GrowthStage.ADULT;
         }
-        return entity.isMale() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage);
+        return growthStage == GrowthStage.SKELETON ? (entity.getIsFossile() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage)) : (entity.isMale() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage));
     }
 
     @Override

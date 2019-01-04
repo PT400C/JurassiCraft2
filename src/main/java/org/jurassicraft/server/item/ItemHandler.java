@@ -19,7 +19,6 @@ import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.item.block.AncientDoorItem;
-import org.jurassicraft.server.item.vehicles.HelicopterItem;
 import org.jurassicraft.server.tab.TabHandler;
 import org.jurassicraft.server.util.RegistryHandler;
 
@@ -142,7 +141,6 @@ public class ItemHandler {
     public static final BasicItem PLANT_CELLS = new BasicItem(TabHandler.ITEMS);
     public static final PlantCallusItem PLANT_CALLUS = new PlantCallusItem();
     public static final BasicItem PLANT_CELLS_PETRI_DISH = new BasicItem(TabHandler.ITEMS);
-    public static final HelicopterItem HELICOPTER = new HelicopterItem();
     //public static final HelicopterModuleItem MINIGUN_MODULE = new HelicopterModuleItem("minigun");
 
     public static final BasicItem TRACKER = new BasicItem(TabHandler.ITEMS);
@@ -210,8 +208,7 @@ public class ItemHandler {
 
     public static final JournalItem INGEN_JOURNAL = new JournalItem();
 
-    public static final JeepWranglerItem JEEP_WRANGLER = new JeepWranglerItem();
-    public static final FordExplorerItem FORD_EXPLORER = new FordExplorerItem();
+    public static final VehicleItem VEHICLE_ITEM = new VehicleItem();
 
     public static final MuralItem MURAL = new MuralItem();
 
@@ -299,9 +296,7 @@ public class ItemHandler {
     public static void init() {
         registerItem(FOSSILIZED_EGG, "Fossilized Egg");
 
-        for (Map.Entry<Integer, Dinosaur> entry : EntityHandler.getDinosaurs().entrySet()) {
-            Dinosaur dinosaur = entry.getValue();
-
+        for (Dinosaur dinosaur : EntityHandler.getDinosaurs().values()) {
             String[] boneTypes = dinosaur.getMetadata().getBones();
 
             for (String boneType : boneTypes) {
@@ -366,7 +361,6 @@ public class ItemHandler {
         registerItem(PLANT_FOSSIL, "Plant Fossil");
         registerItem(TWIG_FOSSIL, "Twig Fossil");
 
-        registerItem(HELICOPTER, "Helicopter");
 //        registerItem(MINIGUN_MODULE, "Helicopter Minigun");
 
         registerItem(AMBER_CANE, "Amber Cane");
@@ -412,8 +406,7 @@ public class ItemHandler {
         registerItem(CAR_TIRE, "Car Tire");
         registerItem(CAR_WINDSCREEN, "Car Windscreen");
         registerItem(UNFINISHED_CAR, "Unfinished Car");
-        registerItem(JEEP_WRANGLER, "Jeep Wrangler");
-        registerItem(FORD_EXPLORER, "Ford Explorer");
+        registerItem(VEHICLE_ITEM, "Vehicle Item");
 
         registerItem(JURASSICRAFT_THEME_DISC, "Disc JurassiCraft Theme");
         registerItem(TROODONS_AND_RAPTORS_DISC, "Disc Troodons And Raptors");
