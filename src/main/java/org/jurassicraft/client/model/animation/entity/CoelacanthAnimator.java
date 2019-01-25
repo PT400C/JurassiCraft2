@@ -9,21 +9,23 @@ import org.jurassicraft.server.entity.dinosaur.CoelacanthEntity;
 
 @SideOnly(Side.CLIENT)
 public class CoelacanthAnimator extends EntityAnimator<CoelacanthEntity> {
+	
     @Override
     protected void performAnimations(AnimatableModel model, CoelacanthEntity entity, float limbSwing, float limbSwingAmount, float ticks, float rotationYaw, float rotationPitch, float scale) {
-        AdvancedModelRenderer neck = model.getCube("Neck ");
-        AdvancedModelRenderer body1 = model.getCube("Body Section 1");
-        AdvancedModelRenderer body2 = model.getCube("Body Section 2");
-        AdvancedModelRenderer body3 = model.getCube("Body Section 3");
-        AdvancedModelRenderer tail1 = model.getCube("Tail Section 1");
-        AdvancedModelRenderer tail2 = model.getCube("Tail Section 2");
-        AdvancedModelRenderer tail3 = model.getCube("Tail Section 3");
-        AdvancedModelRenderer leftFlipper = model.getCube("Left Front Flipper");
-        AdvancedModelRenderer rightFlipper = model.getCube("Right Front Flipper");
-        AdvancedModelRenderer lowerJawFront = model.getCube("Lower jaw front");
+        
+    	final AdvancedModelRenderer neck = model.getCube("Neck ");
+    	final AdvancedModelRenderer body1 = model.getCube("Body Section 1");
+    	final AdvancedModelRenderer body2 = model.getCube("Body Section 2");
+    	final AdvancedModelRenderer body3 = model.getCube("Body Section 3");
+    	final AdvancedModelRenderer tail1 = model.getCube("Tail Section 1");
+    	final AdvancedModelRenderer tail2 = model.getCube("Tail Section 2");
+    	final AdvancedModelRenderer tail3 = model.getCube("Tail Section 3");
+    	final AdvancedModelRenderer leftFlipper = model.getCube("Left Front Flipper");
+    	final AdvancedModelRenderer rightFlipper = model.getCube("Right Front Flipper");
+    	final AdvancedModelRenderer lowerJawFront = model.getCube("Lower jaw front");
 
-        AdvancedModelRenderer[] body = new AdvancedModelRenderer[] { tail3, tail2, tail1, body3, body2, body1 };
-        AdvancedModelRenderer[] frontBody = new AdvancedModelRenderer[] { body3, body2, body1 };
+        final AdvancedModelRenderer[] body = new AdvancedModelRenderer[] { tail3, tail2, tail1, body3, body2, body1 };
+        final AdvancedModelRenderer[] frontBody = new AdvancedModelRenderer[] { body3, body2, body1 };
 
         model.chainSwing(frontBody, 0.6F, 0.4F, 3.0D, limbSwing, limbSwingAmount);
 

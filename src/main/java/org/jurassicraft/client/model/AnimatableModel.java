@@ -8,23 +8,21 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.server.api.Animatable;
+import org.jurassicraft.server.entity.AnimalMetadata;
 
 import java.util.Map;
 import java.util.Set;
 
 @SideOnly(Side.CLIENT)
 public class AnimatableModel extends FixedTabulaModel {
-    public AnimatableModel(TabulaModelContainer model) {
-        this(model, null);
-    }
 
-    public AnimatableModel(TabulaModelContainer model, ITabulaModelAnimator animator) {
-        super(model, animator);
+    public AnimatableModel(final TabulaModelContainer model, final AnimalMetadata animal, final ITabulaModelAnimator animator) {
+        super(model, animal, animator);
     }
 
     @Override
-    public void setRotationAngles(float limbSwing, float limbSwingAmount, float rotation, float rotationYaw, float rotationPitch, float partialTicks, Entity entity) {
-        Animatable animatable = (Animatable) entity;
+    public void setRotationAngles(final float limbSwing, final float limbSwingAmount, final float rotation, final float rotationYaw, final float rotationPitch, final float partialTicks, final Entity entity) {
+    	final Animatable animatable = (Animatable) entity;
 
         if (animatable.isCarcass()) {
             this.setMovementScale(0.0F);
@@ -39,7 +37,7 @@ public class AnimatableModel extends FixedTabulaModel {
         String[] cubeIdentifiers = new String[this.identifierMap.size()];
         int index = 0;
 
-        Set<String> identifiers = this.identifierMap.keySet();
+        final Set<String> identifiers = this.identifierMap.keySet();
 
         for (String identifier : identifiers) {
             cubeIdentifiers[index] = identifier;
@@ -53,7 +51,7 @@ public class AnimatableModel extends FixedTabulaModel {
         String[] cubeNames = new String[this.cubes.size()];
         int index = 0;
 
-        Set<String> names = this.cubes.keySet();
+        final Set<String> names = this.cubes.keySet();
 
         for (String identifier : names) {
             cubeNames[index] = identifier;
@@ -68,10 +66,10 @@ public class AnimatableModel extends FixedTabulaModel {
     }
 
     @Override
-    public void faceTarget(float yaw, float pitch, float rotationDivisor, AdvancedModelRenderer... boxes) {
-        float actualRotationDivisor = rotationDivisor * boxes.length;
-        float yawAmount = MathHelper.clamp(MathHelper.wrapDegrees(yaw), -45.0F, 45.0F) / (180.0F / (float) Math.PI) / actualRotationDivisor;
-        float pitchAmount = MathHelper.wrapDegrees(pitch) / (180.0F / (float) Math.PI) / actualRotationDivisor;
+    public void faceTarget(final float yaw, final float pitch, final float rotationDivisor, final AdvancedModelRenderer... boxes) {
+    	final float actualRotationDivisor = rotationDivisor * boxes.length;
+        final float yawAmount = MathHelper.clamp(MathHelper.wrapDegrees(yaw), -45.0F, 45.0F) / (180.0F / (float) Math.PI) / actualRotationDivisor;
+        final float pitchAmount = MathHelper.wrapDegrees(pitch) / (180.0F / (float) Math.PI) / actualRotationDivisor;
 
         for (AdvancedModelRenderer box : boxes) {
             box.rotateAngleY += yawAmount;

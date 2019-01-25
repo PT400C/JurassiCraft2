@@ -10,8 +10,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.AnimatableModel;
 import org.jurassicraft.server.api.Animatable;
+import org.jurassicraft.server.entity.AnimalMetadata;
 import org.jurassicraft.server.tabula.TabulaModelHelper;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,22 +32,20 @@ public class JabelarAnimationHandler<ENTITY extends EntityLivingBase & Animatabl
     	this.DEFAULT_PASS = new AnimationPass(poseSequences, poses, poseCount, useInertialTweens);
         this.MOVEMENT_PASS = new MovementAnimationPass(poseSequences, poses, poseCount, useInertialTweens);
         this.ON_LAND_PASS = new OnLandAnimationPass(poseSequences, poses, poseCount, useInertialTweens);
-
         this.init(entity, model);
     }
 
-    public static AnimatableModel loadModel(ResourceLocation model) {
-    	
+    public static AnimatableModel loadModel(final ResourceLocation model, final AnimalMetadata animal) {
         try {
-            return new AnimatableModel(TabulaModelHelper.loadTabulaModel(model), null);
+            return new AnimatableModel(TabulaModelHelper.loadTabulaModel(model), animal, null);
         } catch (NullPointerException | IOException e) {
             JurassiCraft.getLogger().error("Could not load Tabula model " + model, e);
         }
         return null;
     }
 
-    private void init(ENTITY entity, AnimatableModel model) {
-        AdvancedModelRenderer[] parts = this.getParts(model);
+    private void init(final ENTITY entity, final AnimatableModel model) {
+    	final AdvancedModelRenderer[] parts = this.getParts(model);
         this.DEFAULT_PASS.init(parts, entity);
         this.MOVEMENT_PASS.init(parts, entity);
         if (entity.isMarineCreature()) {
@@ -55,7 +53,7 @@ public class JabelarAnimationHandler<ENTITY extends EntityLivingBase & Animatabl
         }
     }
 
-    public void performAnimations(ENTITY entity, float limbSwing, float limbSwingAmount, float ticks) {
+    public void performAnimations(final ENTITY entity, final float limbSwing, final float limbSwingAmount, final float ticks) {
         this.DEFAULT_PASS.performAnimations(entity, limbSwing, limbSwingAmount, ticks);
         if (!entity.isCarcass()) {
             this.MOVEMENT_PASS.performAnimations(entity, limbSwing, limbSwingAmount, ticks);
@@ -65,8 +63,8 @@ public class JabelarAnimationHandler<ENTITY extends EntityLivingBase & Animatabl
         }
     }
 
-    private AdvancedModelRenderer[] getParts(AnimatableModel model) {
-        AdvancedModelRenderer[] parts = new AdvancedModelRenderer[model.getIdentifierCubes().size()];
+    private AdvancedModelRenderer[] getParts(final AnimatableModel model) {
+    	final AdvancedModelRenderer[] parts = new AdvancedModelRenderer[model.getIdentifierCubes().size()];
         int i = 0;
         for (AdvancedModelRenderer part : model.getIdentifierCubes().values()) {
             parts[i++] = part;

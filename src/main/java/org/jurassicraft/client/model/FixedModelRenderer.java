@@ -8,8 +8,13 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
+
+import org.jurassicraft.server.dinosaur.TyrannosaurusDinosaur;
+import org.jurassicraft.server.entity.AnimalMetadata;
+import org.jurassicraft.server.entity.dinosaur.TyrannosaurusEntity;
 
 public class FixedModelRenderer extends AdvancedModelRenderer {
     private static final Random RANDOM = new Random();
@@ -20,25 +25,38 @@ public class FixedModelRenderer extends AdvancedModelRenderer {
 
     private int displayList;
     private boolean compiled;
+    
+    public FixedModelRenderer(final AdvancedModelBase model, final String name, final AnimalMetadata animal) {
+    	super(model, name);
+    	if(animal != null && animal.getOffsetCubes().size() > 0) {
+    		final HashMap<String, Float> s = animal.getOffsetCubes();
+    		if(s.keySet().stream().anyMatch(name::contains)) {
+    			if(!(s.get(name) == null)) {
+    				this.fixX = s.get(name);
+    			}else {
+    				RANDOM.setSeed(name.hashCode() << 16);
+    				final float offsetScale = 0.007F;
+    				this.fixX = (RANDOM.nextFloat() - 0.5F) * offsetScale;
+    			}
+            }
+    	}
+        
+    }
 
-    public FixedModelRenderer(AdvancedModelBase model, String name) {
-        super(model, name);
-        RANDOM.setSeed(name.hashCode() << 16);
-        float offsetScale = 0.005F;
-        this.fixX = (RANDOM.nextFloat() - 0.5F) * offsetScale;
-        this.fixY = (RANDOM.nextFloat() - 0.5F) * offsetScale;
-        this.fixZ = (RANDOM.nextFloat() - 0.5F) * offsetScale;
+    public FixedModelRenderer(final AdvancedModelBase model, final String name) {
+        this(model, name, null);
     }
 
     @Override
-    public void render(float scale) {
+    public void render(final float scale) {
         if (!this.isHidden) {
             if (this.showModel) {
                 GlStateManager.pushMatrix();
                 if (!this.compiled) {
                     this.compileDisplayList(scale);
                 }
-                GlStateManager.translate(this.offsetX + this.fixX, this.offsetY + this.fixY, this.offsetZ + this.fixZ);
+                GlStateManager.translate(this.offsetX, this.offsetY, this.offsetZ);
+                GlStateManager.scale(this.scaleX - this.fixX, this.scaleY, this.scaleZ);
                 GlStateManager.translate(this.rotationPointX * scale, this.rotationPointY * scale, this.rotationPointZ * scale);
                 if (this.rotateAngleZ != 0.0F) {
                     GlStateManager.rotate((float) Math.toDegrees(this.rotateAngleZ), 0.0F, 0.0F, 1.0F);
@@ -54,7 +72,8 @@ public class FixedModelRenderer extends AdvancedModelRenderer {
                 }
                 GlStateManager.callList(this.displayList);
                 if (this.childModels != null) {
-                    for (ModelRenderer childModel : this.childModels) {
+                    for (final ModelRenderer childModel : this.childModels) {
+                    	GlStateManager.scale(this.scaleX + this.fixX, this.scaleY, this.scaleZ);
                         childModel.render(scale);
                     }
                 }
@@ -63,11 +82,11 @@ public class FixedModelRenderer extends AdvancedModelRenderer {
         }
     }
 
-    private void compileDisplayList(float scale) {
+    private void compileDisplayList(final float scale) {
         this.displayList = GLAllocation.generateDisplayLists(1);
         GlStateManager.glNewList(this.displayList, 4864);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        for (ModelBox box : this.cubeList) {
+        for (final ModelBox box : this.cubeList) {
             box.render(buffer, scale);
         }
         GlStateManager.glEndList();

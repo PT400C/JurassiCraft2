@@ -46,19 +46,21 @@ import org.jurassicraft.client.model.animation.EntityAnimation;
 import org.jurassicraft.client.model.animation.PoseHandler;
 import org.jurassicraft.client.sound.SoundHandler;
 import org.jurassicraft.server.api.Animatable;
+import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.ai.SmartBodyHelper;
 import org.jurassicraft.server.food.FoodHelper;
 import org.jurassicraft.server.food.FoodType;
 import org.jurassicraft.server.item.ItemHandler;
 
 public class GoatEntity extends EntityAnimal implements Animatable, IEntityAdditionalSpawnData {
-	public static final PoseHandler<GoatEntity> BILLY_POSE_HANDLER = new PoseHandler<>(new ResourceLocation(JurassiCraft.MODID, "goat_billy"), Lists.newArrayList(GrowthStage.ADULT));
-    public static final PoseHandler<GoatEntity> KID_POSE_HANDLER = new PoseHandler<>(new ResourceLocation(JurassiCraft.MODID, "goat_kid"), Lists.newArrayList(GrowthStage.ADULT));
-    public static final PoseHandler<GoatEntity> NANNY_POSE_HANDLER = new PoseHandler<>(new ResourceLocation(JurassiCraft.MODID, "goat_nanny"), Lists.newArrayList(GrowthStage.ADULT));
+	public static final PoseHandler<GoatEntity> BILLY_POSE_HANDLER = new PoseHandler<>(new ResourceLocation(JurassiCraft.MODID, "goat_billy"), Lists.newArrayList(GrowthStage.ADULT), EntityHandler.GOAT.getMetadata());
+    public static final PoseHandler<GoatEntity> KID_POSE_HANDLER = new PoseHandler<>(new ResourceLocation(JurassiCraft.MODID, "goat_kid"), Lists.newArrayList(GrowthStage.ADULT), EntityHandler.GOAT.getMetadata());
+    public static final PoseHandler<GoatEntity> NANNY_POSE_HANDLER = new PoseHandler<>(new ResourceLocation(JurassiCraft.MODID, "goat_nanny"), Lists.newArrayList(GrowthStage.ADULT), EntityHandler.GOAT.getMetadata());
     private static final DataParameter<Boolean> WATCHER_IS_RUNNING = EntityDataManager.createKey(GoatEntity.class, DataSerializers.BOOLEAN);
 
     private Animation animation;
     private int animationTick;
+    protected Animal animal;
     private int animationLength;
     private boolean billy;
     private Variant variant = Variant.JURASSIC_PARK;
@@ -96,15 +98,13 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
+        this.animal = EntityHandler.getAnimalByClass(this.getClass());
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(7.0);
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
     }
 
     @Override
-    public void addVariant(Animation animation, byte variant) {
-    	//TODO: IMPLEMENT!
-    	
-    }
+    public void addVariant(Animation animation, byte variant) {}
     
     @Override
     protected void entityInit() {
@@ -241,7 +241,7 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
 
     @Override
     public PoseHandler getPoseHandler() {
-        return this.isChild() ? KID_POSE_HANDLER : this.billy ? BILLY_POSE_HANDLER : NANNY_POSE_HANDLER;
+    	return this.isChild() ? KID_POSE_HANDLER : this.billy ? BILLY_POSE_HANDLER : NANNY_POSE_HANDLER;
     }
 
     public Type getType() {
@@ -378,13 +378,13 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
         return super.canMateWith(other);
     }
 
-    public enum Type {
+    public static enum Type {
         BILLY,
         NANNY,
         KID
     }
 
-    public enum Variant {
+    public static enum Variant {
         JURASSIC_WORLD,
         JURASSIC_PARK,
         JPOG
@@ -392,14 +392,12 @@ public class GoatEntity extends EntityAnimal implements Animatable, IEntityAddit
 
 	@Override
 	public HashMap<Animation, Byte> getVariants() {
-		// TODO IMPLEMENT!
 		return new HashMap<>();
 	}
 
 	@Override
-	public void setAnimationWithVariant(Animation animation, byte variant) {
-		// TODO Auto-generated method stub
-		
+	public void setAnimationWithVariant(Animation newAnimation, byte variant) {
+		this.setAnimation(newAnimation);
 	}
 
 	@Override

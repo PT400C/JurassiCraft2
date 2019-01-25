@@ -17,6 +17,7 @@ import org.jurassicraft.client.model.animation.dto.PoseDTO;
 import org.jurassicraft.client.model.animation.dto.VariantDTO;
 import org.jurassicraft.server.api.Animatable;
 import org.jurassicraft.server.dinosaur.Dinosaur;
+import org.jurassicraft.server.entity.AnimalMetadata;
 import org.jurassicraft.server.entity.GrowthStage;
 import org.jurassicraft.server.tabula.TabulaModelHelper;
 
@@ -36,18 +37,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
-    private static final Gson GSON = new GsonBuilder().registerTypeAdapter(AnimatableRenderDefDTO.class, new AnimatableRenderDefDTO.AnimatableDeserializer()).create();
+    private final AnimalMetadata metadata;
+	private static final Gson GSON = new GsonBuilder().registerTypeAdapter(AnimatableRenderDefDTO.class, new AnimatableRenderDefDTO.AnimatableDeserializer()).create();
     private Map<GrowthStage, ModelData> modelData = new EnumMap<>(GrowthStage.class);
 
-    public PoseHandler(Dinosaur dinosaur) {
-        this(dinosaur.getIdentifier(), dinosaur.getSupportedStages());
+    public PoseHandler(final Dinosaur dinosaur) {
+        this(dinosaur.getIdentifier(), dinosaur.getSupportedStages(), dinosaur.getMetadata());
     }
 
-    public PoseHandler(ResourceLocation identifier, List<GrowthStage> supported) {
-    	
+    public PoseHandler(final ResourceLocation identifier, final List<GrowthStage> supported, final AnimalMetadata meta) {
+    	this.metadata = meta;
         this.modelData = new EnumMap<>(GrowthStage.class);
-        ResourceLocation entityResource = new ResourceLocation(identifier.getResourceDomain(), "models/entities/" + identifier.getResourcePath());
-        for (GrowthStage growth : GrowthStage.values()) {
+        final ResourceLocation entityResource = new ResourceLocation(identifier.getResourceDomain(), "models/entities/" + identifier.getResourcePath());
+        for (final GrowthStage growth : GrowthStage.values()) {
             try {
                 GrowthStage actualGrowth = growth;
                 if (!supported.contains(actualGrowth)) {
@@ -56,7 +58,7 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
                 if (this.modelData.containsKey(actualGrowth)) {
                     this.modelData.put(growth, this.modelData.get(actualGrowth));
                 } else {
-                    ModelData loaded = this.loadModelData(identifier, entityResource, actualGrowth);
+                	final ModelData loaded = this.loadModelData(identifier, entityResource, actualGrowth);
                     this.modelData.put(growth, loaded);
                     if (actualGrowth != growth) {
                         this.modelData.put(actualGrowth, loaded);
@@ -69,18 +71,18 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
         }
     }
 
-    private ModelData loadModelData(ResourceLocation identifier, ResourceLocation origin, GrowthStage growth) {
-        String namespace = origin.getResourceDomain();
-        String name = identifier.getResourcePath();
-        ResourceLocation stageOrigin = new ResourceLocation(namespace, origin.getResourcePath() + "/" + growth.getKey());
-        ResourceLocation definition = new ResourceLocation(namespace, stageOrigin.getResourcePath() + "/" + name + "_" + growth.getKey() + ".json");
-        try (InputStream modelStream = TabulaModelHelper.class.getResourceAsStream("/assets/" + definition.getResourceDomain() + "/" + definition.getResourcePath())) {
+    private ModelData loadModelData(final ResourceLocation identifier, final ResourceLocation origin, final GrowthStage growth) {
+    	final String namespace = origin.getResourceDomain();
+    	final String name = identifier.getResourcePath();
+    	final ResourceLocation stageOrigin = new ResourceLocation(namespace, origin.getResourcePath() + "/" + growth.getKey());
+    	final ResourceLocation definition = new ResourceLocation(namespace, stageOrigin.getResourcePath() + "/" + name + "_" + growth.getKey() + ".json");
+        try (final InputStream modelStream = TabulaModelHelper.class.getResourceAsStream("/assets/" + definition.getResourceDomain() + "/" + definition.getResourcePath())) {
             if (modelStream == null) {
                 throw new IllegalArgumentException("No model definition for the dino " + identifier + " with grow-state " + growth + " exists. Expected at " + definition);
             }
-            Reader reader = new InputStreamReader(modelStream);
-            AnimationsDTO rawAnimations = GSON.fromJson(reader, AnimationsDTO.class);
-            ModelData data = this.loadModelData(stageOrigin, rawAnimations);
+            final Reader reader = new InputStreamReader(modelStream);
+            final AnimationsDTO rawAnimations = GSON.fromJson(reader, AnimationsDTO.class);
+            final ModelData data = this.loadModelData(stageOrigin, rawAnimations);
             JurassiCraft.INSTANCE.getLogger().debug("Successfully loaded " + identifier + "(" + growth + ") from " + definition);
             reader.close();
             return data;
@@ -90,7 +92,7 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
         }
     }
     
-	private ModelData loadModelData(ResourceLocation origin, AnimationsDTO animationsDefinition) {
+	private ModelData loadModelData(final ResourceLocation origin, final AnimationsDTO animationsDefinition) {
 
 		if (animationsDefinition == null || animationsDefinition.poses == null
 				|| animationsDefinition.poses.get(EntityAnimation.IDLE.name()) == null
@@ -104,17 +106,17 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
 		}
 
 		List<ResourceLocation> posedModelResources = new ArrayList<>();
-		for (Map.Entry<String, VariantDTO> variants : animationsDefinition.poses.entrySet()) {
+		for (final Map.Entry<String, VariantDTO> variants : animationsDefinition.poses.entrySet()) {
 			if (variants == null) {
 				continue;
 			}
-			for (Map.Entry<String, PoseDTO[]> poses : variants.getValue().variants.entrySet()) {
+			for (final Map.Entry<String, PoseDTO[]> poses : variants.getValue().variants.entrySet()) {
 				
 				if (poses == null) {
 					continue;
 				}
 
-				for (PoseDTO pose : poses.getValue()) {
+				for (final PoseDTO pose : poses.getValue()) {
 					if (pose == null) {
 						continue;
 					}
@@ -122,7 +124,7 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
 						throw new IllegalArgumentException("Every pose must define a pose file");
 					}
 					
-					ResourceLocation resolvedRes = new ResourceLocation(origin.getResourceDomain(), origin.getResourcePath() + "/" + pose.pose);
+					final ResourceLocation resolvedRes = new ResourceLocation(origin.getResourceDomain(), origin.getResourcePath() + "/" + pose.pose);
 					int index = posedModelResources.indexOf(resolvedRes);
 					if (index == -1) {
 						pose.index = posedModelResources.size();
@@ -141,19 +143,19 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
 		Map<Animation, float[][][]> animations = new HashMap<>();
 		Map<Animation, byte[]> poseCount = new HashMap<>();
 
-		for (Map.Entry<String, VariantDTO> variants : animationsDefinition.poses.entrySet()) {
+		for (final Map.Entry<String, VariantDTO> variants : animationsDefinition.poses.entrySet()) {
 			
 			int length = 0;
-			for (Map.Entry<String, PoseDTO[]> posesList : variants.getValue().variants.entrySet()) {
-				PoseDTO[] poses = posesList.getValue();
+			for (final Map.Entry<String, PoseDTO[]> posesList : variants.getValue().variants.entrySet()) {
+				final PoseDTO[] poses = posesList.getValue();
 				if(length < poses.length)
 					length = poses.length;
 			}
 
-			for (Map.Entry<String, PoseDTO[]> posesList : variants.getValue().variants.entrySet()) {
+			for (final Map.Entry<String, PoseDTO[]> posesList : variants.getValue().variants.entrySet()) {
 
-				Animation animation = EntityAnimation.valueOf(variants.getKey()).get();
-				PoseDTO[] poses = posesList.getValue();
+				final Animation animation = EntityAnimation.valueOf(variants.getKey()).get();
+				final PoseDTO[] poses = posesList.getValue();
 				float[][][] poseSequence = animations.get(animation);
 				byte[] counts = poseCount.get(animation);
 				if(poseSequence == null) {
@@ -181,28 +183,28 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
 	}
 
     @SideOnly(Side.CLIENT)
-    private ModelData loadModelDataClient(List<ResourceLocation> posedModelResources, Map<Animation, float[][][]> animations, Map<Animation, byte[]> poseCount) {
-        PosedCuboid[][] posedCuboids = new PosedCuboid[posedModelResources.size()][];
-        AnimatableModel mainModel = JabelarAnimationHandler.loadModel(posedModelResources.get(0));
+    private ModelData loadModelDataClient(final List<ResourceLocation> posedModelResources, final Map<Animation, float[][][]> animations, final Map<Animation, byte[]> poseCount) {
+    	final PosedCuboid[][] posedCuboids = new PosedCuboid[posedModelResources.size()][];
+        final AnimatableModel mainModel = JabelarAnimationHandler.loadModel(posedModelResources.get(0), this.metadata);
        
         if (mainModel == null) {
             throw new IllegalArgumentException("Couldn't load the model from " + posedModelResources.get(0));
         }
-        String[] identifiers = mainModel.getCubeIdentifierArray();
-        int partCount = identifiers.length;
+        final String[] identifiers = mainModel.getCubeIdentifierArray();
+        final int partCount = identifiers.length;
         	
         for (int i = 0; i < posedModelResources.size(); i++) {
-        	ResourceLocation resource = posedModelResources.get(i);
-            AnimatableModel model = JabelarAnimationHandler.loadModel(resource);
+        	final ResourceLocation resource = posedModelResources.get(i);
+        	final AnimatableModel model = JabelarAnimationHandler.loadModel(resource, this.metadata);
             if (model == null) {
                 throw new IllegalArgumentException("Couldn't load the model from " + resource);
             }
-            PosedCuboid[] pose = new PosedCuboid[partCount];
+            final PosedCuboid[] pose = new PosedCuboid[partCount];
             for (int partIndex = 0; partIndex < partCount; partIndex++) {
-                String identifier = identifiers[partIndex];
-                AdvancedModelRenderer cube = model.getCubeByIdentifier(identifier);
+            	final String identifier = identifiers[partIndex];
+                final AdvancedModelRenderer cube = model.getCubeByIdentifier(identifier);
                 if (cube == null) {
-                    AdvancedModelRenderer mainCube = mainModel.getCubeByIdentifier(identifier);
+                	final AdvancedModelRenderer mainCube = mainModel.getCubeByIdentifier(identifier);
                     
                     //TODO: Recreate T-Rex running model
                     JurassiCraft.getLogger().error("Could not retrieve cube " + identifier + " (" + mainCube.boxName + ", " + partIndex + ") from the model " + resource +" (We're aware of this problem!)");
@@ -218,7 +220,7 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
     }
 
     @SideOnly(Side.CLIENT)
-    public JabelarAnimationHandler<ENTITY> createAnimationHandler(ENTITY entity, AnimatableModel model, GrowthStage growthStage, boolean useInertialTweens) {
+    public JabelarAnimationHandler<ENTITY> createAnimationHandler(final ENTITY entity, final AnimatableModel model, final GrowthStage growthStage, final boolean useInertialTweens) {
         ModelData growthModel = this.modelData.get(growthStage);
         
         if (!entity.canUseGrowthStage(growthStage)) {
@@ -227,12 +229,12 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
         return new JabelarAnimationHandler<>(entity, model, growthModel.poses, growthModel.animations, growthModel.poseCount, useInertialTweens);
     }
 
-    public Map<Animation, float[][][]> getAnimations(GrowthStage growthStage) {
+    public Map<Animation, float[][][]> getAnimations(final GrowthStage growthStage) {
         return this.modelData.get(growthStage).animations;
     }
 
-	public float getAnimationLength(Animation animation, GrowthStage growthStage, byte variant) {
-		Map<Animation, float[][][]> animations = this.getAnimations(growthStage);
+	public float getAnimationLength(final Animation animation, final GrowthStage growthStage, final byte variant) {
+		final Map<Animation, float[][][]> animations = this.getAnimations(growthStage);
 		float duration = 0;
 		if (animation != null && animations.get(animation) != null) {
 
@@ -246,11 +248,12 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
 		return duration;
 	}
 
-    public boolean hasAnimation(Animation animation, GrowthStage growthStage) {
+    public boolean hasAnimation(final Animation animation, final GrowthStage growthStage) {
         return this.modelData.get(growthStage).animations.get(animation) != null;
     }
 
     private class ModelData {
+    	
         @SideOnly(Side.CLIENT)
         PosedCuboid[][] poses;
 
@@ -262,7 +265,7 @@ public class PoseHandler<ENTITY extends EntityLivingBase & Animatable> {
         }
 
         @SideOnly(Side.CLIENT)
-        public ModelData(PosedCuboid[][] cuboids, Map<Animation, float[][][]> animations, Map<Animation, byte[]> poseCount) {
+        public ModelData(PosedCuboid[][] cuboids, final Map<Animation, float[][][]> animations, final Map<Animation, byte[]> poseCount) {
             this(animations, poseCount);
 
             if (cuboids == null) {

@@ -10,6 +10,7 @@ import org.jurassicraft.server.entity.VenomEntity;
 
 @SideOnly(Side.CLIENT)
 public class VenomRenderer implements IRenderFactory<VenomEntity> {
+	
     @Override
     public Render<? super VenomEntity> createRenderFor(RenderManager manager) {
         return new Renderer(manager);

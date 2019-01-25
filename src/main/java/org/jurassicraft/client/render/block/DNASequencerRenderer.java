@@ -15,13 +15,13 @@ import org.jurassicraft.server.block.OrientedBlock;
 import org.jurassicraft.server.block.entity.DNASequencerBlockEntity;
 
 public class DNASequencerRenderer extends TileEntitySpecialRenderer<DNASequencerBlockEntity> {
-    private Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     @Override
-    public void render(DNASequencerBlockEntity tileEntity, double x, double y, double z, float p_180535_8_, int p_180535_9_, float alpha) {
-        World world = tileEntity.getWorld();
+    public void render(final DNASequencerBlockEntity tileEntity, final double x, final double y, final double z, final float p_180535_8_, final int p_180535_9_, final float alpha) {
+    	final World world = tileEntity.getWorld();
 
-        IBlockState state = world.getBlockState(tileEntity.getPos());
+    	final IBlockState state = world.getBlockState(tileEntity.getPos());
 
         if (state.getBlock() == BlockHandler.DNA_SEQUENCER) {
             EnumFacing value = state.getValue(OrientedBlock.FACING);
@@ -30,7 +30,7 @@ public class DNASequencerRenderer extends TileEntitySpecialRenderer<DNASequencer
                 value = value.getOpposite();
             }
 
-            int rotation = value.getHorizontalIndex() * 90;
+            final int rotation = value.getHorizontalIndex() * 90;
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5, y + 1.5F, z + 0.5);
@@ -40,17 +40,17 @@ public class DNASequencerRenderer extends TileEntitySpecialRenderer<DNASequencer
             GlStateManager.scale(-0.375F, -0.375F, 0.375F);
             GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
 
-            this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-            RenderItem renderItem = this.mc.getRenderItem();
+            final RenderItem renderItem = mc.getRenderItem();
 
-            GlStateManager.translate(0.0, 0.0, MathHelper.sin((this.mc.player.ticksExisted + this.mc.getRenderPartialTicks()) * 0.05F) * 0.025F);
+            GlStateManager.translate(0.0, 0.0, MathHelper.sin((mc.player.ticksExisted + mc.getRenderPartialTicks()) * 0.05F) * 0.025F);
 
-            for (int inputSlot : tileEntity.getSlotsForFace(EnumFacing.UP)) {
+            for (final int inputSlot : tileEntity.getSlotsForFace(EnumFacing.UP)) {
                 GlStateManager.translate(0.0, 0.0, -0.4);
 
                 if (inputSlot % 2 == 0) {
-                    ItemStack sequence = tileEntity.getStackInSlot(inputSlot);
+                	final ItemStack sequence = tileEntity.getStackInSlot(inputSlot);
 
                     if (sequence != null) {
                         renderItem.renderItem(sequence, renderItem.getItemModelMesher().getItemModel(sequence));

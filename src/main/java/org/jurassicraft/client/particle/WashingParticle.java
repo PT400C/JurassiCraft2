@@ -11,8 +11,8 @@ public class WashingParticle extends Particle {
 
 	public WashingParticle(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int rotation) {
 		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-		int xSprinkle = ((zSpeedIn != 0) ? 1 : 0) * ((rotation == 0 || rotation == 3) ? 1 : -1);
-		int zSprinkle = ((xSpeedIn != 0) ? 1 : 0) * ((rotation == 0 || rotation == 3) ? 1 : -1);
+		final int xSprinkle = ((zSpeedIn != 0) ? 1 : 0) * ((rotation == 0 || rotation == 3) ? 1 : -1);
+		final int zSprinkle = ((xSpeedIn != 0) ? 1 : 0) * ((rotation == 0 || rotation == 3) ? 1 : -1);
 		this.posX += (Math.random() * 0.2) * xSprinkle;
 		this.posZ += (Math.random() * 0.2) * zSprinkle;
 		this.motionX = xSpeedIn + (Math.random() * 0.06) * xSprinkle;

@@ -74,8 +74,8 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     protected abstract DinosaurMetadata buildMetadata();
 
     
-    public static Matrix4d getParentRotationMatrix(TabulaModelContainer model, TabulaCubeContainer cube, boolean includeParents, boolean ignoreSelf, float rot) {
-        List<TabulaCubeContainer> parentCubes = new ArrayList<>();
+    public static Matrix4d getParentRotationMatrix(final TabulaModelContainer model, TabulaCubeContainer cube, final boolean includeParents, boolean ignoreSelf, final float rot) {
+    	List<TabulaCubeContainer> parentCubes = new ArrayList<>();
 
         do {
             if (ignoreSelf) {
@@ -99,9 +99,9 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
             transform.setTranslation(new Vector3d(cube.getPosition()));
             mat.mul(transform);
 
-            double rotX = cube.getRotation()[0];
-            double rotY = cube.getRotation()[1];
-            double rotZ = cube.getRotation()[2];
+            final double rotX = cube.getRotation()[0];
+            final double rotY = cube.getRotation()[1];
+            final double rotZ = cube.getRotation()[2];
 
             transform.rotZ(rotZ / 180 * Math.PI);
             mat.mul(transform);
@@ -114,8 +114,8 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         return mat;
     }
 
-    private static double[][] getTransformation(Matrix4d matrix) {
-        double sinRotationAngleY, cosRotationAngleY, sinRotationAngleX, cosRotationAngleX, sinRotationAngleZ, cosRotationAngleZ;
+    private static double[][] getTransformation(final Matrix4d matrix) {
+    	final double sinRotationAngleY, cosRotationAngleY, sinRotationAngleX, cosRotationAngleX, sinRotationAngleZ, cosRotationAngleZ;
 
         sinRotationAngleY = -matrix.m20;
         cosRotationAngleY = Math.sqrt(1 - sinRotationAngleY * sinRotationAngleY);
@@ -132,19 +132,19 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
             cosRotationAngleZ = 1;
         }
 
-        double rotationAngleX = epsilon(Math.atan2(sinRotationAngleX, cosRotationAngleX)) / Math.PI * 180;
-        double rotationAngleY = epsilon(Math.atan2(sinRotationAngleY, cosRotationAngleY)) / Math.PI * 180;
-        double rotationAngleZ = epsilon(Math.atan2(sinRotationAngleZ, cosRotationAngleZ)) / Math.PI * 180;
+        final double rotationAngleX = epsilon(Math.atan2(sinRotationAngleX, cosRotationAngleX)) / Math.PI * 180;
+        final double rotationAngleY = epsilon(Math.atan2(sinRotationAngleY, cosRotationAngleY)) / Math.PI * 180;
+        final double rotationAngleZ = epsilon(Math.atan2(sinRotationAngleZ, cosRotationAngleZ)) / Math.PI * 180;
         return new double[][] { { epsilon(matrix.m03), epsilon(matrix.m13), epsilon(matrix.m23) }, { rotationAngleX, rotationAngleY, rotationAngleZ } };
     }
 
-    private static double epsilon(double x) {
+    private static double epsilon(final double x) {
         return x < 0 ? x > -0.0001 ? 0 : x : x < 0.0001 ? 0 : x;
     }
 
     public void init() {
 
-    	for(OverlayType type : this.metadata.getOverlays()) {
+    	for(final OverlayType type : this.metadata.getOverlays()) {
     		
     		if(this.overlayTextures.get(type) == null)
             	this.overlayTextures.put(type, new HashMap<>());
@@ -152,7 +152,7 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
             	this.skeletonOverlays.put(type, new HashMap<>());
     	}
 
-        for (GrowthStage stage : GrowthStage.VALUES) {
+        for (final GrowthStage stage : GrowthStage.VALUES) {
             if (this.doesSupportGrowthStage(stage)) {
             	if(stage == GrowthStage.SKELETON) {
             		this.getSkeletonModels().entrySet().stream().forEach(entry -> this.skeletonModels.put(entry.getKey(), entry.getValue()));
@@ -164,10 +164,10 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
             }
         }
 
-        ResourceLocation identifier = this.getMetadata().getIdentifier();
-        String domain = identifier.getResourceDomain();
-        String name = identifier.getResourcePath();
-        String textureRoot = "textures/entities/" + name + "/";
+        final ResourceLocation identifier = this.getMetadata().getIdentifier();
+        final String domain = identifier.getResourceDomain();
+        final String name = identifier.getResourcePath();
+        final String textureRoot = "textures/entities/" + name + "/";
 
 		if (FMLCommonHandler.instance().getSide().equals(Side.CLIENT)) {
 
@@ -184,8 +184,8 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
 				for (OverlayType type : this.metadata.getOverlays()) {
 					if (growthStage != GrowthStage.SKELETON) {
 						Map<GrowthStageGenderContainer, ResourceLocation> overlay = this.overlayTextures.get(type);
-						ResourceLocation female = new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + "_" + type.toString() + ".png");
-						ResourceLocation male = new ResourceLocation(domain, textureRoot + name + "_male_" + growthStageName + "_" + type.toString() + ".png");
+						final ResourceLocation female = new ResourceLocation(domain, textureRoot + name + "_female_" + growthStageName + "_" + type.toString() + ".png");
+						final ResourceLocation male = new ResourceLocation(domain, textureRoot + name + "_male_" + growthStageName + "_" + type.toString() + ".png");
 
 						try {
 							Minecraft.getMinecraft().getResourceManager().getResource(female).getInputStream();
@@ -199,8 +199,8 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
 						}
 					} else {
 						Map<SkeletonOverlayContainer, ResourceLocation> overlay = this.skeletonOverlays.get(type);
-						ResourceLocation fresh = new ResourceLocation(domain, textureRoot + name + "_fresh_skeleton_" + type.toString() + ".png");
-						ResourceLocation fossilized = new ResourceLocation(domain, textureRoot + name + "_fossilized_skeleton_" + type.toString() + ".png");
+						final ResourceLocation fresh = new ResourceLocation(domain, textureRoot + name + "_fresh_skeleton_" + type.toString() + ".png");
+						final ResourceLocation fossilized = new ResourceLocation(domain, textureRoot + name + "_fossilized_skeleton_" + type.toString() + ".png");
 
 						try {
 							Minecraft.getMinecraft().getResourceManager().getResource(fresh).getInputStream();
@@ -237,10 +237,10 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
 
     @Nullable
     protected TabulaModelContainer parseModel(String growthStage) {
-        ResourceLocation identifier = this.getIdentifier();
-        String domain = identifier.getResourceDomain();
-        String path = identifier.getResourcePath();
-        ResourceLocation location = new ResourceLocation(domain, "models/entities/" + path + "/" + growthStage + "/" + path + "_" + growthStage + "_idle");
+    	final ResourceLocation identifier = this.getIdentifier();
+    	final String domain = identifier.getResourceDomain();
+    	final String path = identifier.getResourcePath();
+    	final ResourceLocation location = new ResourceLocation(domain, "models/entities/" + path + "/" + growthStage + "/" + path + "_" + growthStage + "_idle");
         try {
         	return TabulaModelHelper.loadTabulaModel(location);
         } catch (Exception e) {
@@ -253,10 +253,10 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     @Nonnull
     protected HashMap<String, TabulaModelContainer> getSkeletonModels() {
     	HashMap<String, TabulaModelContainer> models = new HashMap<>();
-        ResourceLocation identifier = this.getIdentifier();
-        String domain = identifier.getResourceDomain();
-        String path = identifier.getResourcePath();
-        ResourceLocation location = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_idle");
+    	final ResourceLocation identifier = this.getIdentifier();
+    	final String domain = identifier.getResourceDomain();
+    	final String path = identifier.getResourcePath();
+    	final ResourceLocation location = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_idle");
         try {
         	models.put("idle", TabulaModelHelper.loadTabulaModel(location));
 		} catch (IOException e) {
@@ -264,9 +264,9 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
 		}
         
         
-		for (String type : this.getMetadata().skeletonPoses()) {
+		for (final String type : this.getMetadata().skeletonPoses()) {
 
-			ResourceLocation furtherLocation = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_" + type);
+			final ResourceLocation furtherLocation = new ResourceLocation(domain, "models/entities/" + path + "/skeleton/" + path + "_skeleton_" + type);
 			try {
 				models.put(type, TabulaModelHelper.loadTabulaModel(furtherLocation));
 			} catch (IOException e) {
@@ -278,11 +278,11 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         return models;
     }
 
-    public ResourceLocation getMaleTexture(GrowthStage stage) {
+    public ResourceLocation getMaleTexture(final GrowthStage stage) {
         return this.maleTextures.get(stage);
     }
 
-    public ResourceLocation getFemaleTexture(GrowthStage stage) {
+    public ResourceLocation getFemaleTexture(final GrowthStage stage) {
         return this.femaleTextures.get(stage);
     }
 
@@ -304,12 +304,12 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     }
 
     @Override
-    public int compareTo(Dinosaur dinosaur) {
+    public int compareTo(final Dinosaur dinosaur) {
     	return this.getIdentifier().compareTo(dinosaur.getIdentifier());
     }
     
-    public ResourceLocation getOverlayTextures(OverlayType type, DinosaurEntity entity) {
-    	boolean isMale = entity.isMale();
+    public ResourceLocation getOverlayTextures(final OverlayType type, final DinosaurEntity entity) {
+    	final boolean isMale = entity.isMale();
     	if (entity.getGrowthStage() == GrowthStage.SKELETON) {
     		return this.skeletonOverlays.get(type).get(new SkeletonOverlayContainer(entity.getIsFossile(), isMale));
     	}else {
@@ -318,14 +318,13 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
     	return object instanceof Dinosaur && ((Dinosaur) object).getIdentifier().equals(this.getIdentifier());
     }
 
-    public double[] getCubePosition(String cubeName, GrowthStage stage) {
-        TabulaModelContainer model = this.getModelContainer(stage);
-
-        TabulaCubeContainer cube = TabulaModelHelper.getCubeByName(cubeName, model);
+    public double[] getCubePosition(final String cubeName, final GrowthStage stage) {
+    	final TabulaModelContainer model = this.getModelContainer(stage);
+    	final TabulaCubeContainer cube = TabulaModelHelper.getCubeByName(cubeName, model);
 
         if (cube != null) {
             return cube.getPosition();
@@ -334,10 +333,9 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         return new double[] { 0.0, 0.0, 0.0 };
     }
 
-    public double[] getParentedCubePosition(String cubeName, GrowthStage stage, float rot) {
-        TabulaModelContainer model = this.getModelContainer(stage);
-
-        TabulaCubeContainer cube = TabulaModelHelper.getCubeByName(cubeName, model);
+    public double[] getParentedCubePosition(final String cubeName, final GrowthStage stage, final float rot) {
+    	final TabulaModelContainer model = this.getModelContainer(stage);
+    	final TabulaCubeContainer cube = TabulaModelHelper.getCubeByName(cubeName, model);
 
         if (cube != null) {
             return getTransformation(getParentRotationMatrix(model, cube, true, false, rot))[0];
@@ -346,12 +344,12 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         return new double[] { 0.0, 0.0, 0.0 };
     }
 
-    public double[] getHeadPosition(GrowthStage stage, float rot) {
+    public double[] getHeadPosition(final GrowthStage stage, final float rot) {
     	return this.getParentedCubePosition(this.metadata.getHeadCubeName(), stage, rot);
     }
 
-    public TabulaModelContainer getModelContainer(GrowthStage stage) {
-    	TabulaModelContainer model = this.models.get(stage);
+    public TabulaModelContainer getModelContainer(final GrowthStage stage) {
+    	final TabulaModelContainer model = this.models.get(stage);
         if (model == null) {
             return this.models.get(GrowthStage.ADULT);
         }
@@ -359,11 +357,11 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     }
     
     public Map<String, TabulaModelContainer> getSkeletonModel() {
-    	Map<String, TabulaModelContainer> model = this.skeletonModels;
+    	final Map<String, TabulaModelContainer> model = this.skeletonModels;
         return model;
     }
 
-    private void setModelContainer(GrowthStage stage, TabulaModelContainer model) {
+    private void setModelContainer(final GrowthStage stage, final TabulaModelContainer model) {
     	this.models.put(stage, model);
     }
     
@@ -371,7 +369,7 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         return this.poseHandler;
     }
     
-    public DinosaurEntity construct(World world) {
+    public DinosaurEntity construct(final World world) {
         return this.metadata.construct(world);
     }
 
@@ -382,7 +380,7 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         return this.metadata;
     }
     
-    public boolean doesSupportGrowthStage(GrowthStage stage) {
+    public boolean doesSupportGrowthStage(final GrowthStage stage) {
         return stage == GrowthStage.ADULT || stage == GrowthStage.SKELETON;
     }
     
@@ -401,18 +399,18 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
     }
     
     public String getLocalizedName() {
-        ResourceLocation identifier = this.metadata.getIdentifier();
+    	final ResourceLocation identifier = this.metadata.getIdentifier();
         return I18n.translateToLocal("entity." + identifier.getResourceDomain() + "." + identifier.getResourcePath() + ".name");
     }
 
-    public enum DinosaurType {
+    public static enum DinosaurType {
         AGGRESSIVE,
         NEUTRAL,
         PASSIVE,
         SCARED
     }
 
-    public enum BirthType {
+    public static enum BirthType {
         LIVE_BIRTH,
         EGG_LAYING
     }

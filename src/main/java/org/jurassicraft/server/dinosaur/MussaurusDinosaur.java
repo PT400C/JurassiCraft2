@@ -3,9 +3,7 @@ package org.jurassicraft.server.dinosaur;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
-
-import java.util.ArrayList;
-
+import java.util.HashMap;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.OverlayType;
@@ -13,6 +11,14 @@ import org.jurassicraft.server.entity.dinosaur.MussaurusEntity;
 import org.jurassicraft.server.period.TimePeriod;
 
 public class MussaurusDinosaur extends Dinosaur {
+	
+	private static final HashMap<String, Float> offsets = new HashMap<String, Float>() {{
+		put("Neck", null);
+		put("Snout", null);
+		put("Tail", null);
+		put("LBF", null);
+		put("RBF", null);
+	}};
 	
     @Override
     protected DinosaurMetadata buildMetadata() {
@@ -39,6 +45,7 @@ public class MussaurusDinosaur extends Dinosaur {
                 .setFlockSpeed(1.25F)
                 .setMaxHerdSize(20)
                 .setAttackBias(-500.0)
+                .setOffsetCubes(offsets)
                 .setOffset(0.0F, 0.0F, 0.5F)
                 .setBreeding(false, 2, 8, 15, false, true)
                 .setRecipe(new String[][] {

@@ -52,25 +52,29 @@ import java.util.Random;
 
 public class ServerEventHandler {
 	
-	public static ArrayList<Block> vinesException = new ArrayList<>();
+	private static final ArrayList<Block> vinesException = new ArrayList<>();
 	
-	public ServerEventHandler() {
-		this.vinesException.add(BlockHandler.CLEAR_GLASS);
-		this.vinesException.add(BlockHandler.REINFORCED_GLASS);
+	static {
+		vinesException.add(BlockHandler.CLEAR_GLASS);
+		vinesException.add(BlockHandler.REINFORCED_GLASS);
+	}
+	
+	public static final ArrayList<Block> getVinesExceptions() {
+		return vinesException;
 	}
 
     @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event) {
+    public static void onWorldLoad(WorldEvent.Load event) {
         GameRuleHandler.register(event.getWorld());
     }
     
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void blockRegistry(RegistryEvent.Register<Block> e) {
+    public static void blockRegistry(RegistryEvent.Register<Block> e) {
     	e.getRegistry().register(BlockHandler.VINES.setRegistryName("minecraft", "vine"));
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void decorate(DecorateBiomeEvent.Pre event) {
+    public static void decorate(DecorateBiomeEvent.Pre event) {
         World world = event.getWorld();
         BlockPos pos = event.getPos();
         Random rand = event.getRand();
@@ -183,7 +187,7 @@ public class ServerEventHandler {
 
 
     @SubscribeEvent
-    public void onLootTableLoad(LootTableLoadEvent event) {
+    public static void onLootTableLoad(LootTableLoadEvent event) {
         ResourceLocation name = event.getName();
 
         LootTable table = event.getTable();
@@ -191,11 +195,11 @@ public class ServerEventHandler {
         Loot.handleTable(table, name);
     }
     @SubscribeEvent
-    public void fall(LivingFallEvent e){
+    public static void fall(LivingFallEvent e){
         e.setCanceled(e.getEntity().getRidingEntity() instanceof HelicopterEntity);
     }
     @SubscribeEvent
-    public void onHarvest(BlockEvent.HarvestDropsEvent event) {
+    public static void onHarvest(BlockEvent.HarvestDropsEvent event) {
         IBlockState state = event.getState();
         Random rand = event.getWorld().rand;
         if (rand.nextInt(2) == 0) {
@@ -225,7 +229,7 @@ public class ServerEventHandler {
     }
     
     @SubscribeEvent
-	public void onEntitySpawn(EntityJoinWorldEvent event) {
+	public static void onEntitySpawn(EntityJoinWorldEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof EntityVillager) {
 			EntityVillager villager = (EntityVillager) entity;

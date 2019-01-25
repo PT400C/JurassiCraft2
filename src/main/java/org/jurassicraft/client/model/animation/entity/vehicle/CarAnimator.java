@@ -18,8 +18,8 @@ public class CarAnimator implements ITabulaModelAnimator<VehicleEntity> {
     public float partialTicks;
 
     public CarAnimator addDoor(Door door) {
-	this.doorList.add(door);
-	return this;
+    	this.doorList.add(door);
+    	return this;
     }
     
     @Override

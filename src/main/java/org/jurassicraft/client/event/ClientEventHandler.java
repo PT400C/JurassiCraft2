@@ -39,35 +39,35 @@ import org.lwjgl.opengl.GL11;
 
 public class ClientEventHandler {
 	
-    private static final Minecraft MC = Minecraft.getMinecraft();
+    public static final Minecraft MC = Minecraft.getMinecraft();
     private static final ResourceLocation PATREON_BADGE = new ResourceLocation(JurassiCraft.MODID, "textures/items/patreon_badge.png");
 
-    private boolean isGUI;
+    private static boolean isGUI;
 
     @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event) {
+    public static void tick(TickEvent.ClientTickEvent event) {
         JurassiCraft.timerTicks++;
     }
 
     @SubscribeEvent
-    public void onGUIRender(GuiScreenEvent.DrawScreenEvent.Pre event) {
-        this.isGUI = true;
+    public static void onGUIRender(GuiScreenEvent.DrawScreenEvent.Pre event) {
+        isGUI = true;
     }
 
     @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event) {
+    public static void onRenderTick(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
-            this.isGUI = false;
+            isGUI = false;
         }
     }
 
     @SubscribeEvent
-    public void onGameOverlay(RenderGameOverlayEvent.Post event) {
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer player = mc.player;
+    public static void onGameOverlay(RenderGameOverlayEvent.Post event) {
+    	final Minecraft mc = Minecraft.getMinecraft();
+    	final EntityPlayer player = mc.player;
 
-        for(EnumHand hand : EnumHand.values()) {
-            ItemStack stack = player.getHeldItem(hand);
+        for(final EnumHand hand : EnumHand.values()) {
+        	final ItemStack stack = player.getHeldItem(hand);
             if(stack.getItem() == ItemHandler.DART_GUN) {
                 ItemStack dartItem = DartGun.getDartItem(stack);
                 if(!dartItem.isEmpty()) {
@@ -90,7 +90,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void keyInputEvent(InputEvent.KeyInputEvent event) {
+    public static void keyInputEvent(InputEvent.KeyInputEvent event) {
         int i = 0;
         for(KeyBinding binding : ClientProxy.getKeyHandler().VEHICLE_KEY_BINDINGS) {
             if(binding.isPressed()) {
@@ -110,15 +110,15 @@ public class ClientEventHandler {
 
 
     @SubscribeEvent
-    public void onPlayerRender(RenderPlayerEvent.Post event) {
-        EntityPlayer player = event.getEntityPlayer();
+    public static void onPlayerRender(RenderPlayerEvent.Post event) {
+    	final EntityPlayer player = event.getEntityPlayer();
 
-        if (!player.isPlayerSleeping() && player.deathTime <= 0 && !player.isInvisible() && !player.isInvisibleToPlayer(MC.player) && ClientProxy.PATRONS.contains(player.getUniqueID())) {
+        if (ClientProxy.PATRONS.contains(player.getUniqueID()) && !player.isPlayerSleeping() && player.deathTime <= 0 && !player.isInvisible() && !player.isInvisibleToPlayer(MC.player)) {
             GlStateManager.pushMatrix();
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            if (this.isGUI) {
+            if (isGUI) {
                 OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
             }
 
@@ -126,7 +126,7 @@ public class ClientEventHandler {
 
             GlStateManager.translate(event.getX(), event.getY(), event.getZ());
 
-            GlStateManager.rotate(-ClientUtils.interpolate(this.isGUI ? player.renderYawOffset : player.prevRenderYawOffset, player.renderYawOffset, LLibrary.PROXY.getPartialTicks()), 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-ClientUtils.interpolate(isGUI ? player.renderYawOffset : player.prevRenderYawOffset, player.renderYawOffset, LLibrary.PROXY.getPartialTicks()), 0.0F, 1.0F, 0.0F);
 
             if (player.isSneaking()) {
                 GlStateManager.translate(0.0F, -0.3F, 0.0F);
@@ -140,7 +140,7 @@ public class ClientEventHandler {
 
             GlStateManager.translate(-0.1F, 1.4F, 0.14F);
 
-            float scale = 0.35F;
+            final float scale = 0.35F;
 
             GlStateManager.scale(scale, -scale, scale);
 
@@ -160,28 +160,28 @@ public class ClientEventHandler {
 
             GlStateManager.popMatrix();
 
-            if (this.isGUI) {
+            if (isGUI) {
                 OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, OpenGlHelper.lastBrightnessX, OpenGlHelper.lastBrightnessY);
             }
         }
     }
     
 	@SubscribeEvent
-	public void onRenderWorldLast(RenderWorldLastEvent event) {
+	public static void onRenderWorldLast(RenderWorldLastEvent event) {
 
-		Minecraft mc = Minecraft.getMinecraft();
+		final Minecraft mc = Minecraft.getMinecraft();
 		if (!Minecraft.isGuiEnabled())
 			return;
 		
-		Entity cameraEntity = mc.getRenderViewEntity();
+		final Entity cameraEntity = mc.getRenderViewEntity();
 		Frustum frustrum = new Frustum();
-		double viewX = cameraEntity.lastTickPosX + (cameraEntity.posX - cameraEntity.lastTickPosX) * event.getPartialTicks();
-		double viewY = cameraEntity.lastTickPosY + (cameraEntity.posY - cameraEntity.lastTickPosY) * event.getPartialTicks();
-		double viewZ = cameraEntity.lastTickPosZ + (cameraEntity.posZ - cameraEntity.lastTickPosZ) * event.getPartialTicks();
+		final double viewX = cameraEntity.lastTickPosX + (cameraEntity.posX - cameraEntity.lastTickPosX) * event.getPartialTicks();
+		final double viewY = cameraEntity.lastTickPosY + (cameraEntity.posY - cameraEntity.lastTickPosY) * event.getPartialTicks();
+		final double viewZ = cameraEntity.lastTickPosZ + (cameraEntity.posZ - cameraEntity.lastTickPosZ) * event.getPartialTicks();
 		frustrum.setPosition(viewX, viewY, viewZ);
 
-		List<Entity> loadedEntities = mc.world.getLoadedEntityList();
-		for (Entity entity : loadedEntities) {
+		final List<Entity> loadedEntities = mc.world.getLoadedEntityList();
+		for (final Entity entity : loadedEntities) {
 			if (entity != null && entity instanceof DinosaurEntity) {
 				if (entity.isInRangeToRender3d(cameraEntity.getPosition().getX(), cameraEntity.getPosition().getY(), cameraEntity.getPosition().getZ()) && (frustrum.isBoundingBoxInFrustum(entity.getRenderBoundingBox().grow(0.5D))) && entity.isEntityAlive()) {
 					((DinosaurEntity) entity).isRendered = true;

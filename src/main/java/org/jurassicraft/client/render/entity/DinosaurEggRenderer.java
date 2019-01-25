@@ -10,6 +10,7 @@ import org.jurassicraft.client.render.entity.dinosaur.DinosaurRenderInfo;
 import org.jurassicraft.server.entity.item.DinosaurEggEntity;
 
 public class DinosaurEggRenderer implements IRenderFactory<DinosaurEggEntity> {
+	
     @Override
     public Render<? super DinosaurEggEntity> createRenderFor(RenderManager manager) {
         return new Renderer(manager);
@@ -27,7 +28,7 @@ public class DinosaurEggRenderer implements IRenderFactory<DinosaurEggEntity> {
             GlStateManager.translate((float) x, (float) y + 1.5F, (float) z);
             GlStateManager.rotate(180.0F - yaw, 0.0F, 1.0F, 0.0F);
 
-            float scale = 0.75F;
+            final float scale = 0.75F;
             GlStateManager.scale(scale, scale, scale);
             GlStateManager.scale(1.0F / scale, 1.0F / scale, 1.0F / scale);
             this.bindEntityTexture(egg);

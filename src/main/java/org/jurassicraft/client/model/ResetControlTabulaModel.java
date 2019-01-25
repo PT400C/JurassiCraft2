@@ -9,11 +9,11 @@ public class ResetControlTabulaModel<T extends Entity> extends TabulaModel {
     private final ITabulaModelAnimator<T> animator;
     private boolean resetAllowed;
 
-    public ResetControlTabulaModel(TabulaModelContainer model) {
+    public ResetControlTabulaModel(final TabulaModelContainer model) {
         this(model, null);
     }
 
-    public ResetControlTabulaModel(TabulaModelContainer model, ITabulaModelAnimator<T> animator) {
+    public ResetControlTabulaModel(final TabulaModelContainer model, final ITabulaModelAnimator<T> animator) {
         super(model, animator);
         this.animator = animator;
     }
@@ -29,11 +29,11 @@ public class ResetControlTabulaModel<T extends Entity> extends TabulaModel {
         }
     }
 
-    public void setResetEachFrame(boolean reset) {
+    public void setResetEachFrame(final boolean reset) {
         this.resetAllowed = reset;
     }
     
     public ITabulaModelAnimator<T> getAnimator() {
-	return animator;
+    	return animator;
     }
 }

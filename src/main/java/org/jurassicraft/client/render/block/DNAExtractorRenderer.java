@@ -8,18 +8,19 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+
+import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.block.OrientedBlock;
 import org.jurassicraft.server.block.entity.DNAExtractorBlockEntity;
 import org.lwjgl.opengl.GL11;
 
 public class DNAExtractorRenderer extends TileEntitySpecialRenderer<DNAExtractorBlockEntity> {
-    private Minecraft mc = Minecraft.getMinecraft();
-
+	
     @Override
-    public void render(DNAExtractorBlockEntity tileEntity, double x, double y, double z, float p_180535_8_, int p_180535_9_, float alpha) {
-        IBlockState state = tileEntity.getWorld().getBlockState(tileEntity.getPos());
-        ItemStack extraction = tileEntity.getStackInSlot(0);
+    public void render(final DNAExtractorBlockEntity tileEntity, final double x, final double y, final double z, final float p_180535_8_, final int p_180535_9_, final float alpha) {
+    	final IBlockState state = tileEntity.getWorld().getBlockState(tileEntity.getPos());
+        final ItemStack extraction = tileEntity.getStackInSlot(0);
 
         if (extraction != null && state.getBlock() == BlockHandler.DNA_EXTRACTOR) {
             GlStateManager.pushMatrix();
@@ -36,16 +37,16 @@ public class DNAExtractorRenderer extends TileEntitySpecialRenderer<DNAExtractor
                 facing = facing.getOpposite();
             }
 
-            int rotation = facing.getHorizontalIndex() * 90;
+            final int rotation = facing.getHorizontalIndex() * 90;
 
             GlStateManager.rotate(rotation - 180, 0, 1, 0);
 
-            double scale = 1.0;
+            final double scale = 1.0;
             GlStateManager.scale(-scale, -scale, scale);
 
-            this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            ClientEventHandler.MC.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-            RenderItem renderItem = this.mc.getRenderItem();
+            final RenderItem renderItem = ClientEventHandler.MC.getRenderItem();
 
             GlStateManager.translate(0.225, 1.25, -0.125);
             GlStateManager.rotate(-90, 1, 0, 0);

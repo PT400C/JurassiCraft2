@@ -1,19 +1,26 @@
 package org.jurassicraft.server.dinosaur;
 
-import java.util.ArrayList;
-
+import java.util.HashMap;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.GallimimusEntity;
 import org.jurassicraft.server.food.FoodType;
 import org.jurassicraft.server.period.TimePeriod;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
 public class GallimimusDinosaur extends Dinosaur {
+	
+	private static final HashMap<String, Float> offsets = new HashMap<String, Float>() {{
+		put("Neck", null);
+		put("Upper jaw part 1", null);
+		put("Tail", null);
+		put("Upper jaw beak", null);
+		put("Head slope", null);
+		put("ankle", null);
+	}};
 	
 	@Override
     protected DinosaurMetadata buildMetadata() {
@@ -40,6 +47,7 @@ public class GallimimusDinosaur extends Dinosaur {
                 .setFlockSpeed(1.4F)
                 .setBreeding(false, 2, 6, 20, false, true)
                 .setJumpHeight(3)
+                .setOffsetCubes(offsets)
                 .setSpawn(25, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.DRY)
                 .setOverlays(OverlayType.EYELID)
                 .setRecipe(new String[][] {

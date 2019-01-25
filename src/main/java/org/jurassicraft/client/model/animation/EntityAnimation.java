@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
 
 public enum EntityAnimation {
+	
     IDLE(false, false, false),
     ATTACKING(false, false),
     INJURED(false, false),
@@ -136,24 +137,24 @@ public enum EntityAnimation {
         return this.useInertia;
     }
     
-}
-
-class IdentifierContainer {
-	
-	private final Class name;
-	private final int variants;
-	
-	public IdentifierContainer(Class name, int variants) {
-		this.name = name;
-		this.variants = variants;
-	}
-	
-	public Class getName(){
-		return this.name;
-	}
-	
-	public int getVariant(){
-		return this.variants;
-	}
-	
+    private static class IdentifierContainer {
+    	
+    	private final Class name;
+    	private final int variants;
+    	
+    	public IdentifierContainer(Class name, int variants) {
+    		this.name = name;
+    		this.variants = variants;
+    	}
+    	
+    	public Class getName(){
+    		return this.name;
+    	}
+    	
+    	public int getVariant(){
+    		return this.variants;
+    	}
+    	
+    }
+    
 }

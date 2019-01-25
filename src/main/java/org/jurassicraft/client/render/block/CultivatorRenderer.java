@@ -8,16 +8,17 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
+
+import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.server.block.entity.CultivatorBlockEntity;
 import org.jurassicraft.server.entity.DinosaurEntity;
 
 import javax.vecmath.Vector3f;
 
 public class CultivatorRenderer extends TileEntitySpecialRenderer<CultivatorBlockEntity> {
-    private Minecraft mc = Minecraft.getMinecraft();
 
     @Override
-    public void render(CultivatorBlockEntity tileEntity, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+    public void render(final CultivatorBlockEntity tileEntity, final double x, final double y, final double z, final float partialTicks, final int destroyStage, final float alpha) {
         GlStateManager.pushMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.translate(x + 0.5, y + 1, z + 0.5);
@@ -37,11 +38,11 @@ public class CultivatorRenderer extends TileEntitySpecialRenderer<CultivatorBloc
 //
 //        if(tileEntity.isProcessing(0))
         {
-            long timer = getWorld().getTotalWorldTime();
-            ItemStack stack = tileEntity.getStackInSlot(0);
+        	final long timer = getWorld().getTotalWorldTime();
+        	final ItemStack stack = tileEntity.getStackInSlot(0);
             GlStateManager.rotate((timer * 4F) % 360, 0 , 1, 0);
             GlStateManager.translate(0, Math.sin(timer / 7D) * 0.5f, 0);
-            this.mc.getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.GROUND);
+            ClientEventHandler.MC.getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.GROUND);
         }
 
         GlStateManager.popMatrix();

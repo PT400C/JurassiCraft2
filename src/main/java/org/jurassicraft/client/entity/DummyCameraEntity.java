@@ -1,4 +1,7 @@
-package org.jurassicraft.client.entity;
+//Created by Compaszer, currently not used!
+
+
+/*package org.jurassicraft.client.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -42,3 +45,4 @@ public class DummyCameraEntity extends EntityPlayerSP {
 		System.out.println("POS: " + this.posX + ";" + this.posY + ";" + this.posZ);
 	}
 }
+*/

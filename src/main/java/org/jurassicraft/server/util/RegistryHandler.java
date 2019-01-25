@@ -93,17 +93,17 @@ public class RegistryHandler
     }
 
     @SubscribeEvent
-    public void registerBlocks(RegistryEvent.Register<Block> event) {
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().registerAll(blocksToReg.toArray(new Block[blocksToReg.size()]));
     }
 
     @SubscribeEvent
-    public void registerItems(RegistryEvent.Register<Item> event) {
+    public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(itemsToReg.toArray(new Item[itemsToReg.size()]));
     }
 
     @SubscribeEvent
-    public void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
+    public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
         for(IForgeRegistryEntry e : otherItems) {
             if(e instanceof Enchantment) call(event, e);
         }
@@ -115,7 +115,7 @@ public class RegistryHandler
         event.getRegistry().registerAll(sounds.toArray(new SoundEvent[sounds.size()]));
     }
 
-    private <K extends IForgeRegistryEntry<K>, T> void call(RegistryEvent.Register<K> event, T value) {
+    private static <K extends IForgeRegistryEntry<K>, T> void call(RegistryEvent.Register<K> event, T value) {
         event.getRegistry().register((K) value);
     }
 
@@ -134,7 +134,7 @@ public class RegistryHandler
     }
 
     @SubscribeEvent
-    public void missingMapBlock(RegistryEvent.MissingMappings<Block> event) {
+    public static void missingMapBlock(RegistryEvent.MissingMappings<Block> event) {
         for (RegistryEvent.MissingMappings.Mapping<Block> missing : event.getMappings()) {
             ResourceLocation identifier = new ResourceLocation(missing.key.getResourcePath());
             if (identifier.equals(new ResourceLocation(JurassiCraft.MODID, "action_figure_block"))) {
@@ -143,7 +143,7 @@ public class RegistryHandler
         }
     }
     @SubscribeEvent
-    public void missingMapItem(RegistryEvent.MissingMappings<Item> event) {
+    public static void missingMapItem(RegistryEvent.MissingMappings<Item> event) {
         for (RegistryEvent.MissingMappings.Mapping<Item> missing : event.getMappings()) {
             ResourceLocation identifier = new ResourceLocation(missing.key.getResourcePath());
             if (identifier.equals(new ResourceLocation(JurassiCraft.MODID, "action_figure"))) {

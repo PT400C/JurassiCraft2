@@ -20,6 +20,7 @@ import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.tools.nsc.settings.Final;
 
 import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
@@ -35,12 +36,12 @@ import java.util.function.Function;
  */
 @SideOnly(Side.CLIENT)
 public class JurassicraftVanillaTabulaModel implements IModel {
-    private TabulaModelContainer model;
-    private ResourceLocation particle;
-    private ImmutableList<ResourceLocation> textures;
-    private ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms;
+    private final TabulaModelContainer model;
+    private final ResourceLocation particle;
+    private final ImmutableList<ResourceLocation> textures;
+    private final ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms;
 
-    public JurassicraftVanillaTabulaModel(TabulaModelContainer model, ResourceLocation particle, ImmutableList<ResourceLocation> textures, ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms) {
+    public JurassicraftVanillaTabulaModel(final TabulaModelContainer model, final ResourceLocation particle, final ImmutableList<ResourceLocation> textures, final ImmutableMap<ItemCameraTransforms.TransformType, TRSRTransformation> transforms) {
         this.model = model;
         this.particle = particle;
         this.textures = textures;
@@ -58,35 +59,35 @@ public class JurassicraftVanillaTabulaModel implements IModel {
     }
 
     @Override
-    public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+    public IBakedModel bake(final IModelState state, final VertexFormat format, final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
         List<ResourceLocation> locations = Lists.newArrayList(this.textures);
         if(locations.isEmpty()) {
             locations.add(new ResourceLocation("missingno"));
         }
-        ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
-        TextureAtlasSprite particleSprite = this.particle == null ? bakedTextureGetter.apply(locations.get(0)) : bakedTextureGetter.apply(this.particle);
+        final ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
+        final TextureAtlasSprite particleSprite = this.particle == null ? bakedTextureGetter.apply(locations.get(0)) : bakedTextureGetter.apply(this.particle);
         int layer = 0;
-        for(ResourceLocation resourceLocation : locations) {
+        for(final ResourceLocation resourceLocation : locations) {
             Matrix matrix = new Matrix();
-            TextureAtlasSprite sprite = bakedTextureGetter.apply(resourceLocation);
-            TRSRTransformation transformation = state.apply(Optional.empty()).orElse(TRSRTransformation.identity());
+            final TextureAtlasSprite sprite = bakedTextureGetter.apply(resourceLocation);
+            final TRSRTransformation transformation = state.apply(Optional.empty()).orElse(TRSRTransformation.identity());
             matrix.multiply(transformation.getMatrix());
             matrix.translate(0.5F, 1.5F, 0.5F);
             matrix.scale(-0.0625F, -0.0625F, 0.0625F);
             this.build(matrix, builder, format, this.model.getCubes(), sprite, layer++);
         }
-        ImmutableList<BakedQuad> leQuads = builder.build();
+        final ImmutableList<BakedQuad> leQuads = builder.build();
         return new BakedTabulaModel(leQuads, particleSprite, this.transforms);
     }
 
-    private void build(Matrix mat, ImmutableList.Builder<BakedQuad> builder, VertexFormat format, List<TabulaCubeContainer> cubeContainerList, TextureAtlasSprite sprite, int layer) {
-        for (TabulaCubeContainer cube : cubeContainerList) {
-            int[] dimensions = cube.getDimensions();
-            double[] position = cube.getPosition();
-            double[] offset = cube.getOffset();
-            double[] rotation = cube.getRotation();
-            double[] glScale = cube.getScale();
-            int[] txOffset = cube.getTextureOffset();
+    private void build(Matrix mat, final ImmutableList.Builder<BakedQuad> builder, final VertexFormat format, final List<TabulaCubeContainer> cubeContainerList, final TextureAtlasSprite sprite, final int layer) {
+        for (final TabulaCubeContainer cube : cubeContainerList) {
+        	final int[] dimensions = cube.getDimensions();
+            final double[] position = cube.getPosition();
+            final double[] offset = cube.getOffset();
+            final double[] rotation = cube.getRotation();
+            final double[] glScale = cube.getScale();
+            final int[] txOffset = cube.getTextureOffset();
             boolean hasTransparency = this.hasTransparency(cube, sprite);
             mat.push();
             mat.translate(position[0], position[1], position[2]);
@@ -102,29 +103,29 @@ public class JurassicraftVanillaTabulaModel implements IModel {
             if (rotation[0] != 0) {
                 mat.rotate(rotation[0], 1, 0, 0);
             }
-            float x = (float) offset[0], y = (float) offset[1], z = (float) offset[2];
-            float s = (float) cube.getMCScale();
-            int w = dimensions[0], h = dimensions[1], d = dimensions[2];
+            final float x = (float) offset[0], y = (float) offset[1], z = (float) offset[2];
+            final float s = (float) cube.getMCScale();
+            final int w = dimensions[0], h = dimensions[1], d = dimensions[2];
             float x0 = (x - s);
-            float y0 = (y - s);
-            float z0 = (z - s);
+            final float y0 = (y - s);
+            final float z0 = (z - s);
             float x1 = (x + s + w);
-            float y1 = (y + s + h);
-            float z1 = (z + s + d);
+            final float y1 = (y + s + h);
+            final float z1 = (z + s + d);
             boolean isTxMirror = cube.isTextureMirrorEnabled();
             if (isTxMirror) {
                 float x1_ = x1;
                 x1 = x0;
                 x0 = x1_;
             }
-            Point3f vertex000 = new Point3f(x0, y0, z0);
-            Point3f vertex100 = new Point3f(x1, y0, z0);
-            Point3f vertex110 = new Point3f(x1, y1, z0);
-            Point3f vertex010 = new Point3f(x0, y1, z0);
-            Point3f vertex001 = new Point3f(x0, y0, z1);
-            Point3f vertex101 = new Point3f(x1, y0, z1);
-            Point3f vertex111 = new Point3f(x1, y1, z1);
-            Point3f vertex011 = new Point3f(x0, y1, z1);
+            final Point3f vertex000 = new Point3f(x0, y0, z0);
+            final Point3f vertex100 = new Point3f(x1, y0, z0);
+            final Point3f vertex110 = new Point3f(x1, y1, z0);
+            final Point3f vertex010 = new Point3f(x0, y1, z0);
+            final Point3f vertex001 = new Point3f(x0, y0, z1);
+            final Point3f vertex101 = new Point3f(x1, y0, z1);
+            final Point3f vertex111 = new Point3f(x1, y1, z1);
+            final Point3f vertex011 = new Point3f(x0, y1, z1);
             mat.transform(vertex000);
             mat.transform(vertex100);
             mat.transform(vertex110);
@@ -133,17 +134,17 @@ public class JurassicraftVanillaTabulaModel implements IModel {
             mat.transform(vertex101);
             mat.transform(vertex111);
             mat.transform(vertex011);
-            int u = txOffset[0], v = txOffset[1];
-            Point2i rightMinUV = new Point2i(u + d + w, v + d);
-            Point2i rightMaxUV = new Point2i(u + d + w + d, v + d + h);
-            Point2i leftMinUV = new Point2i(u, v + d);
-            Point2i leftMaxUV = new Point2i(u + d, v + d + h);
-            Point2i topMinUV = new Point2i(u + d, v);
-            Point2i topMaxUV = new Point2i(u + d + w + w, v);
-            Point2i frontMinUV = new Point2i(u + d, v + d);
-            Point2i frontMaxUV = new Point2i(u + d + w, v + d + h);
-            Point2i backMinUV = new Point2i(u + d + w + d, v + d);
-            Point2i backMaxUV = new Point2i(u + d + w + d + w, v + d + h);
+            final int u = txOffset[0], v = txOffset[1];
+            final Point2i rightMinUV = new Point2i(u + d + w, v + d);
+            final Point2i rightMaxUV = new Point2i(u + d + w + d, v + d + h);
+            final Point2i leftMinUV = new Point2i(u, v + d);
+            final Point2i leftMaxUV = new Point2i(u + d, v + d + h);
+            final Point2i topMinUV = new Point2i(u + d, v);
+            final Point2i topMaxUV = new Point2i(u + d + w + w, v);
+            final Point2i frontMinUV = new Point2i(u + d, v + d);
+            final Point2i frontMaxUV = new Point2i(u + d + w, v + d + h);
+            final Point2i backMinUV = new Point2i(u + d + w + d, v + d);
+            final Point2i backMaxUV = new Point2i(u + d + w + d + w, v + d + h);
             this.buildQuad(builder, format, isTxMirror, vertex101, vertex100, vertex110, vertex111, rightMinUV, rightMaxUV, sprite, hasTransparency, layer);
             this.buildQuad(builder, format, isTxMirror, vertex000, vertex001, vertex011, vertex010, leftMinUV, leftMaxUV, sprite, hasTransparency, layer);
             this.buildQuad(builder, format, isTxMirror, vertex101, vertex001, vertex000, vertex100, topMinUV, rightMinUV, sprite, hasTransparency, layer);
@@ -155,22 +156,22 @@ public class JurassicraftVanillaTabulaModel implements IModel {
         }
     }
 
-    private boolean hasTransparency(TabulaCubeContainer cube, TextureAtlasSprite sprite) {
-        int textureWidth = this.model.getTextureWidth();
-        int textureHeight = this.model.getTextureHeight();
-        int width = sprite.getIconWidth();
-        int height = sprite.getIconHeight();
-        int frameCount = sprite.getFrameCount();
+    private boolean hasTransparency(final TabulaCubeContainer cube, final TextureAtlasSprite sprite) {
+    	final int textureWidth = this.model.getTextureWidth();
+        final int textureHeight = this.model.getTextureHeight();
+        final int width = sprite.getIconWidth();
+        final int height = sprite.getIconHeight();
+        final int frameCount = sprite.getFrameCount();
         if (frameCount > 0) {
             for (int i = 0; i < frameCount; i++) {
-                int[] pixels = sprite.getFrameTextureData(i)[0];
-                int[] textureOffset = cube.getTextureOffset();
-                int[] dimensions = cube.getDimensions();
-                int textureX = (textureOffset[0] * width) / textureWidth;
-                int textureY = (textureOffset[1] * height) / textureHeight;
-                int dimensionX = (dimensions[0] * width) / textureWidth;
-                int dimensionY = (dimensions[1] * height) / textureHeight;
-                int dimensionZ = (dimensions[2] * width) / textureWidth;
+            	final int[] pixels = sprite.getFrameTextureData(i)[0];
+            	final int[] textureOffset = cube.getTextureOffset();
+            	final int[] dimensions = cube.getDimensions();
+            	final int textureX = (textureOffset[0] * width) / textureWidth;
+            	final int textureY = (textureOffset[1] * height) / textureHeight;
+            	final int dimensionX = (dimensions[0] * width) / textureWidth;
+                final int dimensionY = (dimensions[1] * height) / textureHeight;
+                final int dimensionZ = (dimensions[2] * width) / textureWidth;
                 boolean hasTransparencyTop = this.hasTransparency(pixels, textureX + dimensionZ, textureY, dimensionX * 2, dimensionZ, width, height);
                 boolean hasTransparencyBottom = this.hasTransparency(pixels, textureX, textureY + dimensionZ, (dimensionX + dimensionZ) * 2, dimensionY, width, height);
                 if (hasTransparencyTop || hasTransparencyBottom) {
@@ -181,13 +182,13 @@ public class JurassicraftVanillaTabulaModel implements IModel {
         return false;
     }
 
-    private boolean hasTransparency(int[] pixels, int minX, int minY, int dimensionX, int dimensionY, int width, int height) {
-        int maxX = Math.min(width, minX + dimensionX);
-        int maxY = Math.min(height, minY + dimensionY);
+    private boolean hasTransparency(final int[] pixels, final int minX, final int minY, final int dimensionX, final int dimensionY, final int width, final int height) {
+    	final int maxX = Math.min(width, minX + dimensionX);
+    	final int maxY = Math.min(height, minY + dimensionY);
         for (int x = Math.max(0, minX); x < maxX; x++) {
             for (int y = Math.max(0, minY); y < maxY; y++) {
-                int pixel = pixels[x + y * width];
-                int alpha = (pixel >> 24) & 0xFF;
+            	final int pixel = pixels[x + y * width];
+                final int alpha = (pixel >> 24) & 0xFF;
                 if (alpha < 255) {
                     return true;
                 }
@@ -196,15 +197,15 @@ public class JurassicraftVanillaTabulaModel implements IModel {
         return false;
     }
 
-    private void buildQuad(ImmutableList.Builder<BakedQuad> builder, VertexFormat format, boolean isTxMirror, Point3f vert0, Point3f vert1, Point3f vert2, Point3f vert3, Point2i minUV, Point2i maxUV, TextureAtlasSprite sprite, boolean hasTransparency, int layer) {
+    private void buildQuad(final ImmutableList.Builder<BakedQuad> builder, final VertexFormat format, boolean isTxMirror, final Point3f vert0, final Point3f vert1, final Point3f vert2, final Point3f vert3, final Point2i minUV, final Point2i maxUV, final TextureAtlasSprite sprite, boolean hasTransparency, final int layer) {
         Point3f[] vertices = { vert0, vert1, vert2, vert3 };
         if (this.isQuadOneDimensional(vertices)) {
             return;
         }
         Point2i[] uvs = { new Point2i(maxUV.x, minUV.y), new Point2i(minUV.x, minUV.y), new Point2i(minUV.x, maxUV.y), new Point2i(maxUV.x, maxUV.y) };
         if (isTxMirror) {
-            Point3f[] verticesMirrored = new Point3f[vertices.length];
-            Point2i[] uvsMirrored = new Point2i[vertices.length];
+        	final Point3f[] verticesMirrored = new Point3f[vertices.length];
+        	final Point2i[] uvsMirrored = new Point2i[vertices.length];
             for (int i = 0, j = vertices.length - 1; i < vertices.length; i++, j--) {
                 verticesMirrored[i] = vertices[j];
                 uvsMirrored[i] = uvs[j];
@@ -212,21 +213,21 @@ public class JurassicraftVanillaTabulaModel implements IModel {
             vertices = verticesMirrored;
             uvs = uvsMirrored;
         }
-        Vector3f v01 = new Vector3f(), v21 = new Vector3f(), normal = new Vector3f();
+        final Vector3f v01 = new Vector3f(), v21 = new Vector3f(), normal = new Vector3f();
         v01.sub(vertices[0], vertices[1]);
         v21.sub(vertices[2], vertices[1]);
         normal.cross(v21, v01);
         normal.normalize();
-        UnpackedBakedQuad.Builder quadBuilder = new UnpackedBakedQuad.Builder(format);
-        EnumFacing quadFacing = EnumFacing.getFacingFromVector(normal.x, normal.y, normal.z);
+        final UnpackedBakedQuad.Builder quadBuilder = new UnpackedBakedQuad.Builder(format);
+        final EnumFacing quadFacing = EnumFacing.getFacingFromVector(normal.x, normal.y, normal.z);
         quadBuilder.setQuadOrientation(quadFacing);
         quadBuilder.setTexture(sprite);
         quadBuilder.setQuadTint(layer);
-        float width = this.model.getTextureWidth();
-        float height = this.model.getTextureHeight();
+        final float width = this.model.getTextureWidth();
+        final float height = this.model.getTextureHeight();
         for (int i = 0; i < vertices.length; i++) {
-            Point2i uvi = uvs[i];
-            Point2f uv = new Point2f(sprite.getInterpolatedU(uvi.x / width * 16), sprite.getInterpolatedV(uvi.y / height * 16));
+        	final Point2i uvi = uvs[i];
+        	final Point2f uv = new Point2f(sprite.getInterpolatedU(uvi.x / width * 16), sprite.getInterpolatedV(uvi.y / height * 16));
             this.putVertexData(quadBuilder, format, vertices[i], normal, uv);
         }
 
@@ -246,11 +247,11 @@ public class JurassicraftVanillaTabulaModel implements IModel {
 
     }
 
-    private boolean isQuadOneDimensional(Point3f[] vertices) {
+    private boolean isQuadOneDimensional(final Point3f[] vertices) {
         for (int i = 0; i < vertices.length; i++) {
-            Point3f vertex = vertices[i];
+        	final Point3f vertex = vertices[i];
             for (int n = i + 1; n < vertices.length; n++) {
-                float epsilon = 1e-4F;
+            	final float epsilon = 1e-4F;
                 if (vertex.epsilonEquals(vertices[n], epsilon)) {
                     return true;
                 }
@@ -259,7 +260,7 @@ public class JurassicraftVanillaTabulaModel implements IModel {
         return false;
     }
 
-    private void putVertexData(UnpackedBakedQuad.Builder builder, VertexFormat format, Point3f vert, Vector3f normal, Point2f uv) {
+    private void putVertexData(final UnpackedBakedQuad.Builder builder, final VertexFormat format, final Point3f vert, final Vector3f normal, final Point2f uv) {
         for (int e = 0; e < format.getElementCount(); e++) {
             switch (format.getElement(e).getUsage()) {
                 case POSITION:

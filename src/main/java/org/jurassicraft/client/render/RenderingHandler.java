@@ -77,7 +77,7 @@ import static org.jurassicraft.server.block.BlockHandler.*;
 public enum RenderingHandler {
     INSTANCE;
 
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Minecraft.getMinecraft();
     private static Map<Dinosaur, DinosaurRenderInfo> renderInfos = Maps.newHashMap();
 
     //TODO: CLEAN THIS UP OMG PLZ
@@ -554,7 +554,7 @@ public enum RenderingHandler {
         RenderingRegistry.registerEntityRenderingHandler(metadata.getDinosaurClass(), renderInfo);
     }
 
-    public DinosaurRenderInfo getRenderInfo(Dinosaur dino) {
+    public static DinosaurRenderInfo getRenderInfo(Dinosaur dino) {
         return renderInfos.get(dino);
     }
 }

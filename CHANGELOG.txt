@@ -1,9 +1,3 @@
-*Fixed a rare crash related to vehicles and dinosaurs
-*Fixed overlapping textures for the Brachiosaurus skeleton model
-*Fixed generation issues with the Digsite and Geneticist Villager House
-+The machine inventories are now properly updated when changed by a hopper
-*Fixed an skeleton glitch for the Brachiosaurus and Dilophosaurus
-*Fixed a Tyrannosaurus teeth rendering issue
-*Most of the temporal messages now use the player's actionbar instead of the chat
-+Added gender-specific elements to the T. Rex skeletons
-+Implemented more realistic falling physics for tyrannosaurus when dying
+*improved loading up and rendering performance
+*fixed z-fighting for every entity model
+*improved the overall look of all models

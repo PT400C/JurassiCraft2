@@ -1,7 +1,6 @@
 package org.jurassicraft.server.dinosaur;
 
-import java.util.ArrayList;
-
+import java.util.HashMap;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.GrowthStage;
@@ -14,6 +13,11 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
 public class BrachiosaurusDinosaur extends Dinosaur {
+	
+	private static final HashMap<String, Float> offsets = new HashMap<String, Float>() {{
+		put("foot", null);
+		put("neck", null);
+	}};
 	
 	 @Override
 	    protected DinosaurMetadata buildMetadata() {
@@ -39,6 +43,7 @@ public class BrachiosaurusDinosaur extends Dinosaur {
 	                .setAttackBias(1200.0)
 	                .setMaxHerdSize(4)
 	                .setBreeding(false, 4, 8, 72, true, false)
+	                .setOffsetCubes(offsets)
 	                .setOverlays(OverlayType.EYELID)
 	                .setEyeTime(20)
 	                .setRecipe(new String[][] {

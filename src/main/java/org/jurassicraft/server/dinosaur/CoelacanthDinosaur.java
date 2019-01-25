@@ -1,7 +1,6 @@
 package org.jurassicraft.server.dinosaur;
 
-import java.util.ArrayList;
-
+import java.util.HashMap;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.SleepTime;
@@ -9,7 +8,6 @@ import org.jurassicraft.server.entity.ai.util.MovementType;
 import org.jurassicraft.server.entity.dinosaur.CoelacanthEntity;
 import org.jurassicraft.server.food.FoodType;
 import org.jurassicraft.server.period.TimePeriod;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
@@ -18,6 +16,12 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
 public class CoelacanthDinosaur extends Dinosaur {
+	
+	private static final HashMap<String, Float> offsets = new HashMap<String, Float>() {{
+		put("Body Section", null);
+		put("Lower jaw rear", null);
+		put("Bone1", null);
+	}};
 	
 	@Override
     protected DinosaurMetadata buildMetadata() {
@@ -50,6 +54,7 @@ public class CoelacanthDinosaur extends Dinosaur {
                 .setMovementType(MovementType.DEEP_WATER)
                 .setBreeding(true, 1, 3, 15, true, false)
                 .setRandomFlock(false)
+                .setOffsetCubes(offsets)
                 .setRecipe(new String[][] {
                         { "", "second_dorsal_fin", "first_dorsal_fin", "" },
                         { "caudal_fin", "spine", "pectoral_fin_bones", "skull" },

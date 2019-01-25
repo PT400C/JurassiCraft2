@@ -40,6 +40,7 @@ import net.ilexiconn.llibrary.server.animation.Animation;
 import net.ilexiconn.llibrary.server.animation.IAnimatedEntity;
 import net.ilexiconn.llibrary.server.network.AnimationMessage;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -51,6 +52,7 @@ import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 public class EntityHandler {
+	
     public static final Dinosaur BRACHIOSAURUS = new BrachiosaurusDinosaur();
     public static final Dinosaur COELACANTH = new CoelacanthDinosaur();
     public static final Dinosaur DILOPHOSAURUS = new DilophosaurusDinosaur();
@@ -61,17 +63,22 @@ public class EntityHandler {
     public static final Dinosaur TRICERATOPS = new TriceratopsDinosaur();
     public static final Dinosaur TYRANNOSAURUS = new TyrannosaurusDinosaur();
     public static final Dinosaur VELOCIRAPTOR = new VelociraptorDinosaur();
+    public static final Animal GOAT = new GoatAnimal();
 //    public static final Dinosaur ALLIGATORGAR = new AlligatorGarDinosaur();
     //public static final Dinosaur STEGeOSAURUS = new StegosaurusDinosaur();
 
     private static final Map<Integer, Dinosaur> DINOSAURS = new HashMap<>();
+    private static final Map<Integer, Animal> ANIMALS = new HashMap<>();
     private static final Map<Dinosaur, Integer> DINOSAUR_IDS = new HashMap<>();
+    private static final Map<Animal, Integer> ANIMAL_IDS = new HashMap<>();
     private static final HashMap<TimePeriod, List<Dinosaur>> DINOSAUR_PERIODS = new HashMap<>();
 
     private static int entityId;
 
     private static ProgressManager.ProgressBar dinosaurProgress;
-    private static int highestID;
+    private static ProgressManager.ProgressBar animalProgress;
+    private static int highestAnimalID;
+    private static int highestDinosaurID;
 
     public static List<Dinosaur> getMarineCreatures() {
         List<Dinosaur> marineDinosaurs = new ArrayList<>();
@@ -84,6 +91,7 @@ public class EntityHandler {
     }
 
     public static void init() {
+    	
         registerDinosaur(0, VELOCIRAPTOR);
         registerDinosaur(1, COELACANTH);
         registerDinosaur(2, MICRORAPTOR);
@@ -94,14 +102,23 @@ public class EntityHandler {
         registerDinosaur(13, PARASAUROLOPHUS);
         registerDinosaur(19, TRICERATOPS);
         registerDinosaur(20, TYRANNOSAURUS);
+        
+        registerAnimal(0, GOAT);
 //        registerDinosaur(22, ALLIGATORGAR);
         //registerDinosaur(21, STEGOSAURUS);
 
         dinosaurProgress = ProgressManager.push("Loading dinosaurs", DINOSAURS.size());
 
         initDinosaurs();
+        
 
         ProgressManager.pop(dinosaurProgress);
+        
+        animalProgress = ProgressManager.push("Loading animals", ANIMALS.size());
+        
+        initAnimals();
+        
+        ProgressManager.pop(animalProgress);
 
         registerEntity(AttractionSignEntity.class, "Attraction Sign");
         registerEntity(PaddockSignEntity.class, "Paddock Sign");
@@ -111,7 +128,7 @@ public class EntityHandler {
         registerEntity(JeepWranglerEntity.class, "Jeep Wrangler");
         registerEntity(FordExplorerEntity.class, "Ford Explorer");
 
-        registerEntity(GoatEntity.class, "Goat", 0xEFEDE7, 0x7B3E20);
+        //registerEntity(GoatEntity.class, "Goat", 0xEFEDE7, 0x7B3E20);
 
         registerEntity(TranquilizerDartEntity.class, "Tranquilizer Dart");
         
@@ -152,6 +169,16 @@ public class EntityHandler {
         }
     }
     
+    private static void initAnimals() {
+        for (final Animal animal : ANIMALS.values()) {
+        	
+            animalProgress.step(animal.getIdentifier().toString());
+            final AnimalMetadata meta = animal.getMetadata();
+            final Class<? extends EntityLivingBase> clazz = meta.getAnimalClass();
+            registerAnimalEntity(clazz, animal.getIdentifier(), meta.getEggPrimaryColor(), meta.getEggSecondaryColor());
+        }
+    }
+    
     private static void addSpawn(boolean canSpawn, Class clazz, Dinosaur dinosaur) {
     	
     	if (canSpawn && JurassiCraftConfig.ENTITIES.naturalSpawning_D) {
@@ -161,11 +188,11 @@ public class EntityHandler {
     }
     
     public static void reinitSpawns() {
-        for (Dinosaur dinosaur : DINOSAURS.values()) {
-            DinosaurMetadata metadata = dinosaur.getMetadata();
-            Class<? extends DinosaurEntity> clazz = metadata.getDinosaurClass();
+        for (final Dinosaur dinosaur : DINOSAURS.values()) {
+        	final DinosaurMetadata metadata = dinosaur.getMetadata();
+        	final Class<? extends DinosaurEntity> clazz = metadata.getDinosaurClass();
             EntityRegistry.removeSpawn(clazz, metadata.isMarineCreature() ? EnumCreatureType.WATER_CREATURE : EnumCreatureType.CREATURE, metadata.getSpawnBiomes());
-            boolean canSpawn = !(dinosaur instanceof Hybrid) && dinosaur.shouldRegister();
+            final boolean canSpawn = !(dinosaur instanceof Hybrid) && dinosaur.shouldRegister();
             addSpawn(canSpawn, clazz, dinosaur);
             
         }
@@ -175,6 +202,12 @@ public class EntityHandler {
         String name = identifier.getResourceDomain() + "." + identifier.getResourcePath();
     	ResourceLocation registryName = new ResourceLocation("jurassicraft:entities." + identifier.getResourcePath());
         EntityRegistry.registerModEntity(registryName, entity, name, entityId++, JurassiCraft.INSTANCE, 1024, 1, true);
+    }
+    
+    private static void registerAnimalEntity(Class<? extends EntityLivingBase> entity, ResourceLocation identifier, int primary, int secondary) {
+    	String name = identifier.getResourceDomain() + "." + identifier.getResourcePath();
+    	ResourceLocation registryName = new ResourceLocation("jurassicraft:entities." + identifier.getResourcePath());
+        EntityRegistry.registerModEntity(registryName, entity, name, entityId++, JurassiCraft.INSTANCE, 1024, 1, true, primary, secondary);
     }
     
     private static void registerEntity(Class<? extends Entity> entity, String name) {
@@ -188,10 +221,19 @@ public class EntityHandler {
         ResourceLocation registryName = new ResourceLocation("jurassicraft:entities." + formattedName);
         EntityRegistry.registerModEntity(registryName, entity, "jurassicraft." + formattedName, entityId++, JurassiCraft.INSTANCE, 1024, 1, true, primary, secondary);
     }
+    
+    public static void registerAnimal(int id, Animal animal) {
+        if (id > highestAnimalID) {
+            highestAnimalID = id;
+        }
+
+        ANIMALS.put(id, animal);
+        ANIMAL_IDS.put(animal, id);
+    }
 
     public static void registerDinosaur(int id, Dinosaur dinosaur) {
-        if (id > highestID) {
-            highestID = id;
+        if (id > highestDinosaurID) {
+            highestDinosaurID = id;
         }
 
         DINOSAURS.put(id, dinosaur);
@@ -205,6 +247,15 @@ public class EntityHandler {
 
     public static int getDinosaurId(Dinosaur dinosaur) {
         return DINOSAUR_IDS.get(dinosaur);
+    }
+    
+    public static Animal getAnimalById(int id) {
+        Animal animal = ANIMALS.get(id);
+        return animal != null ? animal : getAnimalById(0);
+    }
+
+    public static int getAnimalId(Animal animal) {
+        return ANIMAL_IDS.get(animal);
     }
 
     public static List<Dinosaur> getDinosaursFromAmber() {
@@ -247,6 +298,21 @@ public class EntityHandler {
     public static List<Dinosaur> getDinosaursFromPeriod(TimePeriod period) {
         return DINOSAUR_PERIODS.get(period);
     }
+    
+    public static Animal getAnimalByClass(Class<? extends EntityLivingBase> clazz) {
+        for (Animal animal : EntityHandler.ANIMALS.values()) {
+
+            if (animal.getMetadata().getAnimalClass().equals(clazz)) {
+                return animal;
+            }
+        }
+
+        return null;
+    }
+
+    public static int getHighestAnimalID() {
+        return highestAnimalID;
+    }
 
     public static Dinosaur getDinosaurByClass(Class<? extends DinosaurEntity> clazz) {
         for (Dinosaur dinosaur : EntityHandler.DINOSAURS.values()) {
@@ -259,8 +325,8 @@ public class EntityHandler {
         return null;
     }
 
-    public static int getHighestID() {
-        return highestID;
+    public static int getHighestDinosaurID() {
+        return highestDinosaurID;
     }
     
     public static <T extends Entity & Animatable> void sendSpecialAnimationMessage(T entity, Animation animation, byte variant) {
@@ -268,8 +334,6 @@ public class EntityHandler {
             return;
         }
         for (EntityPlayer trackingPlayer : ((WorldServer) entity.world).getEntityTracker().getTrackingPlayers(entity)) {
-      
-     //   entity.setAnimation(animation);
        
         	JurassiCraft.NETWORK_WRAPPER.sendTo(new SpecialAnimationMessage(entity.getEntityId(), ArrayUtils.indexOf(entity.getAnimations(), animation), variant), (EntityPlayerMP) trackingPlayer);
         }

@@ -9,18 +9,19 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+
+import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.block.OrientedBlock;
 import org.jurassicraft.server.block.entity.CleaningStationBlockEntity;
 
 public class CleaningStationRenderer extends TileEntitySpecialRenderer<CleaningStationBlockEntity> {
-	private Minecraft mc = Minecraft.getMinecraft();
 
 	@Override
-	public void render(CleaningStationBlockEntity tileEntity, double x, double y, double z, float particialTicks, int p_180535_9_, float alpha) {
-		World world = tileEntity.getWorld();
+	public void render(final CleaningStationBlockEntity tileEntity, final double x, final double y, final double z, final float particialTicks, final int p_180535_9_, final float alpha) {
+		final World world = tileEntity.getWorld();
 
-		IBlockState state = world.getBlockState(tileEntity.getPos());
+		final IBlockState state = world.getBlockState(tileEntity.getPos());
 
 		if (state.getBlock() == BlockHandler.CLEANING_STATION) {
 			EnumFacing value = state.getValue(OrientedBlock.FACING);
@@ -29,8 +30,8 @@ public class CleaningStationRenderer extends TileEntitySpecialRenderer<CleaningS
 				value = value.getOpposite();
 			}
 
-			int rotation = value.getHorizontalIndex() * 90;
-			float scale = 0.25F;
+			final int rotation = value.getHorizontalIndex() * 90;
+			final float scale = 0.25F;
 
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x + 0.5, y + 1.5F, z + 0.5);
@@ -42,11 +43,11 @@ public class CleaningStationRenderer extends TileEntitySpecialRenderer<CleaningS
 
 			GlStateManager.rotate((float) tileEntity.getRenderCleaningRotation(particialTicks), 1.0F, 0.0F, 0.0F);
 
-			this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			ClientEventHandler.MC.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-			RenderItem renderItem = this.mc.getRenderItem();
+			final RenderItem renderItem = ClientEventHandler.MC.getRenderItem();
 
-			ItemStack cleanable = tileEntity.getStackInSlot(0);
+			final ItemStack cleanable = tileEntity.getStackInSlot(0);
 
 			if (cleanable != null) {
 				renderItem.renderItem(cleanable, renderItem.getItemModelMesher().getItemModel(cleanable));

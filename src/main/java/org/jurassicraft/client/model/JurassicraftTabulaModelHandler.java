@@ -37,13 +37,13 @@ import java.util.zip.ZipInputStream;
 public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDeserializationContext {
     INSTANCE;
 
-    private Gson gson = new GsonBuilder().registerTypeAdapter(ItemTransformVec3f.class, new ItemTransformVec3fDeserializer()).registerTypeAdapter(ItemCameraTransforms.class, new ItemCameraTransformsDeserializer()).create();
-    private JsonParser parser = new JsonParser();
-    private ModelBlock.Deserializer modelBlockDeserializer = new ModelBlock.Deserializer();
+    private final Gson gson = new GsonBuilder().registerTypeAdapter(ItemTransformVec3f.class, new ItemTransformVec3fDeserializer()).registerTypeAdapter(ItemCameraTransforms.class, new ItemCameraTransformsDeserializer()).create();
+    private final JsonParser parser = new JsonParser();
+    private final ModelBlock.Deserializer modelBlockDeserializer = new ModelBlock.Deserializer();
     private IResourceManager manager;
     private final Set<String> enabledDomains = new HashSet<>();
 
-    public void addDomain(String domain) {
+    public void addDomain(final String domain) {
         this.enabledDomains.add(domain.toLowerCase(Locale.ROOT));
         LLibrary.LOGGER.info("JurassicraftTabulaModelHandler: Domain {} has been added.", domain.toLowerCase(Locale.ROOT));
     }
@@ -62,7 +62,7 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
         if (!path.endsWith(".tbl")) {
             path += ".tbl";
         }
-        InputStream stream = net.ilexiconn.llibrary.client.model.tabula.TabulaModelHandler.class.getResourceAsStream(path);
+        final InputStream stream = net.ilexiconn.llibrary.client.model.tabula.TabulaModelHandler.class.getResourceAsStream(path);
         return INSTANCE.loadTabulaModel(this.getModelJsonStream(path, stream));
     }
 
@@ -72,7 +72,7 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
      * @param stream the model.json input stream
      * @return the new {@link TabulaModelContainer} instance
      */
-    public TabulaModelContainer loadTabulaModel(InputStream stream) {
+    public TabulaModelContainer loadTabulaModel(final InputStream stream) {
         return this.gson.fromJson(new InputStreamReader(stream), TabulaModelContainer.class);
     }
 
@@ -81,8 +81,8 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
      * @param model the model container
      * @return the cube
      */
-    public TabulaCubeContainer getCubeByName(String name, TabulaModelContainer model) {
-        List<TabulaCubeContainer> allCubes = this.getAllCubes(model);
+    public TabulaCubeContainer getCubeByName(final String name, final TabulaModelContainer model) {
+    	final List<TabulaCubeContainer> allCubes = this.getAllCubes(model);
 
         for (TabulaCubeContainer cube : allCubes) {
             if (cube.getName().equals(name)) {
@@ -98,8 +98,8 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
      * @param model      the model container
      * @return the cube
      */
-    public TabulaCubeContainer getCubeByIdentifier(String identifier, TabulaModelContainer model) {
-        List<TabulaCubeContainer> allCubes = this.getAllCubes(model);
+    public TabulaCubeContainer getCubeByIdentifier(final String identifier, final TabulaModelContainer model) {
+    	final List<TabulaCubeContainer> allCubes = this.getAllCubes(model);
 
         for (TabulaCubeContainer cube : allCubes) {
             if (cube.getIdentifier().equals(identifier)) {
@@ -114,8 +114,8 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
      * @param model the model container
      * @return an array with all cubes of the model
      */
-    public List<TabulaCubeContainer> getAllCubes(TabulaModelContainer model) {
-        List<TabulaCubeContainer> cubes = new ArrayList<>();
+    public List<TabulaCubeContainer> getAllCubes(final TabulaModelContainer model) {
+    	final List<TabulaCubeContainer> cubes = new ArrayList<>();
 
         for (TabulaCubeGroupContainer cubeGroup : model.getCubeGroups()) {
             cubes.addAll(this.traverse(cubeGroup));
@@ -128,8 +128,8 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
         return cubes;
     }
 
-    private List<TabulaCubeContainer> traverse(TabulaCubeGroupContainer group) {
-        List<TabulaCubeContainer> retCubes = new ArrayList<>();
+    private List<TabulaCubeContainer> traverse(final TabulaCubeGroupContainer group) {
+    	final List<TabulaCubeContainer> retCubes = new ArrayList<>();
 
         for (TabulaCubeContainer child : group.getCubes()) {
             retCubes.addAll(this.traverse(child));
@@ -142,8 +142,8 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
         return retCubes;
     }
 
-    private List<TabulaCubeContainer> traverse(TabulaCubeContainer cube) {
-        List<TabulaCubeContainer> retCubes = new ArrayList<>();
+    private List<TabulaCubeContainer> traverse(final TabulaCubeContainer cube) {
+    	final List<TabulaCubeContainer> retCubes = new ArrayList<>();
 
         retCubes.add(cube);
 
@@ -155,42 +155,43 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
     }
 
     @Override
-    public void onResourceManagerReload(IResourceManager manager) {
+    public void onResourceManagerReload(final IResourceManager manager) {
         this.manager = manager;
     }
 
     @Override
-    public boolean accepts(ResourceLocation modelLocation) {
+    public boolean accepts(final ResourceLocation modelLocation) {
         return this.enabledDomains.contains(modelLocation.getResourceDomain()) && modelLocation.getResourcePath().endsWith(".tbl_jurassicraft");
     }
 
     @Override
-    public IModel loadModel(ResourceLocation modelLocation) throws IOException {
+    public IModel loadModel(final ResourceLocation modelLocation) throws IOException {
+    	
         String modelPath = modelLocation.getResourcePath();
         modelPath = modelPath.substring(0, modelPath.lastIndexOf('.')) + ".json";
-        IResource resource = this.manager.getResource(new ResourceLocation(modelLocation.getResourceDomain(), modelPath));
-        InputStreamReader jsonStream = new InputStreamReader(resource.getInputStream());
-        JsonElement json = this.parser.parse(jsonStream);
+        final IResource resource = this.manager.getResource(new ResourceLocation(modelLocation.getResourceDomain(), modelPath));
+        final InputStreamReader jsonStream = new InputStreamReader(resource.getInputStream());
+        final JsonElement json = this.parser.parse(jsonStream);
         jsonStream.close();
-        ModelBlock modelBlock = this.modelBlockDeserializer.deserialize(json, ModelBlock.class, this);
-        String tblLocationStr = json.getAsJsonObject().get("tabula").getAsString() + ".tbl";
-        ResourceLocation tblLocation = new ResourceLocation(tblLocationStr);
-        IResource tblResource = this.manager.getResource(tblLocation);
-        InputStream modelStream = this.getModelJsonStream(tblLocation.toString(), tblResource.getInputStream());
-        TabulaModelContainer modelJson = INSTANCE.loadTabulaModel(modelStream);
+        final ModelBlock modelBlock = this.modelBlockDeserializer.deserialize(json, ModelBlock.class, this);
+        final String tblLocationStr = json.getAsJsonObject().get("tabula").getAsString() + ".tbl";
+        final ResourceLocation tblLocation = new ResourceLocation(tblLocationStr);
+        final IResource tblResource = this.manager.getResource(tblLocation);
+        final InputStream modelStream = this.getModelJsonStream(tblLocation.toString(), tblResource.getInputStream());
+        final TabulaModelContainer modelJson = INSTANCE.loadTabulaModel(modelStream);
         modelStream.close();
-        ImmutableList.Builder<ResourceLocation> builder = ImmutableList.builder();
+        final ImmutableList.Builder<ResourceLocation> builder = ImmutableList.builder();
         int layer = 0;
         String texture;
         while ((texture = modelBlock.textures.get("layer" + layer++)) != null) {
             builder.add(new ResourceLocation(texture));
         }
-        String particle = modelBlock.textures.get("particle");
+        final String particle = modelBlock.textures.get("particle");
         return new JurassicraftVanillaTabulaModel(modelJson, particle != null ? new ResourceLocation(particle) : null, builder.build(), PerspectiveMapWrapper.getTransforms(modelBlock.getAllTransforms()));
     }
 
-    private InputStream getModelJsonStream(String name, InputStream file) throws IOException {
-        ZipInputStream zip = new ZipInputStream(file);
+    private InputStream getModelJsonStream(final String name, final InputStream file) throws IOException {
+    	final ZipInputStream zip = new ZipInputStream(file);
         ZipEntry entry;
         while ((entry = zip.getNextEntry()) != null) {
             if (entry.getName().equals("model.json")) {
@@ -201,7 +202,7 @@ public enum JurassicraftTabulaModelHandler implements ICustomModelLoader, JsonDe
     }
 
     @Override
-    public <T> T deserialize(JsonElement json, Type type) throws JsonParseException {
+    public <T> T deserialize(final JsonElement json, final Type type) throws JsonParseException {
         return this.gson.fromJson(json, type);
     }
 }

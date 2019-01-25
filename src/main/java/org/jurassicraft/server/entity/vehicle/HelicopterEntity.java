@@ -35,9 +35,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-
 import org.jurassicraft.JurassiCraft;
-import org.jurassicraft.client.entity.DummyCameraEntity;
 import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.client.sound.EntitySound;
 import org.jurassicraft.server.entity.ai.util.InterpValue;

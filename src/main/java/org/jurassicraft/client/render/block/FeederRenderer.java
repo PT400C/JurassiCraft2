@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.client.model.ResetControlTabulaModel;
 import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.block.entity.FeederBlockEntity;
@@ -16,8 +17,7 @@ import org.jurassicraft.server.tabula.TabulaModelHelper;
 import org.lwjgl.opengl.GL11;
 
 public class FeederRenderer extends TileEntitySpecialRenderer<FeederBlockEntity> {
-    private Minecraft mc = Minecraft.getMinecraft();
-
+	
     private ResetControlTabulaModel model;
     private ResourceLocation texture;
 
@@ -32,8 +32,8 @@ public class FeederRenderer extends TileEntitySpecialRenderer<FeederBlockEntity>
     }
 
     @Override
-    public void render(FeederBlockEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        IBlockState blockState = tile.getWorld().getBlockState(tile.getPos());
+    public void render(final FeederBlockEntity tile, final double x, final double y, final double z, final float partialTicks, final int destroyStage, final float alpha) {
+    	final IBlockState blockState = tile.getWorld().getBlockState(tile.getPos());
 
         if (blockState.getBlock() == BlockHandler.FEEDER) {
             GlStateManager.pushMatrix();
@@ -44,11 +44,11 @@ public class FeederRenderer extends TileEntitySpecialRenderer<FeederBlockEntity>
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
 
-            EnumFacing facing = blockState.getValue(FeederBlock.FACING);
+            final EnumFacing facing = blockState.getValue(FeederBlock.FACING);
 
-            float rotation = facing.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? -90.0F : 90.0F;
+            final float rotation = facing.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? -90.0F : 90.0F;
 
-            EnumFacing.Axis axis = facing.getAxis();
+            final EnumFacing.Axis axis = facing.getAxis();
 
             if (axis == EnumFacing.Axis.Y) {
                 GlStateManager.rotate(rotation - 90.0F, 0.0F, 0.0F, 1.0F);
@@ -62,12 +62,12 @@ public class FeederRenderer extends TileEntitySpecialRenderer<FeederBlockEntity>
 
             GlStateManager.translate(0.0F, 1.0F, 0.0F);
 
-            double scale = 1.0;
+            final double scale = 1.0;
             GlStateManager.scale(scale, -scale, scale);
 
-            this.mc.getTextureManager().bindTexture(this.texture);
+            ClientEventHandler.MC.getTextureManager().bindTexture(this.texture);
 
-            float openAnimation = Math.max(0.0F, Math.min(20.0F, tile.openAnimation + LLibrary.PROXY.getPartialTicks() * (tile.openAnimation - tile.prevOpenAnimation)));
+            final float openAnimation = Math.max(0.0F, Math.min(20.0F, tile.openAnimation + LLibrary.PROXY.getPartialTicks() * (tile.openAnimation - tile.prevOpenAnimation)));
 
             this.model.getCube("Lid 1").rotateAngleX = (float) Math.toRadians((openAnimation / 20.0F) * 99.13F);
             this.model.getCube("Lid 2").rotateAngleX = (float) Math.toRadians((openAnimation / 20.0F) * -99.13F);

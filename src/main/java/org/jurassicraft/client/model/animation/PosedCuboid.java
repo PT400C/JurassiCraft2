@@ -3,15 +3,15 @@ package org.jurassicraft.client.model.animation;
 import net.ilexiconn.llibrary.client.model.tools.AdvancedModelRenderer;
 
 public class PosedCuboid {
-    public float rotationX;
-    public float rotationY;
-    public float rotationZ;
+    public final float rotationX;
+    public final float rotationY;
+    public final float rotationZ;
 
-    public float positionX;
-    public float positionY;
-    public float positionZ;
+    public final float positionX;
+    public final float positionY;
+    public final float positionZ;
 
-    public PosedCuboid(AdvancedModelRenderer cuboid) {
+    public PosedCuboid(final AdvancedModelRenderer cuboid) {
         this.rotationX = cuboid.defaultRotationX;
         this.rotationY = cuboid.defaultRotationY;
         this.rotationZ = cuboid.defaultRotationZ;

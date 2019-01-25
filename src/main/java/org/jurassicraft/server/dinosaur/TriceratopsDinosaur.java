@@ -1,18 +1,25 @@
 package org.jurassicraft.server.dinosaur;
 
-import java.util.ArrayList;
-
+import java.util.HashMap;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.dinosaur.TriceratopsEntity;
 import org.jurassicraft.server.period.TimePeriod;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
 public class TriceratopsDinosaur extends Dinosaur {
+	
+	private static final HashMap<String, Float> offsets = new HashMap<String, Float>() {{
+		put("Chin", null);
+		put("Tail", null);
+		put("Horn", null);
+		put("Neck", null);
+		put("FOOT", null);
+		put("Foot", null);
+	}};
 	
     @Override
     protected DinosaurMetadata buildMetadata() {
@@ -42,6 +49,7 @@ public class TriceratopsDinosaur extends Dinosaur {
                 .setBreeding(false, 2, 6, 48, false, true)
                 .setSpawn(10, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.SPARSE, BiomeDictionary.Type.FOREST)
                 .setOverlays(OverlayType.EYELID)
+                .setOffsetCubes(offsets)
                 .setRecipe(new String[][] {
                         { "", "", "", "", "horn" },
                         { "tail_vertebrae", "pelvis", "ribcage", "neck_vertebrae", "skull" },
