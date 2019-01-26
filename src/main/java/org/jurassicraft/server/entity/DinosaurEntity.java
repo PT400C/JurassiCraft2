@@ -431,7 +431,6 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     @Override
     public boolean attackEntityFrom(DamageSource damageSource, float amount) {
         boolean canHarmInCreative = damageSource.canHarmInCreative();
-
         Entity attacker = damageSource.getTrueSource();
 
         if (!this.isCarcass()) {
@@ -470,8 +469,9 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 return super.attackEntityFrom(damageSource, amount);
             }
         } else if (!this.world.isRemote) {
-           
+        
         	if(!(((float)this.hurtResistantTime > (float)this.maxHurtResistantTime / 2.0F))) {
+        	
         		if (damageSource != DamageSource.DROWN) {
         			if (!this.dead && this.carcassHealth >= 0 && this.world.getGameRules().getBoolean("doMobLoot")) {
         				this.dropMeat(attacker);
@@ -514,7 +514,6 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
 
     private void dropMeat(Entity attacker) {
         int fortune = 0;
-
         if (attacker instanceof EntityLivingBase) {
             fortune = EnchantmentHelper.getLootingModifier((EntityLivingBase) attacker);
         }
@@ -1270,7 +1269,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         }
         if (carcass && carcassAllowed) {
             this.setAnimation(EntityAnimation.DYING.get());
-            this.carcassHealth = Math.max(1, (int) Math.sqrt(this.width * this.height) * 2);
+            this.carcassHealth = MathHelper.clamp(Math.max(1, (int) Math.sqrt(this.width * this.height) * 2), 0, 10);
             this.ticksExisted = 0;
             this.inventory.dropItems(this.world, this.rand);
         }else if (carcass){
