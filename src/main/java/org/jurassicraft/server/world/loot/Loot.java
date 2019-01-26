@@ -91,7 +91,6 @@ public class Loot {
 		return builders;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void handleTable(LootTable table, ResourceLocation name) {
 		boolean frozen = false;
 		if (table.isFrozen()) {// Some mods like to replace the loot tables which ends up with the loot table

@@ -21,7 +21,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@SuppressWarnings("unused")
 @Mod.EventBusSubscriber(modid=JurassiCraft.MODID, value=Side.CLIENT)
 public class EventHandler {
     
@@ -29,7 +28,7 @@ public class EventHandler {
     
     @SubscribeEvent
     public static void onTextureStitch(TextureStitchEvent event) {
-	DART_GUN_GUI = getModel(new ResourceLocation(JurassiCraft.MODID, "item/dart_gun_gui"), event.getMap());
+    	DART_GUN_GUI = getModel(new ResourceLocation(JurassiCraft.MODID, "item/dart_gun_gui"), event.getMap());
     }
     
     @SubscribeEvent

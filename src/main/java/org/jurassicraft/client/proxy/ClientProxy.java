@@ -51,7 +51,6 @@ public class ClientProxy extends ServerProxy {
 	public static final List<UUID> PATRONS = new ArrayList<>();
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void onPreInit(FMLPreInitializationEvent event) {
 		super.onPreInit(event);
 

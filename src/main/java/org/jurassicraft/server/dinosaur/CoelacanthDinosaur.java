@@ -29,7 +29,7 @@ public class CoelacanthDinosaur extends Dinosaur {
                 .setEggColorFemale(0x7C775E, 0x4D4A3B)
                 .setHealth(3, 10)
                 .setFlee(true)
-                .setSpeed(0.2, 0.40)
+                .setSpeed(0.05, 0.4)
                 .setAttackSpeed(1.5)
                 .setStrength(0.5, 3)
                 .setMaximumAge(this.fromDays(30))

@@ -81,7 +81,7 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 	public float prevWheelRotateAmount;
 
 	protected float rotationDelta;
-
+    private boolean noiseInstance;
 	public int interpProgress;
 	double interpTargetX;
 	public double interpTargetY;
@@ -102,7 +102,6 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 	public final CarWheel frontLeftWheel = new CarWheel(2, wheeldata.fl);
 	public final CarWheel frontRightWheel = new CarWheel(3, wheeldata.fr);
 
-	@SuppressWarnings("unchecked")
 	public final List<WheelParticleData>[] wheelDataList = new List[4];
 
 	public List<CarWheel> allWheels = Lists.newArrayList(backLeftWheel, frontLeftWheel, backRightWheel,
@@ -128,7 +127,6 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 		this.setSize(3.0F, 2.5F);
 		this.stepHeight = 1.5F;
 		if (world.isRemote) {
-			this.startSound();
 			this.steerAmount = new InterpValue(this, 0.1D);
 		}
 		for (int i = 0; i < 4; i++) {
@@ -503,6 +501,11 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
+		if(this.world.isRemote && !this.noiseInstance) {
+			this.noiseInstance = true;
+			this.startSound();
+		}
+	
 		if (shouldStopUpdates()) {
 			return;
 		}

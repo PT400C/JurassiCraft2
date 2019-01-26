@@ -49,6 +49,7 @@ import org.jurassicraft.server.message.UpdateVehicleControlMessage;
 import org.jurassicraft.server.util.MutableVec3;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class HelicopterEntity extends VehicleEntity {
 
@@ -243,7 +244,8 @@ public class HelicopterEntity extends VehicleEntity {
 		super.onEntityUpdate();
 
 		if (!this.isInWater()) {
-			float dist = this.getDistanceToGround();
+			Float dist = this.getDistanceToGround();
+			
 			// this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX-0.65f,
 			// this.posY+2f, this.posZ+ -2.9, 0.0f, 0.0f, 0.0f, new int[0]);
 			// this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX+0.65f,
@@ -390,7 +392,7 @@ public class HelicopterEntity extends VehicleEntity {
 
 				// if(this.getPosition().getY() - 10 <
 				// world.getChunkFromBlockCoords(this.getPosition()).getPrecipitationHeight(this.getPosition()).getY()){
-				if (dist < 10) {
+				if (dist != null && dist < 10) {
 					this.shouldGearLift = false;
 				} else {
 					this.shouldGearLift = true;
@@ -434,7 +436,6 @@ public class HelicopterEntity extends VehicleEntity {
 			moveAmount += 0.05F;
 		}
 		if (this.forward()) {
-			// moveAmount += 0.1F;
 			moveAmount += 0.1F;
 		} else if (this.backward()) {
 			moveAmount += 0.05F;
@@ -448,6 +449,7 @@ public class HelicopterEntity extends VehicleEntity {
 				moveAmount = 0f;
 		}
 		moveAmount *= (1.0f / (float) (this.maxSpeed)) * this.speed;
+		
 		if (this.left()) {
 			this.rotationDelta -= 20.0F * moveAmount;
 		} else if (this.right()) {
@@ -524,19 +526,20 @@ public class HelicopterEntity extends VehicleEntity {
 				4.0F, (1.0F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F) * 0.7F, false);
 	}
 
-	private int computeMaxMovementRotation(float dist) {
+	private int computeMaxMovementRotation(Float dist) {
 		// max dist: 1.4
-		return (dist <= 3) ? ((dist > 1) ? (int) ((float) (MAXMOVEMENTROTATION) / (2.0f - ((dist - 1) * 0.5f))) : 0)
-				: MAXMOVEMENTROTATION;
+		return dist != null ? ((dist <= 3) ? ((dist > 1) ? (int) ((float) (MAXMOVEMENTROTATION) / (2.0f - ((dist - 1) * 0.5f))) : 0)
+				: MAXMOVEMENTROTATION) : MAXMOVEMENTROTATION;
 	}
 
-	private float getDistanceToGround() {
+	@Nullable
+	private Float getDistanceToGround() {
 		boolean found = false;
-		float dist = -1;
+		Float dist = null;
 		mb.setPos(this.getPosition());
 		while (!found) {
-			if (this.posY < 0) {
-				break;
+			if (this.posY < 0 || mb.getY() < 1) {
+				return null;
 			}
 			if (world.isAirBlock(mb)) {
 				mb = mb.setPos(mb.getX(), mb.getY() - 1, mb.getZ());
