@@ -19,7 +19,7 @@ public class FossilizedTrackwayItemBlock extends ItemBlock {
         return this.block.getLocalizedName().replace("{variant}", LangUtils.translate("trackway." + type.getName() + ".name"));
     }
 
-    private FossilizedTrackwayBlock.TrackwayType getType(ItemStack stack) {
+    private static FossilizedTrackwayBlock.TrackwayType getType(ItemStack stack) {
         FossilizedTrackwayBlock.TrackwayType[] values = FossilizedTrackwayBlock.TrackwayType.values();
         return values[stack.getItemDamage() % values.length];
     }

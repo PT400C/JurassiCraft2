@@ -27,7 +27,7 @@ public class DNAItem extends DNAContainerItem {
         return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{dino}", LangUtils.getDinoName(this.getDinosaur(stack)));
     }
 
-    public Dinosaur getDinosaur(ItemStack stack) {
+    public static Dinosaur getDinosaur(ItemStack stack) {
         Dinosaur dinosaur = EntityHandler.getDinosaurById(stack.getItemDamage());
 
         if (dinosaur == null) {

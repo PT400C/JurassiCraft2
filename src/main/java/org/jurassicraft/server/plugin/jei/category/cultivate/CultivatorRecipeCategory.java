@@ -34,7 +34,6 @@ public class CultivatorRecipeCategory implements IRecipeCategory<CultivatorRecip
     public CultivatorRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(TEXTURE, 0, 0, 169, 90);
         this.title = I18n.translateToLocal("tile.cultivator.name");
-
     }
 
     @Override

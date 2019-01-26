@@ -13,12 +13,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class SmeltingRecipeHandler {
     public static void init() {
-        for (Dinosaur dinosaur : EntityHandler.getRegisteredDinosaurs()) {
-            int id = EntityHandler.getDinosaurId(dinosaur);
+    	
+        for (final Dinosaur dinosaur : EntityHandler.getRegisteredDinosaurs()) {
+            final int id = EntityHandler.getDinosaurId(dinosaur);
             GameRegistry.addSmelting(new ItemStack(ItemHandler.DINOSAUR_MEAT, 1, id), new ItemStack(ItemHandler.DINOSAUR_STEAK, 1, id), 5F);
         }
         
-        for (TreeType type : TreeType.values()) {
+        for (final TreeType type : TreeType.values()) {
             GameRegistry.addSmelting(BlockHandler.ANCIENT_LOGS.get(type), new ItemStack(Items.COAL, 1, 1), 0.15F);
         }
         

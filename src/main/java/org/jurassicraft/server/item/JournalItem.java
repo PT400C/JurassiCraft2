@@ -59,7 +59,7 @@ public class JournalItem extends Item {
         }
     }
 
-    public enum JournalType {
+    public static enum JournalType {
         CHEF_ALEJANDRO(0, new ResourceLocation(JurassiCraft.MODID, "chef_alejandro")),
         DENNIS_NEDRY(1, new ResourceLocation(JurassiCraft.MODID, "dennis_nedry")),
         DR_GERRY_HARDING(2, new ResourceLocation(JurassiCraft.MODID, "dr_gerry_harding")),
@@ -98,7 +98,7 @@ public class JournalItem extends Item {
         @SideOnly(Side.CLIENT)
         public Content getContent() {
             if (this.content == null) {
-                try (InputStream input = Minecraft.getMinecraft().getResourceManager().getResource(this.location).getInputStream()) {
+                try (final InputStream input = Minecraft.getMinecraft().getResourceManager().getResource(this.location).getInputStream()) {
                     this.content = new Gson().fromJson(new InputStreamReader(input), Content.class);
                 } catch (IOException e) {
                     String[][] entries = new String[][] { new String[] { "Failed to load journal entries" } };

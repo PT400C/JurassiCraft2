@@ -6,6 +6,7 @@ import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.item.ItemHandler;
 
 public class LootItems {
+	
     public static final Object[] BASIC_STORAGE = new Object[] {
             BlockHandler.LOW_SECURITY_FENCE_WIRE, 0, 64,
             BlockHandler.LOW_SECURITY_FENCE_POLE, 0, 20,
@@ -49,7 +50,7 @@ public class LootItems {
             Items.PAPER, 0, 64
     };
 
-    public static Object[] BASIC_CONTROL = new Object[] {
+    public static final Object[] BASIC_CONTROL = new Object[] {
             Items.PAPER, 0, 64,
             Items.BOOK, 0, 32,
             ItemHandler.BASIC_CIRCUIT, 0, 64,
@@ -66,7 +67,7 @@ public class LootItems {
             Items.COMPARATOR, 0, 2
     };
 
-    public static Object[] BASIC_LABORATORY = new Object[] {
+    public static final Object[] BASIC_LABORATORY = new Object[] {
             ItemHandler.STORAGE_DISC, 0, 64,
             ItemHandler.EMPTY_TEST_TUBE, 0, 64,
             ItemHandler.LIQUID_AGAR, 0, 32,
@@ -77,7 +78,7 @@ public class LootItems {
             Items.BOOK, 0, 12
     };
 
-    public static Object[] BASIC_KITCHEN = new Object[] {
+    public static final Object[] BASIC_KITCHEN = new Object[] {
             Items.WHEAT_SEEDS, 0, 64,
             Items.WHEAT, 0, 64,
             Items.MELON_SEEDS, 0, 64,

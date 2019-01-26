@@ -88,10 +88,10 @@ public class DisplayBlockItem extends Item {
         return EnumActionResult.SUCCESS;
     }
     
-    private Boolean getGender(World world, ItemStack stack){
+    private static Boolean getGender(World world, ItemStack stack){
 		Boolean type = null;
 		if (world != null) {
-			int mode = this.getGenderType(stack);
+			int mode = getGenderType(stack);
 			type = (mode > 0 ? mode == 1 : null);
 		}
 		return type;
@@ -106,7 +106,7 @@ public class DisplayBlockItem extends Item {
         return LangUtils.translate("item.skeleton." + (this.isFossilized(stack) == true ? "fossil" : "fresh") + ".name").replace("{dino}", dinoName);
     }
 
-    public Dinosaur getDinosaur(ItemStack stack) {
+    public static Dinosaur getDinosaur(ItemStack stack) {
         return EntityHandler.getDinosaurById(getDinosaurID(stack));
     }
 
@@ -130,19 +130,19 @@ public class DisplayBlockItem extends Item {
     	return dinosaur << 2 | ((isFossilized ? 1 : 0) << 1) | (isSkeleton ? 1 : 0);
     }
 
-    public int getDinosaurID(ItemStack stack) {
+    public static int getDinosaurID(ItemStack stack) {
         return stack.getMetadata() >> 2;
     }
     
-    public boolean isFossilized(ItemStack stack) {
+    public static boolean isFossilized(ItemStack stack) {
     	return (stack.getMetadata() >> 1 & 1) == 1;
     }
     
-    public boolean isSkeleton(ItemStack stack) {
+    public static boolean isSkeleton(ItemStack stack) {
         return (stack.getMetadata() & 1) == 1;
     }
     
-    public byte getGenderType(ItemStack stack) {
+    public static byte getGenderType(ItemStack stack) {
     	
     	if(stack.hasTagCompound() && stack.getTagCompound().hasKey("Gender")) {
     		return stack.getTagCompound().getByte("Gender");
@@ -151,7 +151,7 @@ public class DisplayBlockItem extends Item {
     	}
     }
     
-    public byte getSkeletonType(ItemStack stack) {
+    public static byte getSkeletonType(ItemStack stack) {
     	
     	if(stack.hasTagCompound() && stack.getTagCompound().hasKey("Type")) {
     		return stack.getTagCompound().getByte("Type");
@@ -160,7 +160,7 @@ public class DisplayBlockItem extends Item {
     	}
     }
     
-    public void setGenderType(ItemStack stack, byte type) {
+    public static void setGenderType(ItemStack stack, byte type) {
     	NBTTagCompound nbt = stack.getTagCompound();
     	if(nbt == null) {
 			nbt = new NBTTagCompound();
@@ -169,7 +169,7 @@ public class DisplayBlockItem extends Item {
     	nbt.setByte("Gender", type);
     }
     
-    public void setSkeletonType(ItemStack stack, byte type) {
+    public static void setSkeletonType(ItemStack stack, byte type) {
     	NBTTagCompound nbt = stack.getTagCompound();
     	if(nbt == null) {
 			nbt = new NBTTagCompound();
@@ -178,17 +178,17 @@ public class DisplayBlockItem extends Item {
     	nbt.setByte("Type", type);
     }
 
-    public int changeMode(ItemStack stack) {
-        int mode = this.getGenderType(stack) + 1;
+    public static int changeMode(ItemStack stack) {
+        int mode = getGenderType(stack) + 1;
         mode %= 3;
-        this.setGenderType(stack, (byte) mode);
+        setGenderType(stack, (byte) mode);
         return mode;
     }
     
-    public int changeSkeletonVariant(ItemStack stack) {
+    public static int changeSkeletonVariant(ItemStack stack) {
     	
-        int dinosaur = this.getDinosaurID(stack);
-        int newVariant = this.getSkeletonType(stack) + 1;
+        int dinosaur = getDinosaurID(stack);
+        int newVariant = getSkeletonType(stack) + 1;
         
         newVariant %= 16;
         if(!(newVariant < EntityHandler.getDinosaurById(dinosaur).getMetadata().skeletonPoses().length)){

@@ -72,6 +72,6 @@ public class CalcificationRecipeCategory implements IRecipeCategory<Calcificatio
 
     @Override
     public String getModName() {
-	return JurassiCraft.NAME;
+    	return JurassiCraft.NAME;
     }
 }

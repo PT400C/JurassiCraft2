@@ -40,7 +40,7 @@ public enum WorldGenerator implements IWorldGenerator {
         }
     }
 
-    public void generateOverworld(World world, Random random, int chunkX, int chunkZ) {
+    public static void generateOverworld(World world, Random random, int chunkX, int chunkZ) {
         Biome biome = world.getBiome(new BlockPos(chunkX, 0, chunkZ));
 
         if (JurassiCraftConfig.MINERAL_GENERATION.petrifiedTreeGeneration) {
@@ -49,7 +49,7 @@ public enum WorldGenerator implements IWorldGenerator {
                 int randPosZ = chunkZ + random.nextInt(16) + 8;
                 int randPosY = random.nextInt(Math.max(1, world.getTopSolidOrLiquidBlock(new BlockPos(randPosX, 0, randPosZ)).getY() - 10));
 
-                this.generatePetrifiedTree(world, TreeType.values()[random.nextInt(TreeType.values().length)], randPosX, randPosY, randPosZ, random);
+                generatePetrifiedTree(world, TreeType.values()[random.nextInt(TreeType.values().length)], randPosX, randPosY, randPosZ, random);
             }
         }
 
@@ -140,19 +140,19 @@ public enum WorldGenerator implements IWorldGenerator {
         Predicate<IBlockState> defaultPredicate = BlockMatcher.forBlock(Blocks.STONE);
 
         if (JurassiCraftConfig.MINERAL_GENERATION.amberGeneration) {
-            this.generateOre(world, chunkX, chunkZ, 20, 8, 3, BlockHandler.AMBER_ORE.getDefaultState(), random, defaultPredicate);
+            generateOre(world, chunkX, chunkZ, 20, 8, 3, BlockHandler.AMBER_ORE.getDefaultState(), random, defaultPredicate);
         }
 
         if (JurassiCraftConfig.MINERAL_GENERATION.iceShardGeneration) {
-            this.generateOre(world, chunkX, chunkZ, 64, 8, 1, BlockHandler.ICE_SHARD.getDefaultState(), random, defaultPredicate);
+            generateOre(world, chunkX, chunkZ, 64, 8, 1, BlockHandler.ICE_SHARD.getDefaultState(), random, defaultPredicate);
         }
 
         if (JurassiCraftConfig.MINERAL_GENERATION.gypsumGeneration) {
-            this.generateOre(world, chunkX, chunkZ, 128, 32, 10, BlockHandler.GYPSUM_STONE.getDefaultState(), random, defaultPredicate);
+            generateOre(world, chunkX, chunkZ, 128, 32, 10, BlockHandler.GYPSUM_STONE.getDefaultState(), random, defaultPredicate);
         }
     }
 
-    public void generateOre(World world, int chunkX, int chunkZ, int minHeight, int veinsPerChunk, int veinSize, IBlockState state, Random random, Predicate<IBlockState> predicate) {
+    public static void generateOre(World world, int chunkX, int chunkZ, int minHeight, int veinsPerChunk, int veinSize, IBlockState state, Random random, Predicate<IBlockState> predicate) {
         WorldGenMinable worldGenMinable = new WorldGenMinable(state, veinSize, predicate);
 
         for (int i = 0; i < veinsPerChunk; i++) {
@@ -164,7 +164,7 @@ public enum WorldGenerator implements IWorldGenerator {
         }
     }
 
-    private void generatePetrifiedTree(World world, TreeType treeType, int x, int y, int z, Random rand) {
+    private static void generatePetrifiedTree(World world, TreeType treeType, int x, int y, int z, Random rand) {
         float rotX = (float) (rand.nextDouble() * 360.0F);
         float rotY = (float) (rand.nextDouble() * 360.0F) - 180.0F;
 

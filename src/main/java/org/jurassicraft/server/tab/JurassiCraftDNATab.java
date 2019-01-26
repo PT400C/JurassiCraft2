@@ -23,15 +23,15 @@ public class JurassiCraftDNATab extends CreativeTabs {
     @SideOnly(Side.CLIENT)
     public ItemStack getIconItemStack() {
         if (this.stacks == null) {
-            List<Dinosaur> registeredDinosaurs = EntityHandler.getRegisteredDinosaurs();
+            final List<Dinosaur> registeredDinosaurs = EntityHandler.getRegisteredDinosaurs();
 
             int dinosaurs = registeredDinosaurs.size();
             this.stacks = new ItemStack[dinosaurs * 3];
 
             int i = 0;
 
-            for (Dinosaur dino : registeredDinosaurs) {
-                int id = EntityHandler.getDinosaurId(dino);
+            for (final Dinosaur dino : registeredDinosaurs) {
+                final int id = EntityHandler.getDinosaurId(dino);
 
                 this.stacks[i] = new ItemStack(ItemHandler.DNA, 1, id);
                 this.stacks[i + dinosaurs] = new ItemStack(ItemHandler.SOFT_TISSUE, 1, id);

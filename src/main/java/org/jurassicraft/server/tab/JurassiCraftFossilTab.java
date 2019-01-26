@@ -17,27 +17,25 @@ public class JurassiCraftFossilTab extends CreativeTabs {
     public JurassiCraftFossilTab(String label) {
         super(label);
 
-        List<Dinosaur> fossilDinosaurs = this.getFossilDinosaurs();
+        final List<Dinosaur> fossilDinosaurs = this.getFossilDinosaurs();
         this.metas = new int[fossilDinosaurs.size()];
 
         int i = 0;
 
-        for (Dinosaur dino : fossilDinosaurs) {
+        for (final Dinosaur dino : fossilDinosaurs) {
             this.metas[i] = EntityHandler.getDinosaurId(dino);
 
             i++;
         }
     }
 
-    public List<Dinosaur> getFossilDinosaurs() {
-        List<Dinosaur> fossilDinosaurs = new ArrayList<>();
-
-        for (Dinosaur dino : FossilItem.fossilDinosaurs.get("skull")) {
+    public static List<Dinosaur> getFossilDinosaurs() {
+        final List<Dinosaur> fossilDinosaurs = new ArrayList<>();
+        for (final Dinosaur dino : FossilItem.fossilDinosaurs.get("skull")) {
             if (dino.shouldRegister()) {
                 fossilDinosaurs.add(dino);	
             }
         }
-
         return fossilDinosaurs;
     }
 

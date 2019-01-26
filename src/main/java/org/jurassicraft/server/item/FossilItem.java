@@ -8,23 +8,47 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import com.google.common.collect.Lists;
+import com.sun.javafx.geom.Vec2d;
+
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.api.Hybrid;
+import org.jurassicraft.server.block.BlockHandler;
+import org.jurassicraft.server.block.entity.DisplayBlockEntity;
+import org.jurassicraft.server.block.entity.SkullDisplayEntity;
 import org.jurassicraft.server.dinosaur.Dinosaur;
+import org.jurassicraft.server.dinosaur.TyrannosaurusDinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
+import org.jurassicraft.server.entity.dinosaur.TyrannosaurusEntity;
 import org.jurassicraft.server.plant.PlantHandler;
 import org.jurassicraft.server.tab.TabHandler;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Rotations;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -74,7 +98,7 @@ public class FossilItem extends Item implements GrindableItem {
         return super.getItemStackDisplayName(stack);
     }
 
-    public Dinosaur getDinosaur(ItemStack stack) {
+    public static Dinosaur getDinosaur(ItemStack stack) {
         return EntityHandler.getDinosaurById(stack.getItemDamage());
     }
 
@@ -117,6 +141,11 @@ public class FossilItem extends Item implements GrindableItem {
             lore.add(colour + LangUtils.translate(LangUtils.LORE.get("dna_quality")).replace("{quality}", LangUtils.getFormattedQuality(quality)));
             lore.add(TextFormatting.BLUE + LangUtils.translate(LangUtils.LORE.get("genetic_code")).replace("{code}", LangUtils.getFormattedGenetics(nbt.getString("Genetics"))));
         }
+        
+        if(((FossilItem) stack.getItem()).getBoneType().equals("skull") && ((FossilItem) stack.getItem()).getDinosaur(stack).getClass() == TyrannosaurusDinosaur.class) {
+        	lore.add(TextFormatting.GOLD + LangUtils.translate("pose.name") + ": " + LangUtils.getStandType(this.getHasStand(stack)));
+			lore.add(TextFormatting.WHITE + LangUtils.translate("lore.change_variant.name"));
+        }
     }
 
     @Override
@@ -131,6 +160,123 @@ public class FossilItem extends Item implements GrindableItem {
     public String getBoneType(){
         return type;
     }
+    
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    	IBlockState blockstate = world.getBlockState(pos);
+    	Block worldBlock = blockstate.getBlock();
+    	
+    	if (worldBlock.isReplaceable(world, pos))
+        {
+            side = EnumFacing.UP;
+            pos = pos.down();
+        }
+    	worldBlock = world.getBlockState(pos).getBlock();
+
+        if (!worldBlock.isReplaceable(world, pos))
+        {
+            if (!world.getBlockState(pos).getMaterial().isSolid() || !world.isSideSolid(pos, side, true))
+            {
+                return EnumActionResult.FAIL;
+            }
+
+            pos = pos.offset(side);
+        }
+
+        ItemStack stack = player.getHeldItem(hand);
+        Block block = BlockHandler.SKULL_DISPLAY;
+        if (!player.world.isRemote && player.canPlayerEdit(pos, side, stack) && world.mayPlace(block, pos, false, side, (Entity)null) && ((FossilItem) stack.getItem()).getBoneType().equals("skull") && ((FossilItem) stack.getItem()).getDinosaur(stack).getClass() == TyrannosaurusDinosaur.class) {
+        	
+        	if (side == EnumFacing.DOWN)
+            {
+                return EnumActionResult.FAIL;
+            }
+            
+            if (block.canPlaceBlockAt(world, pos)) {
+            	IBlockState blockstatePlacement = block.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, /*meta*/ 0, player, hand);
+            	if (!world.setBlockState(pos, blockstatePlacement, 11))
+            		return EnumActionResult.FAIL;
+
+                IBlockState state = world.getBlockState(pos);
+                if (state.getBlock() == block)
+                {
+                    ItemBlock.setTileEntityNBT(world, player, pos, stack);
+                    block.onBlockPlacedBy(world, pos, state, player, stack);
+
+                    if (player instanceof EntityPlayerMP)
+                        CriteriaTriggers.PLACED_BLOCK.trigger((EntityPlayerMP)player, pos, stack);
+                }
+                
+                world.playSound(null, pos, SoundType.STONE.getPlaceSound(), SoundCategory.BLOCKS, (SoundType.STONE.getVolume() + 1.0F) / 2.0F, SoundType.STONE.getPitch() * 0.8F);
+                SkullDisplayEntity tile = (SkullDisplayEntity) world.getTileEntity(pos);
+                
+                if (tile != null) {
+                	tile.setModel(stack.getItemDamage(), !this.isFresh(), this.getHasStand(stack));
+                	EnumFacing.Axis axis = side.getAxis();
+                	if (axis == EnumFacing.Axis.Y) {
+                		tile.setAngle(this.angleToPlayer(pos, new Vec2d(player.posX, player.posZ)));
+                	}else if(axis == EnumFacing.Axis.X) {
+                		tile.setAngle((short) side.getHorizontalAngle());
+                	}else if(axis == EnumFacing.Axis.Z) {
+                		tile.setAngle((short) (180 + side.getHorizontalAngle()));
+                	}
+                    world.notifyBlockUpdate(pos, state, state, 0);
+                    tile.markDirty();
+                    stack.shrink(1);
+
+                }
+
+            }
+        }
+
+        return EnumActionResult.SUCCESS;
+    }
+    
+    private static short angleToPlayer(BlockPos block, Vec2d player) {
+    	return (short) (90 - Math.toDegrees(Math.atan2(((double) block.getZ() + 0.5 - player.y), ((double) block.getX() + 0.5 - player.x))));
+    }
+    
+    public static boolean getHasStand(ItemStack stack) {
+    	
+    	if(stack.hasTagCompound() && stack.getTagCompound().hasKey("Type")) {
+    		return stack.getTagCompound().getBoolean("Type");
+    	}else {
+    		return true;
+    	}
+    }
+    
+    public static void setHasStand(ItemStack stack, boolean hasStand) {
+    	NBTTagCompound nbt = stack.getTagCompound();
+    	if(nbt == null) {
+			nbt = new NBTTagCompound();
+			stack.setTagCompound(nbt);
+    	}
+    	nbt.setBoolean("Type", hasStand);
+    }
+    
+    public static boolean changeStandType(ItemStack stack) {
+    	
+        boolean newType = !getHasStand(stack);
+        
+        setHasStand(stack, newType);
+        return newType;
+    }
+    
+    @Override
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		ItemStack stack = player.getHeldItem(hand);
+			if (player.isSneaking() && ((FossilItem) stack.getItem()).getBoneType().equals("skull") && ((FossilItem) stack.getItem()).getDinosaur(stack).getClass() == TyrannosaurusDinosaur.class) {
+				boolean oldType = this.getHasStand(stack);
+				boolean type = this.changeStandType(stack);
+				if (type != oldType && world.isRemote) {
+					TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.STAND_CHANGE.get("type")).replace("{mode}", LangUtils.getStandType(type)));
+					change.getStyle().setColor(TextFormatting.YELLOW);
+					Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, change);
+				}
+			}
+		
+		return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+}
     
     @Override
     public ItemStack getGroundItem(ItemStack stack, Random random) {

@@ -16,7 +16,7 @@ public class JurassiCraftDecorationsTab extends CreativeTabs {
     public JurassiCraftDecorationsTab(String label) {
         super(label);
 
-        List<Dinosaur> registeredDinosaurs = EntityHandler.getRegisteredDinosaurs();
+        final List<Dinosaur> registeredDinosaurs = EntityHandler.getRegisteredDinosaurs();
         this.metas = new int[registeredDinosaurs.size()];
 
         for (int i = 0; i < registeredDinosaurs.size(); i++) {

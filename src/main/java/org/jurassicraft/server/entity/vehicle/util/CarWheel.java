@@ -14,16 +14,16 @@ public class CarWheel {
     private CarWheel oppositeWheel;
     
     public CarWheel(int id, Vector2d relativeWheelPosition) {
-	this.relativeWheelPosition = relativeWheelPosition;
-	this.ID = id;
+    	this.relativeWheelPosition = relativeWheelPosition;
+		this.ID = id;
     }
     
     public Vector2d getRelativeWheelPosition() {
-	return relativeWheelPosition;
+    	return relativeWheelPosition;
     }
     
     public void setCurrentWheelPos(Vec3d currentWheelPos) {
-	this.prevCurrentWheelPos = this.currentWheelPos;
+    	this.prevCurrentWheelPos = this.currentWheelPos;
         this.currentWheelPos = currentWheelPos;
     }
     
@@ -36,15 +36,15 @@ public class CarWheel {
     }
     
     public int getID() {
-	return ID;
+    	return ID;
     }
     
     public void setPair(CarWheel oppositeWheel) {
-	this.oppositeWheel = oppositeWheel;
-	oppositeWheel.oppositeWheel = this;
+    	this.oppositeWheel = oppositeWheel;
+    	oppositeWheel.oppositeWheel = this;
     }
     
     public CarWheel getOppositeWheel() {
-	return oppositeWheel;
+    	return oppositeWheel;
     }
 }

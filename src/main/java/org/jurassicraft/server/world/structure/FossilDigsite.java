@@ -63,7 +63,7 @@ public class FossilDigsite extends StructureVillagePieces.Village {
 		this.structureType = structureType;
 	}
 
-	private ResourceLocation getResource(final int type) {
+	private static ResourceLocation getResource(final int type) {
 		
 		return new ResourceLocation(JurassiCraft.MODID, "fossildigsite_" + type);	
 	}

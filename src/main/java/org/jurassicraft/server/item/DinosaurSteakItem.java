@@ -38,7 +38,7 @@ public class DinosaurSteakItem extends ItemFood {
         }
     }
 
-    public Dinosaur getDinosaur(ItemStack stack) {
+    public static Dinosaur getDinosaur(ItemStack stack) {
         return EntityHandler.getDinosaurById(stack.getItemDamage());
     }
 

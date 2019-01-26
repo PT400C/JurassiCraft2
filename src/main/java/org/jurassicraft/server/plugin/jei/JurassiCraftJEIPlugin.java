@@ -168,19 +168,19 @@ public class JurassiCraftJEIPlugin implements IModPlugin {
         registry.addRecipes(ForgeRegistries.POTION_TYPES.getValuesCollection().stream().map(TippedDartRecipeWrapper::new).collect(Collectors.toList()), VanillaRecipeCategoryUid.CRAFTING);
     }
 
-    private <T> List<T> getDinos(Function<Dinosaur,T> func) {
+    private static <T> List<T> getDinos(Function<Dinosaur,T> func) {
         return getDinos(func, dino -> true);
     }
 
-    private <T> List<T> getDinos(Function<Dinosaur,T> func, Predicate<Dinosaur> filter) {
+    private static <T> List<T> getDinos(Function<Dinosaur,T> func, Predicate<Dinosaur> filter) {
         return EntityHandler.getRegisteredDinosaurs().stream().filter(filter).map(func).collect(Collectors.toList());
     }
 
-    private <T> List<T> getPlants(Function<Plant,T> func) {
+    private static <T> List<T> getPlants(Function<Plant,T> func) {
         return PlantHandler.getPrehistoricPlantsAndTrees().stream().map(func).collect(Collectors.toList());
     }
 
-    private <T> List<T> getAllItems(Function<ItemStack, JurassicIngredientItem> ingredientFunction, Function<ItemStack, T> tFunction) {
+    private static <T> List<T> getAllItems(Function<ItemStack, JurassicIngredientItem> ingredientFunction, Function<ItemStack, T> tFunction) {
         List<T> list = Lists.newArrayList();
         ForgeRegistries.ITEMS.getValuesCollection()
                 .stream()
@@ -192,7 +192,7 @@ public class JurassiCraftJEIPlugin implements IModPlugin {
         return list;
     }
 
-    private void addHollowClickHandler(IModRegistry registry, Class<? extends GuiContainer> guiContainerClass, Rectangle size, Rectangle ignore, String... recipeCategoryUids) {
+    private static void addHollowClickHandler(IModRegistry registry, Class<? extends GuiContainer> guiContainerClass, Rectangle size, Rectangle ignore, String... recipeCategoryUids) {
         registry.addRecipeClickArea(guiContainerClass, size.x, size.y, ignore.x - size.x, size.height, recipeCategoryUids);
         registry.addRecipeClickArea(guiContainerClass, ignore.x + ignore.width, size.y, (size.x + size.width) - (ignore.x + ignore.width), size.height, recipeCategoryUids);
         registry.addRecipeClickArea(guiContainerClass, ignore.x, size.y, ignore.width, ignore.y - size.y, recipeCategoryUids);

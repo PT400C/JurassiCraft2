@@ -21,7 +21,7 @@ public class NestFossilItemBlock extends ItemBlock {
         return LangUtils.translate(this.encased ? "tile.encased_nest_fossil.name" : "tile.nest_fossil.name");
     }
 
-    private NestFossilBlock.Variant getVariant(ItemStack stack) {
+    private static NestFossilBlock.Variant getVariant(ItemStack stack) {
         NestFossilBlock.Variant[] values = NestFossilBlock.Variant.values();
         return values[stack.getItemDamage() % values.length];
     }

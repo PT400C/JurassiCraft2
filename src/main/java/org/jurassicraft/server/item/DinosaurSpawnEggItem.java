@@ -51,14 +51,14 @@ public class DinosaurSpawnEggItem extends Item {
         return true;
     }
 
-    public DinosaurEntity spawnDinosaur(World world, EntityPlayer player, ItemStack stack, double x, double y, double z) {
-        Dinosaur dinosaur = this.getDinosaur(stack);
+    public static DinosaurEntity spawnDinosaur(World world, EntityPlayer player, ItemStack stack, double x, double y, double z) {
+        Dinosaur dinosaur = getDinosaur(stack);
         if (dinosaur != null) {
             try {
             	DinosaurEntity entity = dinosaur.construct(world);
                 entity.setDNAQuality(100);
 
-                int mode = this.getMode(stack);
+                int mode = getMode(stack);
                 if (mode > 0) {
                     entity.setMale(mode == 1);
                 }
@@ -99,7 +99,7 @@ public class DinosaurSpawnEggItem extends Item {
         return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{dino}", LangUtils.getDinoName(this.getDinosaur(stack)));
     }
 
-    public Dinosaur getDinosaur(ItemStack stack) {
+    public static Dinosaur getDinosaur(ItemStack stack) {
         Dinosaur dinosaur = EntityHandler.getDinosaurById(stack.getItemDamage());
 
         if (dinosaur == null) {
@@ -175,14 +175,14 @@ public class DinosaurSpawnEggItem extends Item {
         }
     }
 
-    public int getMode(ItemStack stack) {
-        return this.getNBT(stack).getInteger("GenderMode");
+    public static int getMode(ItemStack stack) {
+        return getNBT(stack).getInteger("GenderMode");
     }
 
-    public int changeMode(ItemStack stack) {
-        NBTTagCompound nbt = this.getNBT(stack);
+    public static int changeMode(ItemStack stack) {
+        NBTTagCompound nbt = getNBT(stack);
 
-        int mode = this.getMode(stack) + 1;
+        int mode = getMode(stack) + 1;
         mode %= 3;
 
         nbt.setInteger("GenderMode", mode);
@@ -192,7 +192,7 @@ public class DinosaurSpawnEggItem extends Item {
         return mode;
     }
 
-    public NBTTagCompound getNBT(ItemStack stack) {
+    public static NBTTagCompound getNBT(ItemStack stack) {
         NBTTagCompound nbt = stack.getTagCompound();
         if (nbt == null) {
             nbt = new NBTTagCompound();

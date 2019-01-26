@@ -55,13 +55,13 @@ public class HelicopterEntity extends VehicleEntity {
 	private static final byte UPWARD = 0b010000;
 	private static final byte DOWNWARD = 0b100000;
 	private boolean lastDirBackwards;
-	private final float MAX_POWER = 80.0F;
-	private final float REQUIRED_POWER = MAX_POWER / 2.0F;
+	private static final float MAX_POWER = 80.0F;
+	private static final float REQUIRED_POWER = MAX_POWER / 2.0F;
 	private float enginePower;
 	public float gearLift;
 	public boolean shouldGearLift = true;
 	private final InterpValue rotationYawInterp = new InterpValue(this, 4f);
-	private final float SPEEDMODIFIER = 2.5f;
+	private static final float SPEEDMODIFIER = 2.5f;
 	public boolean isFlying;
 	public float rotorRotationAmount;
 	public final InterpValue interpRotationPitch = new InterpValue(this, 0.25D);
@@ -69,7 +69,7 @@ public class HelicopterEntity extends VehicleEntity {
 	private MutableVec3 direction;
 	public float pitch;
 	public float roll;
-	private final int MAXMOVEMENTROTATION = 15;
+	private static final int MAXMOVEMENTROTATION = 15;
 	private boolean shouldFallDamage;
 	public double rotAmount = 0D;
 	private Vec3d prevInAirPos;
@@ -77,8 +77,8 @@ public class HelicopterEntity extends VehicleEntity {
 	private MutableBlockPos mb = new MutableBlockPos();
 
 	private float acceleration = 0.0f;
-	private float airResistance = 0.4f;
-	private int maxSpeed = 20;
+	private static float airResistance = 0.4f;
+	private static int maxSpeed = 20;
 	private float speed = 0;
 	/*
 	 * =================================== CAR START

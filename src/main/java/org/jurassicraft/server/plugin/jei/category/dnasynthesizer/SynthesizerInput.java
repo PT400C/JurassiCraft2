@@ -22,6 +22,7 @@ public class SynthesizerInput {
     public final SynthesizableItem item;
 
     public SynthesizerInput(ItemStack stack) {
+    	
         this.stack = stack;
         Item item = stack.getItem();
         if(item instanceof ItemBlock) {

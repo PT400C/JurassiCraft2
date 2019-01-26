@@ -36,7 +36,6 @@ public class CleaningStationRecipeCategory implements IRecipeCategory<CleaningSt
 
     private RecipeLayoutOutputSupplier outPutSupplier = null;
 
-
     public CleaningStationRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.createDrawable(TEXTURE, 46, 16, 115, 54);
         this.title = I18n.translateToLocal("tile.cleaning_station.name");

@@ -41,11 +41,9 @@ public class AncientSlabItemBlock extends ItemBlock {
     public String getUnlocalizedName(ItemStack stack) {
         return this.singleSlab.getUnlocalizedName(stack.getMetadata());
     }
-
     
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand,
-    		EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
     	ItemStack stack = player.getHeldItem(hand);
         if (stack.getCount() != 0 && player.canPlayerEdit(pos.offset(facing), facing, stack)) {
             IBlockState state = world.getBlockState(pos);

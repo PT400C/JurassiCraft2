@@ -32,7 +32,7 @@ public class AncientItemHoldingBlockRenderer extends TileEntitySpecialRenderer<A
 			GlStateManager.translate(x + 0.5F + te.getDisplayItemXOffset(), y + 0.5F + te.getDisplayItemYOffset(), z + 0.5F + te.getDisplayItemZOffset());
 			GlStateManager.disableLighting();
 
-			float scale = 0.7f;
+			final float scale = 0.7f;
 			GlStateManager.rotate(te.getItemRotation(), 0.0F, 1.0F, 0.0F);
 			GlStateManager.rotate(90, 1.0F, 0.0F, 0.0F);
 			GlStateManager.scale(scale, scale, scale);

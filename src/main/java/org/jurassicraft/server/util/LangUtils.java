@@ -24,6 +24,7 @@ public final class LangUtils
     public static final TranslateKey ORDER_VALUE = new TranslateKey("order.%s.name");
     public static final TranslateKey GENDER_CHANGE = new TranslateKey("%s.genderchange.name");
     public static final TranslateKey SKELETON_CHANGE = new TranslateKey("%s.skeletonchange.name");
+    public static final TranslateKey STAND_CHANGE = new TranslateKey("%s.standchange.name");
     public static final TranslateKey GUI = new TranslateKey("gui.%s.name");
     public static final TranslateKey STATUS = new TranslateKey("status.%s.name");
     public static final TranslateKey ENTITY_NAME   = new TranslateKey("entity.%s.name");
@@ -101,6 +102,10 @@ public final class LangUtils
     
     public static String getSkeletonMode(Dinosaur dinosaur, int variant) {
         return dinosaur.getMetadata().skeletonPoses()[variant];
+    }
+    
+    public static String getStandType(boolean type) {
+        return type == true ? translate("stand.stand.name") : translate("stand.placed.name");
     }
     
     public static String getPlantName(int plantId) {

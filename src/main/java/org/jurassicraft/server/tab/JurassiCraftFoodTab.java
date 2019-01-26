@@ -15,12 +15,12 @@ public class JurassiCraftFoodTab extends CreativeTabs {
     public JurassiCraftFoodTab(String label) {
         super(label);
 
-        List<Dinosaur> registeredDinosaurs = EntityHandler.getRegisteredDinosaurs();
+        final List<Dinosaur> registeredDinosaurs = EntityHandler.getRegisteredDinosaurs();
         this.metas = new int[registeredDinosaurs.size()];
 
         int i = 0;
 
-        for (Dinosaur dino : registeredDinosaurs) {
+        for (final Dinosaur dino : registeredDinosaurs) {
             if (dino.shouldRegister()) {
                 this.metas[i] = EntityHandler.getDinosaurId(dino);
 

@@ -8,6 +8,7 @@ import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.item.ItemHandler;
 
 public class TabHandler {
+	
     public static final CreativeTabs ITEMS = new CreativeTabs("jurassicraft.items") {
         @Override
         public ItemStack getTabIconItem() {

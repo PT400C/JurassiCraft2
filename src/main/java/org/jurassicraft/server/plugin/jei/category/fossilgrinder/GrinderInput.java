@@ -10,6 +10,7 @@ public class GrinderInput {
     public final GrindableItem grind;
 
     public GrinderInput(ItemStack stack) {
+    	
         this.stack = stack;
         Item item = stack.getItem();
         if(item instanceof ItemBlock) {

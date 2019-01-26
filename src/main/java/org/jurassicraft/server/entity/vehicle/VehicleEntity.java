@@ -56,16 +56,11 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public abstract class VehicleEntity extends Entity implements MultiSeatedEntity {
-	public static final DataParameter<Byte> WATCHER_STATE = EntityDataManager.createKey(VehicleEntity.class,
-			DataSerializers.BYTE);
-	public static final DataParameter<Float> WATCHER_HEALTH = EntityDataManager.createKey(VehicleEntity.class,
-			DataSerializers.FLOAT);
-	public static final DataParameter<Integer> WATCHER_SPEED = EntityDataManager.createKey(VehicleEntity.class,
-			DataSerializers.VARINT);
-	public static final DataParameter<ItemStack> RECORD_ITEM = EntityDataManager.createKey(VehicleEntity.class,
-			DataSerializers.ITEM_STACK);
-	public static final DataParameter<NBTTagCompound> WATCHER_SEATS = EntityDataManager.createKey(VehicleEntity.class,
-			DataSerializers.COMPOUND_TAG);
+	public static final DataParameter<Byte> WATCHER_STATE = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.BYTE);
+	public static final DataParameter<Float> WATCHER_HEALTH = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.FLOAT);
+	public static final DataParameter<Integer> WATCHER_SPEED = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.VARINT);
+	public static final DataParameter<ItemStack> RECORD_ITEM = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.ITEM_STACK);
+	public static final DataParameter<NBTTagCompound> WATCHER_SEATS = EntityDataManager.createKey(VehicleEntity.class, DataSerializers.COMPOUND_TAG);
 
 	public static final float MAX_HEALTH = 40;
 	private static final byte LEFT = 0b000001;

@@ -17,6 +17,7 @@ public class RhamnusBerriesItem extends ItemFood {
 
     }
 
+    @Override
     protected void onFoodEaten(ItemStack stack, World worldIn, EntityPlayer player) {
         player.addPotionEffect(new PotionEffect(MobEffects.POISON, 1400, 1));
     }

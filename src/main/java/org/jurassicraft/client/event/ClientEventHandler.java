@@ -2,9 +2,13 @@ package org.jurassicraft.client.event;
 
 import net.ilexiconn.llibrary.LLibrary;
 import net.ilexiconn.llibrary.client.util.ClientUtils;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.model.ModelChest;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.RenderPlayer;
@@ -13,10 +17,14 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -25,10 +33,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.List;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.proxy.ClientProxy;
+import org.jurassicraft.server.block.SkullDisplay;
+import org.jurassicraft.server.block.entity.SkullDisplayEntity;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.vehicle.MultiSeatedEntity;
 import org.jurassicraft.server.item.DartGun;
@@ -58,6 +70,51 @@ public class ClientEventHandler {
     public void onRenderTick(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             this.isGUI = false;
+        }
+    }
+    
+    @SubscribeEvent
+    public void hightlightEvent(final DrawBlockHighlightEvent e) {
+    	if (e.getTarget().typeOfHit == RayTraceResult.Type.BLOCK)
+        {
+    		final BlockPos blockpos = e.getTarget().getBlockPos();
+            final IBlockState iblockstate = e.getPlayer().world.getBlockState(blockpos);
+            if(iblockstate.getBlock() instanceof SkullDisplay) {
+    		e.setCanceled(true);
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            GlStateManager.glLineWidth(2.0F);
+            GlStateManager.disableTexture2D();
+            GlStateManager.depthMask(false);
+            
+
+            if (iblockstate.getMaterial() != Material.AIR && e.getPlayer().world.getWorldBorder().contains(blockpos))
+            {
+            	final double x = e.getPlayer().lastTickPosX + (e.getPlayer().posX - e.getPlayer().lastTickPosX) * (double) e.getPartialTicks();
+            	final double y = e.getPlayer().lastTickPosY + (e.getPlayer().posY - e.getPlayer().lastTickPosY) * (double) e.getPartialTicks();
+            	final double z = e.getPlayer().lastTickPosZ + (e.getPlayer().posZ - e.getPlayer().lastTickPosZ) * (double) e.getPartialTicks();
+
+                GL11.glPushMatrix();
+                GlStateManager.translate(-x, -y, -z);
+                GlStateManager.translate(blockpos.getX() + 0.5, blockpos.getY(), blockpos.getZ() + 0.5);
+                final TileEntity tile = e.getPlayer().world.getTileEntity(blockpos);
+
+                if(tile != null && tile instanceof SkullDisplayEntity && ((SkullDisplayEntity) tile).hasData()) {
+                	GlStateManager.rotate(((SkullDisplayEntity) tile).getAngle(), 0.0F, 1.0F, 0.0F);
+                }
+
+                
+                RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).offset(-0.5, 0, -0.5).grow(0.0020000000949949026D), 0.0f, 0.0f, 0.0f, 0.4f);
+                GL11.glPopMatrix();
+                
+           
+            }
+
+            GlStateManager.depthMask(true);
+            GlStateManager.enableTexture2D();
+            GlStateManager.disableBlend();
+      
+            }
         }
     }
 

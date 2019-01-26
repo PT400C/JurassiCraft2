@@ -228,7 +228,7 @@ public class FoodHelper {
         }
     }
 
-    static class FoodKey {
+    private static class FoodKey {
         final Item item;
         final Block block;
 

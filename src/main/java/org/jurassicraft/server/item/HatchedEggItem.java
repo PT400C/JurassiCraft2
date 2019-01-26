@@ -36,11 +36,11 @@ public class HatchedEggItem extends DNAContainerItem {
     	tooltip.add(TextFormatting.GOLD +LangUtils.translate("gender.name") +": "+ this.getItemGender(stack));
     }
 
-    public Dinosaur getDinosaur(ItemStack stack) {
+    public static Dinosaur getDinosaur(ItemStack stack) {
         return EntityHandler.getDinosaurById(stack.getMetadata());
     }
 
-    public String getItemGender(ItemStack stack) {
+    public static String getItemGender(ItemStack stack) {
     	Boolean gender = null;
         NBTTagCompound nbt = stack.getTagCompound();
   
@@ -53,7 +53,7 @@ public class HatchedEggItem extends DNAContainerItem {
         return LangUtils.getGenderMode(gender != null ? (gender == true ? 1 : 2) : 0);
     }
     
-    public boolean getGender(EntityPlayer player, ItemStack stack) {
+    public static boolean getGender(EntityPlayer player, ItemStack stack) {
         NBTTagCompound nbt = stack.getTagCompound();
 
         boolean gender = player.world.rand.nextBoolean();

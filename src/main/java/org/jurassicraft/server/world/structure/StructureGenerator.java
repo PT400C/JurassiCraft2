@@ -90,7 +90,7 @@ public abstract class StructureGenerator extends WorldGenerator {
         }
     }
 
-    protected BlockPos getGround(World world, BlockPos pos) {
+    protected static BlockPos getGround(World world, BlockPos pos) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
         BlockPos currentPos;
         BlockPos ground;
@@ -139,7 +139,7 @@ public abstract class StructureGenerator extends WorldGenerator {
         return false;
     }
 
-    protected BlockPos transformPos(BlockPos pos, Mirror mirror, Rotation rotation) {
+    protected static BlockPos transformPos(BlockPos pos, Mirror mirror, Rotation rotation) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();

@@ -125,6 +125,8 @@ public class BlockHandler
     public static final MossBlock MOSS = new MossBlock();
 
     public static final FeederBlock FEEDER = new FeederBlock();
+    
+    public static final SkullDisplay SKULL_DISPLAY = new SkullDisplay();
 
     public static final BugCrateBlock BUG_CRATE = new BugCrateBlock();
 
@@ -264,6 +266,7 @@ public class BlockHandler
         registerBlock(DNACombinatorHybridizerBlockEntity.class, DNA_COMBINATOR_HYBRIDIZER, "DNA Combinator Hybridizer");
         registerBlock(IncubatorBlockEntity.class, INCUBATOR, "Incubator");
         registerBlock(DisplayBlockEntity.class, DISPLAY_BLOCK, "Display Block");
+        registerBlock(SkullDisplayEntity.class, SKULL_DISPLAY, "Skull Display Block");
         registerBlock(FeederBlockEntity.class, FEEDER, "Feeder");
         registerBlock(BugCrateBlockEntity.class, BUG_CRATE, "Bug Crate");
 

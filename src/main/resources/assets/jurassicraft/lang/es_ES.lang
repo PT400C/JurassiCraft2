@@ -23,16 +23,17 @@ entity.jurassicraft.mussaurus.name=Mussaurus
 entity.jurassicraft.goat.name=Cabra
 entity.jurassicraft.jeep_wrangler.name=Jeep Wrangler
 entity.jurassicraft.ford_explorer.name=Ford Explorer
+entity.jurassicraft.helicopter_base.name=Helicóptero
 entity.jurassicraft.mural.name=Mural
 entity.jurassicraft.attraction_sign.name=Cartel de Atracción
 entity.jurassicraft.paddock_sign.name=Cartel de Prados
 
 entity.Villager.jurassicraft:geneticist=Genetista
-entity.Villager.jurassicraft:paleontologist=Paleontóloga
+entity.Villager.jurassicraft:paleontologist=Paleontólogo/a
 
 //Items ==================================================
 item.plaster_and_bandage.name=Yeso y Venda
-item.growth_serum.denied=Esta función no está activa
+item.growth_serum.denied=Esta función ha sido desactivada a distancia
 
 item.attraction_sign.name={type} Cartel de Atracción
 attraction_sign.aquarium.name=Acuario
@@ -174,7 +175,6 @@ item.plant_cells.name=Células de Planta
 item.plant_cells_petri_dish.name=Células de Planta en una Placa de Petri
 item.plant_callus.name=Callos de Planta {plant}
 item.tracker.name=Implemento de Seguimiento de Dinosaurios
-item.helicopter_spawner.name=Helicóptero
 item.disc_reader.name=Unidad de Disco
 item.laser.name=Láser
 item.disc_jurassicraft_theme.name=Disco de JurassiCraft
@@ -194,6 +194,8 @@ item.plant_soft_tissue.name=Tejido Suave de {plant}
 item.plant_fossil.name=Fósil Vegetal
 item.twig_fossil.name=Ramita Fósil
 item.keyboard.name=Teclado
+item.helicopter.name=Helicóptero
+item.vehicle_item.place.name=Haz Click Derecho en un Bloque para Generar el {variant}
 item.computer_screen.name=Monitor
 item.dna_analyzer.name=Analizador de ADN
 item.chilean_sea_bass.name=Lubina Chilena Dorada
@@ -243,7 +245,7 @@ item.wild_potato.name=Patata Salvaje
 item.wild_potato_cooked.name=Patata Salvaje Cocinada
 
 //Blocks ==================================================
-tile.ancient_item_holding_block.name=Bloque de sujeción de artículo antiguo
+tile.ancient_item_holding_block.name=Bloque de Sujeción de Artículo Antiguo
 tile.fossil_block.name=Fósil de {dinosaur}
 tile.encased_fossil.name=Fósil Recubierto de {dinosaur}
 tile.plant_fossil_block.name=Fósil Vegetal
@@ -380,9 +382,9 @@ tile.cultivate.name=Cultivador {color}
 tile.cultivator.name=Cultivador
 
 tile.clear_glass.name=Cristal Transparente
-tile.clear_glass_pane.name=Panel De Vidrio Transparente
+tile.clear_glass_pane.name=Panel de Cristal Transparente
 tile.reinforced_glass.name=Cristal Reforzado
-tile.reinforced_glass_pane.name=Panel De Vidrio Reforzado
+tile.reinforced_glass_pane.name=Panel de Cristal Reforzado
 
 tile.feeder.name=Comedero
 tile.bug_crate.name=Caja Granja de Insectos
@@ -492,6 +494,8 @@ lore.genetic_code.name=Código Genético: {code}
 lore.dinosaur.name=Dinosaurio: {dino}
 lore.plant.name=Planta: {plant}
 lore.change_gender.name=Click Derecho en el Aire para Cambiar el Género
+lore.change_variant.name=Agáchate y haz Click Derecho en el Arie para Cambiar la Pose
+lore.change_gender2.name=Shift Agáchate y haz Click Derecho en el Arie para Cambiar el Género
 item.record.jurassicraft_theme.desc=PigeonAce - Tema de JurassiCraft
 item.record.troodons_and_raptors.desc=PigeonAce - Troodons y Raptors
 item.record.dont_move_a_muscle.desc=PigeonAce - No Muevas Ni un Músculo
@@ -501,9 +505,10 @@ gender.male.name=Masculino
 gender.female.name=Femenino
 gender.random.name=Aleatorio
 gender.name=Género
+pose.name=Pose
 spawnegg.genderchange.name=Este Huevo se Generará en Género {mode}.
 actionfigure.genderchange.name=Esta Figura de Acción se Generará en Género {mode}.
-variant.skeletonchange.name=Este esqueleto ahora estará en la pose de {mode}.
+variant.skeletonchange.name=Este Esqueleto Ahora Estará en la Posición {modo}.
 amber.mosquito.name=Mosquito
 amber.aphid.name=Áfido
 
@@ -614,16 +619,16 @@ status.crepuscular.name=Crepuscular
 status.piscivorous.name=Piscívoro
 status.insectivorous.name=Insectívoro
 
-info.jurassicraft.triceratops.name=El Triceratops vivió en América del Norte durante el Cretácico superior. Eran herbívoros, comiendo principalmente palmas, cícadas y helechos. Cuando estaba completamente crecido, el Triceratops medía 8-9 m de largo y pesaba 6-12 toneladas. El volante de la cabeza se usó para mostrar, mientras que los cuernos se usaron para ataque y defensa. El Triceratops vive en grupos familiares de 5 a 15 individuos dirigidos por una matriarca adulta.
-info.jurassicraft.dilophosaurus.name=Con 6-7 metros de largo, este terópodo del Jurásico Temprano de Arizona fue uno de los primeros dinosaurios depredadores grandes. Tenía dos crestas gemelas en su cabeza que podrían haber sido para exhibición sexual. El Dilofosaurio es realmente venenoso, y prefiere escupir veneno en los ojos de su presa. Si el veneno golpea los ojos, causa ceguera y dolor agonizante, y finalmente parálisis. El Dilofosaurio vive en pandillas pequeñas y desorganizadas (alrededor de 3 a 10 individuos) tanto en machos como de hembras.
-info.jurassicraft.brachiosaurus.name=El Braquiosaurio era un saurópodo gigante que vivía en América del Norte. Puede crecer hasta 25 o 26 metros de largo y 9 metros o más de altura, y puede pesar hasta 40 toneladas. Se cree que ha navegado desde lo alto de los árboles, comiendo principalmente hojas de ginkgo, coníferas, helechos arborescentes y cícadas grandes. Los Braquiosaurios viven en grupos de 2 a 15 individuos, liderados por un macho o una hembra alfa. Producen llamadas de "canto" para comunicarse entre ellos.
-info.jurassicraft.parasaurolophus.name=El Parasaurio era un hadrosaurio que vivió en América del Norte durante el Cretácico superior. Mide 10 m de largo, y pesa alrededor de 2.5 toneladas. Su gran cresta tubular curva en su cabeza era hueca, se usaba para producir sonido. El Parasaurio era un herbívoro, y al igual que otros hadrosaurios, utilizaba las mejillas para moler su comida. El Parasaurio vive en manadas de aproximadamente de 5-50, en una mezcla de machos y hembras. Las llamadas del Parasaurio pueden viajar por millas, y son muy ruidosas.
-info.jurassicraft.tyrannosaurus.name=El Tiranosaurio rex era un gran terópodo que vivió durante el Cretácico superior en América del Norte. Creció alrededor de 12-13 metros de largo y 6 toneladas de peso. Las heridas de mordida curadas que hacía el Tiranosaurio rex que se encuentran en los huesos de herbívoros afirmaron que, era un depredador. Sin embargo, también secuestrado. Llevaban un estilo de vida violento y eran ferozmente territoriales. El Tiranosaurio rex es magnífico, pero no debe tomárselo a la ligera.
-info.jurassicraft.velociraptor.name=El Velociraptor era un pequeño dinosaurio terópodo que vivió en el este de Asia durante el Cretácico superior. Cazaba una amplia variedad de presas que iban desde pequeños mamíferos y lagartos, hasta dinosaurios medianos. El Velociraptor, rápido, altamente inteligente y altamente agresivo es muy difícil de mantener. Son unos artistas del escape y tienen buena memoria. Compiten con la velocidad de un guepardo, y pueden saltar hasta 4 metros verticalmente.
-info.jurassicraft.gallimimus.name=El Gallimimo era un terópodo herbívoro que vivió en Mongolia durante el Cretácico superior. Mide 6-8 m cuando está completamente crecido. Prefería vivir cerca del agua, pastando en la vegetación y tamizando algas. El Gallimimo era un corredor rápido, aunque su velocidad máxima es actualmente desconocida. Los Gallimimos son animales de pastoreo que viven en bandadas de 10 a 100 individuos, generalmente una mezcla de machos y hembras. Son extremadamente aterrorizados, y cualquier amenaza potencial puede causar una estampida.
-info.jurassicraft.microraptor.name=Uno de los dinosaurios con plumas más famosos que se haya encontrado, el Microraptor vivió en el noreste de China durante el Cretácico Inferior. Se sabe que las plumas del Microraptor fueron de color negro iridiscente. El Microraptor es un depredador inteligente que caza insectos y otros animales pequeños.
-info.jurassicraft.coelacanth.name=Los Celacantos son el último pez coelocanthiforme moderno, una orden que se remonta al Devónico. La palabra "Celacanto" significa "Espina Hueca". Usando 8 aletas diferentes, el Celacanto puede girar fácilmente en casi cualquier dirección. Los Celacantos son cazadores de aves piscívoros nocturnos que se encuentran solo en las profundidades del Océano Índico. Los Celacantos prehistóricos, sin embargo, fueron enormemente diversos. Los Celacantos son ovivivíparos.
-info.jurassicraft.mussaurus.name=El Mussaurus es un pequeño dinosaurio prosaurópodo del Triásico argentino. Su nombre significa "Ratón Lagarto", ya que durante mucho tiempo solo se lo conocía a partir de diminutos esqueletos de bebé. Las proporciones de los bebés sugieren que los adultos se preocuparon por ellos. Los Mussaurus son muy pequeños para los sauropodomorfos, y son herbívoros, relativamente fáciles de cuidar. Todo lo que necesitan es vegetación exuberante, algunos árboles y agua.
+info.triceratops.name=El Triceratops vivió en América del Norte durante el Cretácico superior. Eran herbívoros, comiendo principalmente palmas, cícadas y helechos. Cuando estaba completamente crecido, el Triceratops medía 8-9 m de largo y pesaba 6-12 toneladas. El volante de la cabeza se usó para mostrar, mientras que los cuernos se usaron para ataque y defensa. El Triceratops vive en grupos familiares de 5 a 15 individuos dirigidos por una matriarca adulta.
+info.dilophosaurus.name=Con 6-7 metros de largo, este terópodo del Jurásico Temprano de Arizona fue uno de los primeros dinosaurios depredadores grandes. Tenía dos crestas gemelas en su cabeza que podrían haber sido para exhibición sexual. El Dilofosaurio es realmente venenoso, y prefiere escupir veneno en los ojos de su presa. Si el veneno golpea los ojos, causa ceguera y dolor agonizante, y finalmente parálisis. El Dilofosaurio vive en pandillas pequeñas y desorganizadas (alrededor de 3 a 10 individuos) tanto en machos como de hembras.
+info.brachiosaurus.name=El Braquiosaurio era un saurópodo gigante que vivía en América del Norte. Puede crecer hasta 25 o 26 metros de largo y 9 metros o más de altura, y puede pesar hasta 40 toneladas. Se cree que ha navegado desde lo alto de los árboles, comiendo principalmente hojas de ginkgo, coníferas, helechos arborescentes y cícadas grandes. Los Braquiosaurios viven en grupos de 2 a 15 individuos, liderados por un macho o una hembra alfa. Producen llamadas de "canto" para comunicarse entre ellos.
+info.parasaurolophus.name=El Parasaurio era un hadrosaurio que vivió en América del Norte durante el Cretácico superior. Mide 10 m de largo, y pesa alrededor de 2.5 toneladas. Su gran cresta tubular curva en su cabeza era hueca, se usaba para producir sonido. El Parasaurio era un herbívoro, y al igual que otros hadrosaurios, utilizaba las mejillas para moler su comida. El Parasaurio vive en manadas de aproximadamente de 5-50, en una mezcla de machos y hembras. Las llamadas del Parasaurio pueden viajar por millas, y son muy ruidosas.
+info.tyrannosaurus.name=El Tiranosaurio rex era un gran terópodo que vivió durante el Cretácico superior en América del Norte. Creció alrededor de 12-13 metros de largo y 6 toneladas de peso. Las heridas de mordida curadas que hacía el Tiranosaurio rex que se encuentran en los huesos de herbívoros afirmaron que, era un depredador. Sin embargo, también secuestrado. Llevaban un estilo de vida violento y eran ferozmente territoriales. El Tiranosaurio rex es magnífico, pero no debe tomárselo a la ligera.
+info.velociraptor.name=El Velociraptor era un pequeño dinosaurio terópodo que vivió en el este de Asia durante el Cretácico superior. Cazaba una amplia variedad de presas que iban desde pequeños mamíferos y lagartos, hasta dinosaurios medianos. El Velociraptor, rápido, altamente inteligente y altamente agresivo es muy difícil de mantener. Son unos artistas del escape y tienen buena memoria. Compiten con la velocidad de un guepardo, y pueden saltar hasta 4 metros verticalmente.
+info.gallimimus.name=El Gallimimo era un terópodo herbívoro que vivió en Mongolia durante el Cretácico superior. Mide 6-8 m cuando está completamente crecido. Prefería vivir cerca del agua, pastando en la vegetación y tamizando algas. El Gallimimo era un corredor rápido, aunque su velocidad máxima es actualmente desconocida. Los Gallimimos son animales de pastoreo que viven en bandadas de 10 a 100 individuos, generalmente una mezcla de machos y hembras. Son extremadamente aterrorizados, y cualquier amenaza potencial puede causar una estampida.
+info.microraptor.name=Uno de los dinosaurios con plumas más famosos que se haya encontrado, el Microraptor vivió en el noreste de China durante el Cretácico Inferior. Se sabe que las plumas del Microraptor fueron de color negro iridiscente. El Microraptor es un depredador inteligente que caza insectos y otros animales pequeños.
+info.coelacanth.name=Los Celacantos son el último pez coelocanthiforme moderno, una orden que se remonta al Devónico. La palabra "Celacanto" significa "Espina Hueca". Usando 8 aletas diferentes, el Celacanto puede girar fácilmente en casi cualquier dirección. Los Celacantos son cazadores de aves piscívoros nocturnos que se encuentran solo en las profundidades del Océano Índico. Los Celacantos prehistóricos, sin embargo, fueron enormemente diversos. Los Celacantos son ovivivíparos.
+info.mussaurus.name=El Mussaurus es un pequeño dinosaurio prosaurópodo del Triásico argentino. Su nombre significa "Ratón Lagarto", ya que durante mucho tiempo solo se lo conocía a partir de diminutos esqueletos de bebé. Las proporciones de los bebés sugieren que los adultos se preocuparon por ellos. Los Mussaurus son muy pequeños para los sauropodomorfos, y son herbívoros, relativamente fáciles de cuidar. Todo lo que necesitan es vegetación exuberante, algunos árboles y agua.
 
 journal.chef_alejandro.name=Cocinero Alejandro
 journal.dennis_nedry.name=Dennis Nedry

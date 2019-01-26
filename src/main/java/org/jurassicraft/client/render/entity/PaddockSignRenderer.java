@@ -61,7 +61,6 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
             this.bindTexture(texture);
 
             if (HAS_COMPILED) {
-            	this.renderLayer(entity, entity.getWidthPixels(), entity.getHeightPixels(), entity.getWidthPixels(), entity.getHeightPixels(), true);
                 GlStateManager.callList(DISPLAY_LIST);
             } else {
                 DISPLAY_LIST = GLAllocation.generateDisplayLists(1);
@@ -100,7 +99,7 @@ public class PaddockSignRenderer implements IRenderFactory<PaddockSignEntity> {
                     float maxY = centerHeight + (y + 1) / pixelSize;
                     float minY = centerHeight + y / pixelSize;
                     if(lighting) {
-                    this.setLightmap(entity, (maxX + minX) / 2.0F, (maxY + minY) / 2.0F);
+                    	this.setLightmap(entity, (maxX + minX) / 2.0F, (maxY + minY) / 2.0F);
                     }else {
                     float maxTextureX = (textureWidth - x / pixelSize) / textureWidth;
                     float minTextureX = (textureWidth - (x + 1) / pixelSize) / textureWidth;
