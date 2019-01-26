@@ -60,18 +60,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SkullDisplay extends BlockContainer {
+	
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
-    private static final AxisAlignedBB EAST = new AxisAlignedBB(0, 0, 0.125, 0.875, 1, 0.875);
-    private static final AxisAlignedBB NORTH = new AxisAlignedBB(0.125, 0, 0.125, 0.875, 1, 1);
-    private static final AxisAlignedBB SOUTH = new AxisAlignedBB(0.125, 0, 0, 0.875, 1, 0.875);
-    private static final AxisAlignedBB WEST = new AxisAlignedBB(0.125, 0, 0.125, 1, 1, 0.875);
-    private static final AxisAlignedBB EAST_WEST_HORIZONTAL = new AxisAlignedBB(0, 0, 0.125, 1, 1, 0.875);
-    private static final AxisAlignedBB NORTH_SOUTH_HORIZONTAL = new AxisAlignedBB(0.125, 0, 0, 0.875, 1, 1);
-    private static final AxisAlignedBB TEST = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
     
-
     public SkullDisplay() {
         super(Material.ROCK);
+        
         this.setSoundType(SoundType.STONE);
         this.setHardness(0.0F);
         this.setResistance(0.0F);
@@ -112,20 +106,20 @@ public class SkullDisplay extends BlockContainer {
     }
     
     private void checkAndDropBlock(World world, BlockPos pos, IBlockState state) {
-        if (!this.canBlockStay(world, pos)) {
+        if (!canBlockStay(world, pos)) {
             this.dropBlockAsItem(world, pos, state, 0);
             world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
         }
     }
     
-    public boolean canBlockStay(World world, BlockPos pos) {
+    private static boolean canBlockStay(World world, BlockPos pos) {
         
     	final EnumFacing facing = world.getBlockState(pos).getValue(SkullDisplay.FACING);
     	final EnumFacing.Axis axis = facing.getAxis();
     	if (axis == EnumFacing.Axis.Y) {
     		return world.getBlockState(pos.down()).isOpaqueCube();
     	}else {
-    		return world.getBlockState(pos.offset(this.mirror(facing))).isOpaqueCube();
+    		return world.getBlockState(pos.offset(mirror(facing))).isOpaqueCube();
     	}
     }
     
@@ -188,10 +182,10 @@ public class SkullDisplay extends BlockContainer {
 
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        return this.getItemFromTile(this.getTile(world, pos));
+        return getItemFromTile(getTile(world, pos));
     }
 
-    public ItemStack getItemFromTile(SkullDisplayEntity tile) {
+    private static ItemStack getItemFromTile(SkullDisplayEntity tile) {
     	final ItemStack stack;
     	if(tile.isFossilized()) {
     		stack = new ItemStack(ItemHandler.FOSSILS.get("skull"), 1, EntityHandler.getDinosaurId(tile.getDinosaur()));
@@ -201,7 +195,7 @@ public class SkullDisplay extends BlockContainer {
         return stack;
     }
     
-    protected SkullDisplayEntity getTile(IBlockAccess world, BlockPos pos) {
+    private static SkullDisplayEntity getTile(IBlockAccess world, BlockPos pos) {
         return (SkullDisplayEntity) world.getTileEntity(pos);
     }
 
@@ -209,16 +203,16 @@ public class SkullDisplay extends BlockContainer {
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
         List<ItemStack> drops = new ArrayList<>(1);
 
-        final SkullDisplayEntity tile = this.getTile(world, pos);
+        final SkullDisplayEntity tile = getTile(world, pos);
 
         if (tile != null) {
-            drops.add(this.getItemFromTile(tile));
+            drops.add(getItemFromTile(tile));
         }
 
         return drops;
     }
     
-    public EnumFacing mirror(EnumFacing facing)
+    public static EnumFacing mirror(EnumFacing facing)
     {
         switch (facing)
         {

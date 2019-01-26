@@ -50,8 +50,8 @@ public abstract class StructureGenerator extends WorldGenerator {
             int minHeight = Integer.MAX_VALUE;
             int maxHeight = Integer.MIN_VALUE;
             BlockPos.MutableBlockPos currentPos = new BlockPos.MutableBlockPos();
-            BlockPos min = this.transformPos(new BlockPos(0, 0, 0), this.mirror, this.rotation).add(pos);
-            BlockPos max = this.transformPos(new BlockPos(this.sizeX - 1, 0, this.sizeZ - 1), this.mirror, this.rotation).add(pos);
+            BlockPos min = transformPos(new BlockPos(0, 0, 0), this.mirror, this.rotation).add(pos);
+            BlockPos max = transformPos(new BlockPos(this.sizeX - 1, 0, this.sizeZ - 1), this.mirror, this.rotation).add(pos);
             int minX = min.getX();
             int minZ = min.getZ();
             int maxX = max.getX();
@@ -70,7 +70,7 @@ public abstract class StructureGenerator extends WorldGenerator {
                 for (int x = minX; x <= maxX; ++x) {
                     if (x == minX || x == maxX || z == minZ || z == maxZ) {
                         currentPos.setPos(x, 64, z);
-                        BlockPos ground = this.getGround(world, currentPos);
+                        BlockPos ground = getGround(world, currentPos);
                         int level = ground.getY();
                         if (level < minHeight) {
                             minHeight = level;
@@ -108,7 +108,7 @@ public abstract class StructureGenerator extends WorldGenerator {
     @Override
     public boolean generate(World world, Random random, BlockPos position) {
         BlockPos levelPos = getLevelPosition();
-        position = levelPos == null ? this.placeOnGround(world, position, this.getOffsetY()) : this.getGround(world, position).subtract(this.transformPos(levelPos, this.mirror, this.rotation));
+        position = levelPos == null ? this.placeOnGround(world, position, this.getOffsetY()) : getGround(world, position).subtract(transformPos(levelPos, this.mirror, this.rotation));
         if (position != null) {
             this.generateStructure(world, random, position);
             this.generateFiller(world, position);
@@ -118,8 +118,8 @@ public abstract class StructureGenerator extends WorldGenerator {
     }
 
     protected void generateFiller(World world, BlockPos pos) {
-        BlockPos min = this.transformPos(new BlockPos(0, 0, 0), this.mirror, this.rotation).add(pos);
-        BlockPos max = this.transformPos(new BlockPos(this.sizeX - 1, 0, this.sizeZ - 1), this.mirror, this.rotation).add(pos);
+        BlockPos min = transformPos(new BlockPos(0, 0, 0), this.mirror, this.rotation).add(pos);
+        BlockPos max = transformPos(new BlockPos(this.sizeX - 1, 0, this.sizeZ - 1), this.mirror, this.rotation).add(pos);
 
         for(int x = Math.min(min.getX(), max.getX()); x <= Math.max(min.getX(), max.getX()); x ++) {
             for(int z = Math.min(min.getZ(), max.getZ()); z <= Math.max(min.getZ(), max.getZ()); z ++) {

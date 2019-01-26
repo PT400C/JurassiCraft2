@@ -15,7 +15,7 @@ public class FossilizedTrackwayItemBlock extends ItemBlock {
 
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        FossilizedTrackwayBlock.TrackwayType type = this.getType(stack);
+        FossilizedTrackwayBlock.TrackwayType type = getType(stack);
         return this.block.getLocalizedName().replace("{variant}", LangUtils.translate("trackway." + type.getName() + ".name"));
     }
 
@@ -31,6 +31,6 @@ public class FossilizedTrackwayItemBlock extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack stack) {
-        return super.getUnlocalizedName() + "." + this.getType(stack).getName();
+        return super.getUnlocalizedName() + "." + getType(stack).getName();
     }
 }

@@ -89,7 +89,7 @@ public class FossilItem extends Item implements GrindableItem {
     
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        Dinosaur dinosaur = this.getDinosaur(stack);
+        Dinosaur dinosaur = getDinosaur(stack);
 
         if (dinosaur != null) {
             return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{dino}", LangUtils.getDinoName(dinosaur));
@@ -143,7 +143,7 @@ public class FossilItem extends Item implements GrindableItem {
         }
         
         if(((FossilItem) stack.getItem()).getBoneType().equals("skull") && ((FossilItem) stack.getItem()).getDinosaur(stack).getClass() == TyrannosaurusDinosaur.class) {
-        	lore.add(TextFormatting.GOLD + LangUtils.translate("pose.name") + ": " + LangUtils.getStandType(this.getHasStand(stack)));
+        	lore.add(TextFormatting.GOLD + LangUtils.translate("pose.name") + ": " + LangUtils.getStandType(getHasStand(stack)));
 			lore.add(TextFormatting.WHITE + LangUtils.translate("lore.change_variant.name"));
         }
     }
@@ -211,10 +211,10 @@ public class FossilItem extends Item implements GrindableItem {
                 SkullDisplayEntity tile = (SkullDisplayEntity) world.getTileEntity(pos);
                 
                 if (tile != null) {
-                	tile.setModel(stack.getItemDamage(), !this.isFresh(), this.getHasStand(stack));
+                	tile.setModel(stack.getItemDamage(), !this.isFresh(), getHasStand(stack));
                 	EnumFacing.Axis axis = side.getAxis();
                 	if (axis == EnumFacing.Axis.Y) {
-                		tile.setAngle(this.angleToPlayer(pos, new Vec2d(player.posX, player.posZ)));
+                		tile.setAngle(angleToPlayer(pos, new Vec2d(player.posX, player.posZ)));
                 	}else if(axis == EnumFacing.Axis.X) {
                 		tile.setAngle((short) side.getHorizontalAngle());
                 	}else if(axis == EnumFacing.Axis.Z) {
@@ -266,8 +266,8 @@ public class FossilItem extends Item implements GrindableItem {
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack stack = player.getHeldItem(hand);
 			if (player.isSneaking() && ((FossilItem) stack.getItem()).getBoneType().equals("skull") && ((FossilItem) stack.getItem()).getDinosaur(stack).getClass() == TyrannosaurusDinosaur.class) {
-				boolean oldType = this.getHasStand(stack);
-				boolean type = this.changeStandType(stack);
+				boolean oldType = getHasStand(stack);
+				boolean type = changeStandType(stack);
 				if (type != oldType && world.isRemote) {
 					TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.STAND_CHANGE.get("type")).replace("{mode}", LangUtils.getStandType(type)));
 					change.getStyle().setColor(TextFormatting.YELLOW);

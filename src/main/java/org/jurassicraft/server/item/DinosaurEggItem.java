@@ -31,7 +31,7 @@ public class DinosaurEggItem extends DNAContainerItem {
 
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{dino}", LangUtils.getDinoName(this.getDinosaur(stack)));
+        return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{dino}", LangUtils.getDinoName(getDinosaur(stack)));
     }
 
     public static Dinosaur getDinosaur(ItemStack stack) {
@@ -40,7 +40,7 @@ public class DinosaurEggItem extends DNAContainerItem {
 
     @Override
     public int getContainerId(ItemStack stack) {
-        return EntityHandler.getDinosaurId(this.getDinosaur(stack));
+        return EntityHandler.getDinosaurId(getDinosaur(stack));
     }
 
     @Override

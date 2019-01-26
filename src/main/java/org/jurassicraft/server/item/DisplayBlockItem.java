@@ -62,12 +62,12 @@ public class DisplayBlockItem extends Item {
                 world.setBlockState(pos, block.getStateForPlacement(world, pos, side, hitX, hitY, hitZ, 0, player));
                 block.onBlockPlacedBy(world, pos, state, player, stack);
 
-                int mode = this.getGenderType(stack);
+                int mode = getGenderType(stack);
                 world.playSound(null, pos, SoundType.WOOD.getPlaceSound(), SoundCategory.BLOCKS, (SoundType.WOOD.getVolume() + 1.0F) / 2.0F, SoundType.WOOD.getPitch() * 0.8F);
                 DisplayBlockEntity tile = (DisplayBlockEntity) world.getTileEntity(pos);
 
                 if (tile != null) {
-                    tile.setDinosaur(this.getDinosaurID(stack), mode > 0 ? mode == 1 : world.rand.nextBoolean(), this.isSkeleton(stack), this.isFossilized(stack), this.getSkeletonType(stack));
+                    tile.setDinosaur(getDinosaurID(stack), mode > 0 ? mode == 1 : world.rand.nextBoolean(), isSkeleton(stack), isFossilized(stack), getSkeletonType(stack));
                     tile.setRot(180 - (int) player.getRotationYawHead());
                     world.notifyBlockUpdate(pos, state, state, 0);
                     tile.markDirty();
@@ -77,7 +77,7 @@ public class DisplayBlockItem extends Item {
                 }
             }
         }else if(player.isSneaking()) {
-        	int mode = this.changeMode(stack);
+        	int mode = changeMode(stack);
 			if (world.isRemote) {
 				TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.GENDER_CHANGE.get("actionfigure")).replace("{mode}", LangUtils.getGenderMode(mode)));
 				change.getStyle().setColor(TextFormatting.GOLD);
@@ -99,11 +99,11 @@ public class DisplayBlockItem extends Item {
 
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        String dinoName = LangUtils.getDinoName(this.getDinosaur(stack));
-        if (!this.isSkeleton(stack)) {
+        String dinoName = LangUtils.getDinoName(getDinosaur(stack));
+        if (!isSkeleton(stack)) {
             return LangUtils.translate("item.action_figure.name").replace("{dino}", dinoName);
         }
-        return LangUtils.translate("item.skeleton." + (this.isFossilized(stack) == true ? "fossil" : "fresh") + ".name").replace("{dino}", dinoName);
+        return LangUtils.translate("item.skeleton." + (isFossilized(stack) == true ? "fossil" : "fresh") + ".name").replace("{dino}", dinoName);
     }
 
     public static Dinosaur getDinosaur(ItemStack stack) {
@@ -206,10 +206,10 @@ public class DisplayBlockItem extends Item {
 		Boolean type = getGender(world, stack);
 		lore.add(TextFormatting.GOLD + LangUtils.translate("gender.name") + ": " + LangUtils.getGenderMode(type != null ? (type == true ? 1 : 2) : 0));
 		lore.add(TextFormatting.WHITE + LangUtils.translate("lore.change_gender.name"));
-		Dinosaur dinosaur = EntityHandler.getDinosaurById(this.getDinosaurID(stack));
+		Dinosaur dinosaur = EntityHandler.getDinosaurById(getDinosaurID(stack));
 		
-		if (this.isSkeleton(stack) && dinosaur.getMetadata().skeletonPoses().length > 1) {
-			lore.add(TextFormatting.YELLOW + LangUtils.translate("pose.name") + ": " + LangUtils.getSkeletonMode(dinosaur, this.getSkeletonType(stack)));
+		if (isSkeleton(stack) && dinosaur.getMetadata().skeletonPoses().length > 1) {
+			lore.add(TextFormatting.YELLOW + LangUtils.translate("pose.name") + ": " + LangUtils.getSkeletonMode(dinosaur, getSkeletonType(stack)));
 			lore.add(TextFormatting.WHITE + LangUtils.translate("lore.change_variant.name"));
 		}
 	}
@@ -217,12 +217,12 @@ public class DisplayBlockItem extends Item {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack stack = player.getHeldItem(hand);
-		if (this.isSkeleton(stack)) {
+		if (isSkeleton(stack)) {
 			if (player.isSneaking()) {
-				int oldVariant = this.getSkeletonType(stack);
-				int variant = this.changeSkeletonVariant(stack);
+				int oldVariant = getSkeletonType(stack);
+				int variant = changeSkeletonVariant(stack);
 				if (variant != oldVariant && world.isRemote) {
-					TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.SKELETON_CHANGE.get("variant")).replace("{mode}", LangUtils.getSkeletonMode(EntityHandler.getDinosaurById(this.getDinosaurID(stack)), variant)));
+					TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.SKELETON_CHANGE.get("variant")).replace("{mode}", LangUtils.getSkeletonMode(EntityHandler.getDinosaurById(getDinosaurID(stack)), variant)));
 					change.getStyle().setColor(TextFormatting.YELLOW);
 					Minecraft.getMinecraft().ingameGUI.addChatMessage(ChatType.GAME_INFO, change);
 				}

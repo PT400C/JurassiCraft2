@@ -84,7 +84,7 @@ public class DinosaurSpawnEggItem extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
     	ItemStack stack = player.getHeldItem(hand);
     	if(player.isSneaking()) {
-            int mode = this.changeMode(stack);
+            int mode = changeMode(stack);
             if (world.isRemote) {
             	TextComponentString change = new TextComponentString(LangUtils.translate(LangUtils.GENDER_CHANGE.get("spawnegg")).replace("{mode}", LangUtils.getGenderMode(mode)));
 				change.getStyle().setColor(TextFormatting.GOLD);
@@ -96,7 +96,7 @@ public class DinosaurSpawnEggItem extends Item {
 
     @Override
     public String getItemStackDisplayName(ItemStack stack) {
-        return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{dino}", LangUtils.getDinoName(this.getDinosaur(stack)));
+        return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{dino}", LangUtils.getDinoName(getDinosaur(stack)));
     }
 
     public static Dinosaur getDinosaur(ItemStack stack) {
@@ -138,7 +138,7 @@ public class DinosaurSpawnEggItem extends Item {
 
                 if (tile instanceof TileEntityMobSpawner) {
                     MobSpawnerBaseLogic spawnerLogic = ((TileEntityMobSpawner) tile).getSpawnerBaseLogic();
-                    spawnerLogic.setEntityId(EntityList.getKey(this.getDinosaur(stack).getMetadata().getDinosaurClass()));
+                    spawnerLogic.setEntityId(EntityList.getKey(getDinosaur(stack).getMetadata().getDinosaurClass()));
                     tile.markDirty();
 
                     if (!player.capabilities.isCreativeMode) {
@@ -156,7 +156,7 @@ public class DinosaurSpawnEggItem extends Item {
                 yOffset = 0.5D;
             }
 
-            DinosaurEntity dinosaur = this.spawnDinosaur(world, player, stack, pos.getX() + 0.5D, pos.getY() + yOffset, pos.getZ() + 0.5D);
+            DinosaurEntity dinosaur = spawnDinosaur(world, player, stack, pos.getX() + 0.5D, pos.getY() + yOffset, pos.getZ() + 0.5D);
 
             if (dinosaur != null) {
                 if (stack.hasDisplayName()) {
@@ -203,7 +203,7 @@ public class DinosaurSpawnEggItem extends Item {
 
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> lore, ITooltipFlag tooltipFlag) {
-    	int mode = this.getMode(stack);
+    	int mode = getMode(stack);
     	Boolean type = (mode > 0 ? mode == 1 : null);
     	lore.add(TextFormatting.GOLD + LangUtils.translate("gender.name") +": "+ LangUtils.getGenderMode(type != null ? (type == true ? 1 : 2) : 0));
     	lore.add(TextFormatting.WHITE + I18n.format("lore.change_gender2.name"));

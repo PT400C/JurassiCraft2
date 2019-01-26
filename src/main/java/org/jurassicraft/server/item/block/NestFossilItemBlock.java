@@ -33,6 +33,6 @@ public class NestFossilItemBlock extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack stack) {
-        return super.getUnlocalizedName() + "." + this.getVariant(stack).getName();
+        return super.getUnlocalizedName() + "." + getVariant(stack).getName();
     }
 }

@@ -34,7 +34,7 @@ public class PlantSoftTissueItem extends Item implements SequencableItem {
     public String getItemStackDisplayName(ItemStack stack) {
         getItemSubtypes(this);
 
-        return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{plant}", LangUtils.getPlantName(this.getPlant(stack)));
+        return LangUtils.translate(this.getUnlocalizedName() + ".name").replace("{plant}", LangUtils.getPlantName(getPlant(stack)));
     }
 
     public static Plant getPlant(ItemStack stack) {

@@ -61,7 +61,7 @@ public class HelicopterEntity extends VehicleEntity {
 	public float gearLift;
 	public boolean shouldGearLift = true;
 	private final InterpValue rotationYawInterp = new InterpValue(this, 4f);
-	private static final float SPEEDMODIFIER = 2.5f;
+	//private static final float SPEEDMODIFIER = 2.5f;
 	public boolean isFlying;
 	public float rotorRotationAmount;
 	public final InterpValue interpRotationPitch = new InterpValue(this, 0.25D);
@@ -270,9 +270,9 @@ public class HelicopterEntity extends VehicleEntity {
 					this.pitch -= 1f;
 				}
 				if (this.speed < 0) {
-					this.acceleration = this.airResistance;
+					this.acceleration = airResistance;
 				} else {
-					this.acceleration = -this.airResistance;
+					this.acceleration = -airResistance;
 				}
 			}
 			if (this.left() && this.isFlying) {
@@ -361,10 +361,10 @@ public class HelicopterEntity extends VehicleEntity {
 				}
 			}
 			this.speed += this.acceleration;
-			if (this.speed > this.maxSpeed) {
-				this.speed = this.maxSpeed;
-			} else if (this.speed < -this.maxSpeed) {
-				this.speed = -this.maxSpeed;
+			if (this.speed > maxSpeed) {
+				this.speed = maxSpeed;
+			} else if (this.speed < -maxSpeed) {
+				this.speed = -maxSpeed;
 			}
 
 			// System.out.println("speed: " + this.speed + ";acceleration: " +
@@ -447,7 +447,7 @@ public class HelicopterEntity extends VehicleEntity {
 			if (moveAmount < 0f)
 				moveAmount = 0f;
 		}
-		moveAmount *= (1.0f / (float) (this.maxSpeed)) * this.speed;
+		moveAmount *= (1.0f / (float) (maxSpeed)) * this.speed;
 		if (this.left()) {
 			this.rotationDelta -= 20.0F * moveAmount;
 		} else if (this.right()) {

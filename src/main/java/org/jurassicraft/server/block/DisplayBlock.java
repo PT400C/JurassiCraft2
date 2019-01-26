@@ -33,8 +33,10 @@ import java.util.List;
 import java.util.Random;
 
 public class DisplayBlock extends BlockContainer {
+	
     public DisplayBlock() {
         super(Material.WOOD);
+        
         this.setSoundType(SoundType.WOOD);
         this.setTickRandomly(false);
         this.setHardness(0.0F);
@@ -43,15 +45,15 @@ public class DisplayBlock extends BlockContainer {
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
-        return this.getBounds(blockAccess, pos);
+        return getBounds(blockAccess, pos);
     }
 
     @Override
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World world, BlockPos pos) {
-        return this.getBounds(world, pos).offset(pos);
+        return getBounds(world, pos).offset(pos);
     }
 
-    private AxisAlignedBB getBounds(IBlockAccess world, BlockPos pos) {
+    private static AxisAlignedBB getBounds(IBlockAccess world, BlockPos pos) {
         TileEntity entity = world.getTileEntity(pos);
         if (entity instanceof DisplayBlockEntity) {
             DisplayBlockEntity displayEntity = (DisplayBlockEntity) entity;
@@ -69,7 +71,7 @@ public class DisplayBlock extends BlockContainer {
 
     @Override
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
-        return super.canPlaceBlockAt(world, pos) && this.canBlockStay(world, pos);
+        return super.canPlaceBlockAt(world, pos) && canBlockStay(world, pos);
     }
 
     @Override
@@ -83,14 +85,14 @@ public class DisplayBlock extends BlockContainer {
         this.checkAndDropBlock(world, pos, state);
     }
 
-    protected void checkAndDropBlock(World world, BlockPos pos, IBlockState state) {
-        if (!this.canBlockStay(world, pos)) {
+    private void checkAndDropBlock(World world, BlockPos pos, IBlockState state) {
+        if (!canBlockStay(world, pos)) {
             this.dropBlockAsItem(world, pos, state, 0);
             world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
         }
     }
 
-    public boolean canBlockStay(World world, BlockPos pos) {
+    private static boolean canBlockStay(World world, BlockPos pos) {
         return world.getBlockState(pos.down()).isOpaqueCube();
     }
 
@@ -101,7 +103,7 @@ public class DisplayBlock extends BlockContainer {
 
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        return this.getItemFromTile(this.getTile(world, pos));
+        return getItemFromTile(getTile(world, pos));
     }
 
     @Override
@@ -131,7 +133,7 @@ public class DisplayBlock extends BlockContainer {
         return true;
     }
 
-    protected DisplayBlockEntity getTile(IBlockAccess world, BlockPos pos) {
+    private static DisplayBlockEntity getTile(IBlockAccess world, BlockPos pos) {
         return (DisplayBlockEntity) world.getTileEntity(pos);
     }
 
@@ -144,7 +146,7 @@ public class DisplayBlock extends BlockContainer {
         super.onBlockHarvested(world, pos, state, player);
     }
 
-    public ItemStack getItemFromTile(DisplayBlockEntity tile) {
+    private static ItemStack getItemFromTile(DisplayBlockEntity tile) {
         int metadata = DisplayBlockItem.getMetadata(EntityHandler.getDinosaurId(tile.getEntity().getDinosaur()), tile.isFossile(), tile.isSkeleton());
         ItemStack stack = new ItemStack(ItemHandler.DISPLAY_BLOCK_ITEM, 1, metadata);
         NBTTagCompound nbt = new NBTTagCompound();
@@ -158,10 +160,10 @@ public class DisplayBlock extends BlockContainer {
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
         List<ItemStack> drops = new ArrayList<>(1);
 
-        DisplayBlockEntity tile = this.getTile(world, pos);
+        DisplayBlockEntity tile = getTile(world, pos);
 
         if (tile != null) {
-            drops.add(this.getItemFromTile(tile));
+            drops.add(getItemFromTile(tile));
         }
 
         return drops;
