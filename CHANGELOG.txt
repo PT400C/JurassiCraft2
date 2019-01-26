@@ -3,3 +3,4 @@
 +Feeding dinosaurs will now indicate success by green particles
 *Fixed an incompatibility with the Statues and EvilNotchLib mod
 *Nerfed Coelacanth infant speed
+*Fixed helicopter crashing worlds in the End
