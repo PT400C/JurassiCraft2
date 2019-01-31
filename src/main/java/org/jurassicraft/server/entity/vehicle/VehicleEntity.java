@@ -35,6 +35,7 @@ import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.client.render.entity.TyretrackRenderer;
 import org.jurassicraft.client.sound.EntitySound;
+import org.jurassicraft.server.conf.JurassiCraftConfig;
 import org.jurassicraft.server.damage.DamageSources;
 import org.jurassicraft.server.entity.ai.util.InterpValue;
 import org.jurassicraft.server.entity.vehicle.VehicleEntity.Seat;
@@ -508,23 +509,24 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 		if (shouldStopUpdates()) {
 			return;
 		}
-
-		AxisAlignedBB aabb = this.getEntityBoundingBox();
-		for (BlockPos pos : BlockPos.getAllInBoxMutable(
-				new BlockPos(Math.floor(aabb.minX), Math.floor(aabb.minY), Math.floor(aabb.minZ)),
-				new BlockPos(Math.ceil(aabb.maxX), Math.ceil(aabb.maxY), Math.ceil(aabb.maxZ)))) {
-			IBlockState state = world.getBlockState(pos);
-			if (state.getMaterial() == Material.VINE) {
-				if (world.isRemote) {
-					world.playEvent(2001, pos, Block.getStateId(state));
-				} else {
-					state.getBlock().dropBlockAsItem(world, pos, state, 0);
+		if (JurassiCraftConfig.VEHICLES.destroyBlocks) {
+			AxisAlignedBB aabb = this.getEntityBoundingBox();
+			for (BlockPos pos : BlockPos.getAllInBoxMutable(
+					new BlockPos(Math.floor(aabb.minX), Math.floor(aabb.minY), Math.floor(aabb.minZ)),
+					new BlockPos(Math.ceil(aabb.maxX), Math.ceil(aabb.maxY), Math.ceil(aabb.maxZ)))) {
+				IBlockState state = world.getBlockState(pos);
+				if (state.getMaterial() == Material.VINE) {
+					if (world.isRemote) {
+						world.playEvent(2001, pos, Block.getStateId(state));
+					} else {
+						state.getBlock().dropBlockAsItem(world, pos, state, 0);
+					}
+					world.setBlockToAir(pos);
+				} else if (state.getMaterial() == Material.LEAVES) {
+					world.setBlockToAir(pos);
 				}
-				world.setBlockToAir(pos);
-			} else if (state.getMaterial() == Material.LEAVES) {
-				world.setBlockToAir(pos);
-			}
 
+			}
 		}
 		this.prevWheelRotateAmount = this.wheelRotateAmount;
 		double deltaX = this.posX - this.prevPosX;
