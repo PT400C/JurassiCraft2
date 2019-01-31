@@ -332,9 +332,11 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 	public void fall(float distance, float damageMultiplier) {
 
 		if (!world.isRemote) {
+			
 			float damage = MathHelper.ceil((distance - 3F) * damageMultiplier);
 
 			if (damage > 0) {
+				JurassiCraft.getLogger().debug("The vehicle at the coordinates " + this.getPosition() + " fell down! " + distance + "   " + damage);
 				this.setHealth(this.getHealth() - (float) (damage * 1.25F));
 
 				if (this.getHealth() < 0) {
@@ -822,6 +824,7 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 
 	@Override
 	public void setDead() {
+		JurassiCraft.getLogger().debug("The vehicle at the coordinates " + this.getPosition() + " has been destroyed! " + this.getHealth() + " "+ this.motionX + " " + this.motionY + " " + this.motionZ);
 		super.setDead();
 		TyretrackRenderer.uploadList(this);
 	}
