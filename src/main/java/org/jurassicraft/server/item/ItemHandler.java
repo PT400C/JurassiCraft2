@@ -180,7 +180,9 @@ public class ItemHandler {
 
     public static final Map<String, FossilItem> FOSSILS = new HashMap<>();
     public static final Map<String, FossilItem> FRESH_FOSSILS = new HashMap<>();
-
+    
+    //No real item
+    public static final FossilItem FOSSIL_DUMMY = new FossilItem("dummy", false);
     public static final FossilizedEggItem FOSSILIZED_EGG = new FossilizedEggItem();
 
     public static final BasicItem GYPSUM_POWDER = new BasicItem(TabHandler.ITEMS);
