@@ -17,13 +17,13 @@ public class GuiItemModelWrapper extends BakedModelWrapper<IBakedModel> {
 
     private final IBakedModel guiModel;
     
-    public GuiItemModelWrapper(IBakedModel originalModel, IBakedModel guiModel) {
-	super(originalModel);
-	this.guiModel = guiModel;
-    }
+	public GuiItemModelWrapper(final IBakedModel originalModel, final IBakedModel guiModel) {
+		super(originalModel);
+		this.guiModel = guiModel;
+	}
     
     @Override
-    public Pair<? extends IBakedModel, Matrix4f> handlePerspective(TransformType cameraTransformType) {
+    public Pair<? extends IBakedModel, Matrix4f> handlePerspective(final TransformType cameraTransformType) {
         return transformTypes.contains(cameraTransformType) ? guiModel.handlePerspective(cameraTransformType) : super.handlePerspective(cameraTransformType);
     }
 

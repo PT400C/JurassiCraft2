@@ -41,6 +41,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -136,9 +137,10 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     private static final DataParameter<Integer> WATCHER_AGE = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> WATCHER_IS_SLEEPING = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> WATCHER_HAS_TRACKER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<String> WATCHER_OWNER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.STRING);
+    private static final DataParameter<String> WATCHER_OWNER_IDENTIFIER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.STRING);
     private static final DataParameter<Byte> WATCHER_CURRENT_ORDER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BYTE);
     private static final DataParameter<Boolean> WATCHER_IS_RUNNING = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> WATCHER_WAS_FED = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> WATCHER_WAS_MOVED = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
     
     public HashMap<Animation, Byte> variants = new HashMap<>();
@@ -371,12 +373,10 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         return (int) time;
     }
 
-    @SuppressWarnings("unused")
     public boolean hasTracker() {
         return this.hasTracker;
     }
 
-    @SuppressWarnings("unused")
     public void setHasTracker(boolean hasTracker) {
         this.hasTracker = hasTracker;
     }
@@ -431,7 +431,6 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     @Override
     public boolean attackEntityFrom(DamageSource damageSource, float amount) {
         boolean canHarmInCreative = damageSource.canHarmInCreative();
-
         Entity attacker = damageSource.getTrueSource();
 
         if (!this.isCarcass()) {
@@ -470,8 +469,9 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 return super.attackEntityFrom(damageSource, amount);
             }
         } else if (!this.world.isRemote) {
-           
+        
         	if(!(((float)this.hurtResistantTime > (float)this.maxHurtResistantTime / 2.0F))) {
+        	
         		if (damageSource != DamageSource.DROWN) {
         			if (!this.dead && this.carcassHealth >= 0 && this.world.getGameRules().getBoolean("doMobLoot")) {
         				this.dropMeat(attacker);
@@ -514,7 +514,6 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
 
     private void dropMeat(Entity attacker) {
         int fortune = 0;
-
         if (attacker instanceof EntityLivingBase) {
             fortune = EnchantmentHelper.getLootingModifier((EntityLivingBase) attacker);
         }
@@ -614,9 +613,10 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         this.dataManager.register(WATCHER_AGE, this.dinosaurAge);
         this.dataManager.register(WATCHER_IS_SLEEPING, this.isSleeping);
         this.dataManager.register(WATCHER_HAS_TRACKER, this.hasTracker);
-        this.dataManager.register(WATCHER_OWNER, "");
+        this.dataManager.register(WATCHER_OWNER_IDENTIFIER, "");
         this.dataManager.register(WATCHER_CURRENT_ORDER, (byte) 0);
         this.dataManager.register(WATCHER_IS_RUNNING, false);
+        this.dataManager.register(WATCHER_WAS_FED, false);
         this.dataManager.register(WATCHER_WAS_MOVED, this.wasMoved);
     }
 
@@ -1009,6 +1009,8 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         if (this.isServerWorld()) {
             this.lookHelper.onUpdateLook();
         }
+        if(!this.world.isRemote && this.ticksExisted % 20 == 0)
+        	this.dataManager.set(WATCHER_WAS_FED, false);
     }
 
     private void updateGrowth() {
@@ -1031,7 +1033,9 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     @Override
     public void onUpdate() {
         super.onUpdate();
-        
+        if(this.world.isRemote && this.dataManager.get(WATCHER_WAS_FED)) {
+        	this.world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, 0.0D, 0.0D, 0.0D);
+        }
         if(this.ticksUntilDeath > 0) {
             if(--this.ticksUntilDeath == 0) {
         	this.playSound(this.getSoundForAnimation(EntityAnimation.DYING.get()), this.getSoundVolume(), this.getSoundPitch());
@@ -1070,7 +1074,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 this.animationTick = this.animationLength - 1;
             }
         }
-
+       
         if (!this.world.isRemote) {
         	this.dataManager.set(WATCHER_WAS_MOVED, this.wasMoved);
             this.dataManager.set(WATCHER_AGE, this.dinosaurAge);
@@ -1078,7 +1082,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             this.dataManager.set(WATCHER_IS_CARCASS, this.isCarcass);
             this.dataManager.set(WATCHER_HAS_TRACKER, this.hasTracker);
             this.dataManager.set(WATCHER_CURRENT_ORDER, (byte) this.order.ordinal());
-            this.dataManager.set(WATCHER_OWNER, this.owner != null ? this.owner.toString() : "");
+            this.dataManager.set(WATCHER_OWNER_IDENTIFIER, this.owner != null ? this.owner.toString() : "");
             this.dataManager.set(WATCHER_IS_RUNNING, this.getAIMoveSpeed() > this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
         } else {
             this.updateTailBuffer();
@@ -1087,7 +1091,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             this.isSleeping = this.dataManager.get(WATCHER_IS_SLEEPING);
             this.isCarcass = this.dataManager.get(WATCHER_IS_CARCASS);
             this.hasTracker = this.dataManager.get(WATCHER_HAS_TRACKER);
-            String owner = this.dataManager.get(WATCHER_OWNER);
+            String owner = this.dataManager.get(WATCHER_OWNER_IDENTIFIER);
             this.order = Order.values()[this.dataManager.get(WATCHER_CURRENT_ORDER)];
 
             if (owner.length() > 0 && (this.owner == null || !owner.equals(this.owner.toString()))) {
@@ -1096,6 +1100,8 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                 this.owner = null;
             }
         }
+        
+        
 
         if (this.ticksExisted % 20 == 0) {
             this.updateAttributes();
@@ -1270,7 +1276,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         }
         if (carcass && carcassAllowed) {
             this.setAnimation(EntityAnimation.DYING.get());
-            this.carcassHealth = Math.max(1, (int) Math.sqrt(this.width * this.height) * 2);
+            this.carcassHealth = MathHelper.clamp(Math.max(1, (int) Math.sqrt(this.width * this.height) * 2), 0, 10);
             this.ticksExisted = 0;
             this.inventory.dropItems(this.world, this.rand);
         }else if (carcass){
@@ -1325,6 +1331,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                         FoodHelper.applyEatEffects(this, item);
                     }
                     if (fed) {
+                    	this.dataManager.set(WATCHER_WAS_FED, true);
                         if (!player.capabilities.isCreativeMode) {
                             stack.shrink(1);
                             if (item == Items.POTIONITEM) {

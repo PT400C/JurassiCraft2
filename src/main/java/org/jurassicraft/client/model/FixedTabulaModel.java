@@ -1,5 +1,7 @@
 package org.jurassicraft.client.model;
 
+import org.jurassicraft.server.entity.AnimalMetadata;
+
 import net.ilexiconn.llibrary.client.model.tabula.ITabulaModelAnimator;
 import net.ilexiconn.llibrary.client.model.tabula.TabulaModel;
 import net.ilexiconn.llibrary.client.model.tabula.container.TabulaCubeContainer;
@@ -10,8 +12,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class FixedTabulaModel extends TabulaModel {
-    public FixedTabulaModel(TabulaModelContainer container, ITabulaModelAnimator<?> tabulaAnimator) {
+	
+	private final AnimalMetadata animal;
+	
+    public FixedTabulaModel(final TabulaModelContainer container, final AnimalMetadata animal, final ITabulaModelAnimator<?> tabulaAnimator) {
         super(container, tabulaAnimator);
+        this.animal = animal;
         this.cubes.clear();
         this.identifierMap.clear();
         this.rootBoxes.clear();
@@ -22,19 +28,15 @@ public class FixedTabulaModel extends TabulaModel {
         this.updateDefaultPose();
     }
 
-    public FixedTabulaModel(TabulaModelContainer container) {
-        this(container, null);
-    }
-
-    private void parseCubeGroup(TabulaCubeGroupContainer container) {
+    private void parseCubeGroup(final TabulaCubeGroupContainer container) {
         for (TabulaCubeContainer cube : container.getCubes()) {
             this.parseCube(cube, null);
         }
         container.getCubeGroups().forEach(this::parseCubeGroup);
     }
 
-    private void parseCube(TabulaCubeContainer cube, FixedModelRenderer parent) {
-        FixedModelRenderer box = this.createBox(cube);
+    private void parseCube(final TabulaCubeContainer cube, final FixedModelRenderer parent) {
+    	final FixedModelRenderer box = this.createBox(cube);
         this.cubes.put(cube.getName(), box);
         this.identifierMap.put(cube.getIdentifier(), box);
         if (parent != null) {
@@ -47,13 +49,13 @@ public class FixedTabulaModel extends TabulaModel {
         }
     }
 
-    private FixedModelRenderer createBox(TabulaCubeContainer cube) {
-        int[] textureOffset = cube.getTextureOffset();
-        double[] position = cube.getPosition();
-        double[] rotation = cube.getRotation();
-        double[] offset = cube.getOffset();
-        int[] dimensions = cube.getDimensions();
-        FixedModelRenderer box = new FixedModelRenderer(this, cube.getName());
+    private FixedModelRenderer createBox(final TabulaCubeContainer cube) {
+    	final int[] textureOffset = cube.getTextureOffset();
+        final double[] position = cube.getPosition();
+        final double[] rotation = cube.getRotation();
+        final double[] offset = cube.getOffset();
+        final int[] dimensions = cube.getDimensions();
+        final FixedModelRenderer box = new FixedModelRenderer(this, cube.getName(), this.animal);
         box.setTextureOffset(textureOffset[0], textureOffset[1]);
         box.setRotationPoint((float) position[0], (float) position[1], (float) position[2]);
         box.addBox((float) offset[0], (float) offset[1], (float) offset[2], dimensions[0], dimensions[1], dimensions[2], 0.0F);

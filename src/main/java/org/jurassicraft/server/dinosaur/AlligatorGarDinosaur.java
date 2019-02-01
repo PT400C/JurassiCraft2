@@ -1,7 +1,5 @@
 package org.jurassicraft.server.dinosaur;
 
-import java.util.ArrayList;
-
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.SleepTime;
@@ -9,7 +7,6 @@ import org.jurassicraft.server.entity.ai.util.MovementType;
 import org.jurassicraft.server.entity.dinosaur.AlligatorGarEntity;
 import org.jurassicraft.server.food.FoodType;
 import org.jurassicraft.server.period.TimePeriod;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;

@@ -1,6 +1,8 @@
 package org.jurassicraft.client.render.entity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelChest;
+import net.minecraft.client.model.ModelCreeper;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.Render;
@@ -23,38 +25,35 @@ import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.GrowthStage;
 import org.jurassicraft.server.entity.OverlayType;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Random;
 
 @SideOnly(Side.CLIENT)
 public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
 	
-    public Dinosaur dinosaur;
-    public DinosaurRenderInfo renderInfo;
-    public Random random;
+    public final Dinosaur dinosaur;
+    public final DinosaurRenderInfo renderInfo;
+    public final Random random;
 
-    public DinosaurRenderer(DinosaurRenderInfo renderInfo, RenderManager renderManager) {
-        super(renderManager, renderInfo.getModel(GrowthStage.INFANT, (byte) 0), renderInfo.getShadowSize());
-
+    public DinosaurRenderer(final DinosaurRenderInfo renderInfo, final RenderManager renderManager) {
+    
+        super(renderManager, null, 0);
         this.dinosaur = renderInfo.getDinosaur();
         this.random = new Random();
         this.renderInfo = renderInfo;
-        for(OverlayType type : this.dinosaur.getMetadata().getOverlays()) {
-        	this.addLayer(new LayerOverlay(this, type));
-        }
+        this.addLayer(new LayerOverlay(this, this.dinosaur.getMetadata().getOverlays()));
     }
 
     @Override
-    public void preRenderCallback(DinosaurEntity entity, float partialTick) {
-    	DinosaurMetadata metadata = this.dinosaur.getMetadata();
-        float scaleModifier = entity.getAttributes().getScaleModifier();
-        float scale = (float) entity.interpolate(metadata.getScaleInfant(), metadata.getScaleAdult()) * scaleModifier;
+    public void preRenderCallback(final DinosaurEntity entity, final float partialTick) {
+    	final DinosaurMetadata metadata = this.dinosaur.getMetadata();
+    	final float scaleModifier = entity.getAttributes().getScaleModifier();
+    	final float scale = (float) entity.interpolate(metadata.getScaleInfant(), metadata.getScaleAdult()) * scaleModifier;
         this.shadowSize = scale * this.renderInfo.getShadowSize();
 
         GlStateManager.translate(metadata.getOffsetX() * scale, metadata.getOffsetY() * scale, metadata.getOffsetZ() * scale);
 
-        String name = entity.getCustomNameTag();
-        
+        final String name = entity.getCustomNameTag();
         switch (name) {
             case "Kashmoney360":
             case "JTGhawk137":
@@ -70,7 +69,7 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
                 GlStateManager.scale(scale, scale, scale * -1);
                 break;
             case "Wyn":
-                int color = Color.HSBtoRGB((entity.world.getTotalWorldTime() % 1000) / 100f, 1f, 1f);
+            	final int color = Color.HSBtoRGB((entity.world.getTotalWorldTime() % 1000) / 100f, 1f, 1f);
                 GlStateManager.color((color & 0xFF) / 255f, ((color >> 8) & 0xFF) / 255f, ((color >> 16) & 0xFF) / 255f);
             default:
                 GlStateManager.scale(scale, scale, scale);
@@ -80,47 +79,49 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
     }
 
     @Override
-    public void doRender(DinosaurEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    public void doRender(final DinosaurEntity entity, final double x, final double y, final double z, final float entityYaw, final float partialTicks) {
         this.mainModel = this.renderInfo.getModel(entity.getGrowthStage(), (byte) entity.getSkeletonVariant());
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
     @Override
-    public ResourceLocation getEntityTexture(DinosaurEntity entity) {
+    public ResourceLocation getEntityTexture(final DinosaurEntity entity) {
         GrowthStage growthStage = entity.getGrowthStage();
         if (!this.dinosaur.doesSupportGrowthStage(growthStage)) {
             growthStage = GrowthStage.ADULT;
         }
         return growthStage == GrowthStage.SKELETON ? (entity.getIsFossile() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage)) : (entity.isMale() ? this.dinosaur.getMaleTexture(growthStage) : this.dinosaur.getFemaleTexture(growthStage));
+   
     }
 
     @Override
-    protected void applyRotations(DinosaurEntity entity, float p_77043_2_, float p_77043_3_, float partialTicks) {
+    protected void applyRotations(final DinosaurEntity entity, final float p_77043_2_, final float p_77043_3_, final float partialTicks) {
         GlStateManager.rotate(180.0F - p_77043_3_, 0.0F, 1.0F, 0.0F);
     }
 
     @SideOnly(Side.CLIENT)
-    public class LayerOverlay implements LayerRenderer<DinosaurEntity> {
+    public static class LayerOverlay implements LayerRenderer<DinosaurEntity> {
         private final DinosaurRenderer renderer;
-        private final OverlayType type;
+        private final OverlayType[] type;
 
-        public LayerOverlay(DinosaurRenderer renderer, OverlayType type) {
+        public LayerOverlay(final DinosaurRenderer renderer, final OverlayType[] type) {
             this.renderer = renderer;
             this.type = type;
         }
 
         @Override
-        public void doRenderLayer(DinosaurEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float age, float yaw, float pitch, float scale) {
+        public void doRenderLayer(final DinosaurEntity entity, final float limbSwing, final float limbSwingAmount, final float partialTicks, final float age, final float yaw, final float pitch, final float scale) {
             if (!entity.isInvisible()) {
-            	boolean render = false;
-                if (entity.areEyelidsClosed() && type == OverlayType.EYELID) {
-                	renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
-                }else if(!entity.areEyelidsClosed() && type == OverlayType.EYE){
-                	renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
-                	
-                }else if(type != OverlayType.EYE && type != OverlayType.EYELID){
-                	renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
-                }
+				for (OverlayType type : this.type) {
+					if (entity.areEyelidsClosed() && type == OverlayType.EYELID) {
+						renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
+					} else if (!entity.areEyelidsClosed() && type == OverlayType.EYE) {
+						renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
+
+					} else if (type != OverlayType.EYE && type != OverlayType.EYELID) {
+						renderOverlay(type, entity, limbSwing, limbSwingAmount, partialTicks, age, yaw, pitch, scale);
+					}
+				}
             }
         }
 
@@ -129,10 +130,10 @@ public class DinosaurRenderer extends RenderLiving<DinosaurEntity> {
             return true;
         }
         
-        private void renderOverlay(OverlayType type, DinosaurEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float age, float yaw, float pitch, float scale) {
-        	ResourceLocation texture = this.renderer.dinosaur.getOverlayTextures(type, entity);
+        private void renderOverlay(final OverlayType type, final DinosaurEntity entity, final float limbSwing, final float limbSwingAmount, final float partialTicks, final float age, final float yaw, final float pitch, final float scale) {
+        	final ResourceLocation texture = this.renderer.dinosaur.getOverlayTextures(type, entity);
             if (texture != null) {
-                ITextureObject textureObject = Minecraft.getMinecraft().getTextureManager().getTexture(texture);
+            	final ITextureObject textureObject = Minecraft.getMinecraft().getTextureManager().getTexture(texture);
                 if (textureObject != TextureUtil.MISSING_TEXTURE) {
                     this.renderer.bindTexture(texture);
                     this.renderer.getMainModel().render(entity, limbSwing, limbSwingAmount, age, yaw, pitch, scale);

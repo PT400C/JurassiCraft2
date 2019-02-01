@@ -13,6 +13,7 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.BlockShulkerBox;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -80,6 +81,7 @@ public class ClearGlassPaneBlock extends Block {
 				.withProperty(BLOCK_EAST, Boolean.valueOf(false)).withProperty(BLOCK_SOUTH, Boolean.valueOf(false))
 				.withProperty(BLOCK_WEST, Boolean.valueOf(false)).withProperty(UP, Boolean.valueOf(false)));
 		this.canDrop = true;
+		this.setSoundType(SoundType.GLASS);
 		this.setCreativeTab(TabHandler.BLOCKS);
 	}
 
@@ -349,26 +351,7 @@ public class ClearGlassPaneBlock extends Block {
 				&& !(state.getBlock() instanceof BlockPane || state.getBlock() instanceof ClearGlassPaneBlock);
 	}
 
-	/*
-	 * ======================================== FORGE END
-	 * ========================================
-	 */
-
-	/**
-	 * Get the geometry of the queried face at the given position and state. This is
-	 * used to decide whether things like buttons are allowed to be placed on the
-	 * face, or how glass panes connect to the face, among other things.
-	 * <p>
-	 * Common values are {@code SOLID}, which is the default, and {@code UNDEFINED},
-	 * which represents something that does not fit the other descriptions and will
-	 * generally cause other things not to connect to the face.
-	 * 
-	 * @return an approximation of the form of the given face
-	 */
 	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-		// return face != EnumFacing.UP && face != EnumFacing.DOWN ?
-		// BlockFaceShape.MIDDLE_POLE_THIN
-		// : BlockFaceShape.MIDDLE_POLE_THIN;
 		return BlockFaceShape.MIDDLE_POLE_THIN;
 	}
 

@@ -30,7 +30,7 @@ public class ReinforcedGlassBlock extends BlockGlass {
 		this.setCreativeTab(TabHandler.BLOCKS);
 		setHardness(10.0F);
 		setResistance(14.0F);
-		this.setSoundType(SoundType.GLASS);
+		this.setSoundType(SoundType.STONE);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(NORTH, false).withProperty(EAST, false)
 				.withProperty(SOUTH, false).withProperty(WEST, false).withProperty(UP, false)
 				.withProperty(DOWN, false));

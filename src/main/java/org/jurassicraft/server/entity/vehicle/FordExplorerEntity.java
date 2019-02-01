@@ -308,7 +308,7 @@ public class FordExplorerEntity extends VehicleEntity {
             TourRailBlock.EnumRailDirection dir = TourRailBlock.getRailDirection(world, railTracks);
 
             EnumFacing facing = getFacingDir();
-
+            //TODO: Working?
             switch (dir) {
                 case ASCENDING_EAST:
                     motionX -= slopeAdjustment;
@@ -325,6 +325,7 @@ public class FordExplorerEntity extends VehicleEntity {
                 case ASCENDING_SOUTH:
                     motionZ -= slopeAdjustment;
                     ++posY;
+                default:
             }
             double d1 = (double)(dir.getBackwardsX(facing) - dir.getForwardX(facing));
             double d2 = (double)(dir.getBackwardsZ(facing) - dir.getForwardZ(facing));

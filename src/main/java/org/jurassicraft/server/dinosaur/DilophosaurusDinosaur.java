@@ -1,19 +1,25 @@
 package org.jurassicraft.server.dinosaur;
 
-import java.util.ArrayList;
-
+import java.util.HashMap;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.OverlayType;
 import org.jurassicraft.server.entity.SleepTime;
 import org.jurassicraft.server.entity.dinosaur.DilophosaurusEntity;
 import org.jurassicraft.server.period.TimePeriod;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
 public class DilophosaurusDinosaur extends Dinosaur {
+	
+	private static final HashMap<String, Float> offsets = new HashMap<String, Float>() {{
+		put("Snout 2", null);
+		put("Snout 3", null);
+		put("Neck", null);
+		put("Tail", null);
+		put("Head", null);
+	}};
 	
 	 @Override
 	 protected DinosaurMetadata buildMetadata() {
@@ -41,6 +47,7 @@ public class DilophosaurusDinosaur extends Dinosaur {
 	                .setMaxHerdSize(10)
 	                .setAttackBias(1200.0)
 	                .setBreeding(false, 2, 4, 24, false, true)
+	                .setOffsetCubes(offsets)
 	                .setOverlays(OverlayType.EYELID)
 	                .setRecipe(new String[][] {
 	                        { "", "", "", "neck", "skull" },

@@ -23,7 +23,6 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
-import org.jurassicraft.client.entity.DummyCameraEntity;
 import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.client.gui.*;
 import org.jurassicraft.client.model.JurassicraftTabulaModelHandler;
@@ -51,21 +50,17 @@ public class ClientProxy extends ServerProxy {
 	public static final List<UUID> PATRONS = new ArrayList<>();
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void onPreInit(FMLPreInitializationEvent event) {
 		super.onPreInit(event);
 
 //		registerEntity(DummyCameraEntity.class, "DummyCameraEntity");
 		KeyBindingHandler.init();
-
 		try {
 			LanguageHandler.INSTANCE.loadRemoteLocalization(JurassiCraft.MODID);
 		} catch (Exception e) {
 			JurassiCraft.getLogger().error("Failed to load remote localizations", e);
 		}
-
-		ClientEventHandler eventHandler = new ClientEventHandler();
-		MinecraftForge.EVENT_BUS.register(eventHandler);
+		MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
 		MinecraftForge.EVENT_BUS.register(RenderingHandler.INSTANCE);
 		RenderingHandler.INSTANCE.preInit();
 		ModelLoaderRegistry.registerLoader(JurassicraftTabulaModelHandler.INSTANCE);
@@ -85,7 +80,7 @@ public class ClientProxy extends ServerProxy {
 		RenderingHandler.INSTANCE.postInit();
 
 		new Thread(() -> {
-			List<String> patrons = WebUtils.readPastebinAsList("G8AVxw6A");
+			final List<String> patrons = WebUtils.readPastebinAsList("G8AVxw6A");
 			if (patrons != null) {
 				for (String patron : patrons) {
 					PATRONS.add(UUID.fromString(patron));

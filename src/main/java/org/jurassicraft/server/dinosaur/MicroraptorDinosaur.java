@@ -3,9 +3,6 @@ package org.jurassicraft.server.dinosaur;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
-
-import java.util.ArrayList;
-
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.OverlayType;

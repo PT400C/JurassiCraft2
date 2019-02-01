@@ -4,6 +4,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+
+import org.jurassicraft.server.entity.AnimalMetadata;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.OverlayType;
@@ -11,17 +13,18 @@ import org.jurassicraft.server.entity.SleepTime;
 import org.jurassicraft.server.entity.ai.util.MovementType;
 import org.jurassicraft.server.period.TimePeriod;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
-public class DinosaurMetadata {
-    private final ResourceLocation identifier;
-    private Class<? extends DinosaurEntity> entityClass;
-    private Function<World, DinosaurEntity> entityConstructor;
-    private Dinosaur.DinosaurType dinosaurType;
+public class DinosaurMetadata extends AnimalMetadata {
+	
+	private Dinosaur.DinosaurType dinosaurType;
     private int primaryEggColorMale, primaryEggColorFemale;
     private int secondaryEggColorMale, secondaryEggColorFemale;
+    private Class<? extends DinosaurEntity> entityClass;
+    private Function<World, DinosaurEntity> entityConstructor;
     private TimePeriod timePeriod;
     private double babyHealth, adultHealth;
     private double babyStrength, adultStrength;
@@ -68,77 +71,82 @@ public class DinosaurMetadata {
     private int overlayCount;
     private int eyeTime = 4;
     
-    public DinosaurMetadata(ResourceLocation identifier) {
-        this.identifier = identifier;
+    public DinosaurMetadata(final ResourceLocation identifier) {
+    	super(identifier);
     }
     public ResourceLocation getIdentifier() {
         return this.identifier;
     }
-    public DinosaurMetadata setEggColorMale(int primary, int secondary) {
+    public DinosaurMetadata setEntity(final Class<? extends DinosaurEntity> clazz, final Function<World, DinosaurEntity> constructor) {
+        this.entityClass = clazz;
+        this.entityConstructor = constructor;
+        return this;
+    }
+    public DinosaurMetadata setEggColorMale(final int primary, final int secondary) {
         this.primaryEggColorMale = primary;
         this.secondaryEggColorMale = secondary;
         return this;
     }
-    public DinosaurMetadata setEggColorFemale(int primary, int secondary) {
+    public DinosaurMetadata setEggColorFemale(final int primary, final int secondary) {
         this.primaryEggColorFemale = primary;
         this.secondaryEggColorFemale = secondary;
         return this;
     }
-    public DinosaurMetadata setTimePeriod(TimePeriod timePeriod) {
+    public DinosaurMetadata setTimePeriod(final TimePeriod timePeriod) {
         this.timePeriod = timePeriod;
         return this;
     }
-    public DinosaurMetadata setHealth(double baby, double adult) {
+    public DinosaurMetadata setHealth(final double baby, final double adult) {
         this.babyHealth = baby;
         this.adultHealth = adult;
         return this;
     }
-    public DinosaurMetadata setStrength(double baby, double adult) {
+    public DinosaurMetadata setStrength(final double baby, final double adult) {
         this.babyStrength = baby;
         this.adultStrength = adult;
         return this;
     }
-    public DinosaurMetadata setSpeed(double baby, double adult) {
+    public DinosaurMetadata setSpeed(final double baby, final double adult) {
         this.babySpeed = baby;
         this.adultSpeed = adult;
         return this;
     }
-    public DinosaurMetadata setSizeX(float baby, float adult) {
+    public DinosaurMetadata setSizeX(final float baby, final float adult) {
         this.babySizeX = baby;
         this.adultSizeX = adult;
         return this;
     }
-    public DinosaurMetadata setSizeY(float baby, float adult) {
+    public DinosaurMetadata setSizeY(final float baby, final float adult) {
         this.babySizeY = baby;
         this.adultSizeY = adult;
         return this;
     }
-    public DinosaurMetadata setEyeHeight(float baby, float adult) {
+    public DinosaurMetadata setEyeHeight(final float baby, final float adult) {
         this.babyEyeHeight = baby;
         this.adultEyeHeight = adult;
         return this;
     }
-    public DinosaurMetadata setFlockSpeed(float speed) {
+    public DinosaurMetadata setFlockSpeed(final float speed) {
         this.flockSpeed = speed;
         return this;
     }
-    public DinosaurMetadata setAttackBias(double bias) {
+    public DinosaurMetadata setAttackBias(final double bias) {
         this.attackBias = bias;
         return this;
     }
-    public DinosaurMetadata setMaxHerdSize(int herdSize) {
+    public DinosaurMetadata setMaxHerdSize(final int herdSize) {
         this.maxHerdSize = herdSize;
         return this;
     }
-    public DinosaurMetadata setRandomFlock(boolean randomFlock) {
+    public DinosaurMetadata setRandomFlock(final boolean randomFlock) {
         this.randomFlock = randomFlock;
         return this;
     }
-    public DinosaurMetadata setMovementType(MovementType type) {
+    public DinosaurMetadata setMovementType(final MovementType type) {
         this.movementType = type;
         return this;
     }
-    public DinosaurMetadata setBreeding(boolean directBirth, int minClutch, int maxClutch, int breedCooldown, boolean breedAroundOffspring, boolean defendOffspring) {
+    public DinosaurMetadata setBreeding(final boolean directBirth, final int minClutch, final int maxClutch, final int breedCooldown, final boolean breedAroundOffspring, final boolean defendOffspring) {
         this.directBirth = directBirth;
         this.minClutch = minClutch;
         this.maxClutch = maxClutch;
@@ -147,103 +155,102 @@ public class DinosaurMetadata {
         this.defendOffspring = defendOffspring;
         return this;
     }
-    public DinosaurMetadata setEntity(Class<? extends DinosaurEntity> clazz, Function<World, DinosaurEntity> constructor) {
-        this.entityClass = clazz;
-        this.entityConstructor = constructor;
-        return this;
-    }
-    public DinosaurMetadata setMaximumAge(int age) {
+    public DinosaurMetadata setMaximumAge(final int age) {
         this.maximumAge = age;
         return this;
     }
-    public DinosaurMetadata setSkeletonPoses(String... poses) {
+    public DinosaurMetadata setSkeletonPoses(final String... poses) {
         this.skeletonPoses = poses;
         return this;
     }
-    public DinosaurMetadata setOverlayCount(int count) {
+    public DinosaurMetadata setOffsetCubes(final HashMap<String, Float> cubes) {
+        this.offsetCubes = cubes;
+        return this;
+    }
+    public DinosaurMetadata setOverlayCount(final int count) {
         this.overlayCount = count;
         return this;
     }
-    public DinosaurMetadata setOverlays(OverlayType... types) {
+    public DinosaurMetadata setOverlays(final OverlayType... types) {
     	this.overlayTypes = types;
     	return this;
     }
-    public DinosaurMetadata setAttackSpeed(double attackSpeed) {
+    public DinosaurMetadata setAttackSpeed(final double attackSpeed) {
         this.attackSpeed = attackSpeed;
         return this;
     }
-    public DinosaurMetadata setScale(float scaleAdult, float scaleInfant) {
+    public DinosaurMetadata setScale(final float scaleAdult, final float scaleInfant) {
         this.scaleInfant = scaleInfant;
         this.scaleAdult = scaleAdult;
         return this;
     }
-    public DinosaurMetadata setOffset(float x, float y, float z) {
+    public DinosaurMetadata setOffset(final float x, final float y, final float z) {
         this.offsetX = x;
         this.offsetY = y;
         this.offsetZ = z;
         return this;
     }
-    public DinosaurMetadata setDefendOwner(boolean defendOwner) {
+    public DinosaurMetadata setDefendOwner(final boolean defendOwner) {
         this.defendOwner = defendOwner;
         return this;
     }
-    public DinosaurMetadata setFlee(boolean flee) {
+    public DinosaurMetadata setFlee(final boolean flee) {
         this.flee = flee;
         return this;
     }
-    public DinosaurMetadata setBones(String... bones) {
+    public DinosaurMetadata setBones(final String... bones) {
         this.bones = bones;
         return this;
     }
-    public DinosaurMetadata setBirthType(Dinosaur.BirthType birthType) {
+    public DinosaurMetadata setBirthType(final Dinosaur.BirthType birthType) {
         this.birthType = birthType;
         return this;
     }
-    public DinosaurMetadata setMarineAnimal(boolean marineAnimal) {
+    public DinosaurMetadata setMarineAnimal(final boolean marineAnimal) {
         this.isMarineAnimal = marineAnimal;
         return this;
     }
-    public DinosaurMetadata setEyeTime(int eyeTime) {
+    public DinosaurMetadata setEyeTime(final int eyeTime) {
         this.eyeTime = eyeTime;
         return this;
     }
-    public DinosaurMetadata setMammal(boolean isMammal) {
+    public DinosaurMetadata setMammal(final boolean isMammal) {
         this.isMammal = isMammal;
         return this;
     }
-    public DinosaurMetadata setStorage(int storage) {
+    public DinosaurMetadata setStorage(final int storage) {
         this.storage = storage;
         return this;
     }
-    public DinosaurMetadata setDiet(Diet diet) {
+    public DinosaurMetadata setDiet(final Diet diet) {
         this.diet = diet;
         return this;
     }
-    public DinosaurMetadata setSleepTime(SleepTime sleepTime) {
+    public DinosaurMetadata setSleepTime(final SleepTime sleepTime) {
         this.sleepTime = sleepTime;
         return this;
     }
-    public DinosaurMetadata setHeadCubeName(String headCubeName) {
+    public DinosaurMetadata setHeadCubeName(final String headCubeName) {
         this.headCubeName = headCubeName;
         return this;
     }
-    public DinosaurMetadata setImprintable(boolean imprintable) {
+    public DinosaurMetadata setImprintable(final boolean imprintable) {
         this.isImprintable = imprintable;
         return this;
     }
-    public DinosaurMetadata setCanClimb(boolean canClimb) {
+    public DinosaurMetadata setCanClimb(final boolean canClimb) {
         this.canClimb = canClimb;
         return this;
     }
-    public DinosaurMetadata setJumpHeight(int jumpHeight) {
+    public DinosaurMetadata setJumpHeight(final int jumpHeight) {
         this.jumpHeight = jumpHeight;
         return this;
     }
-    public DinosaurMetadata setRecipe(String[][] recipe) {
+    public DinosaurMetadata setRecipe(final String[][] recipe) {
         this.recipe = recipe;
         return this;
     }
-    public DinosaurMetadata setSpawn(int chance, Biome[]... allBiomes) {
+    public DinosaurMetadata setSpawn(final int chance, final Biome[]... allBiomes) {
         this.spawnChance = chance;
         List<Biome> spawnBiomes = new LinkedList<>();
         for (Biome[] biomes : allBiomes) {
@@ -256,7 +263,7 @@ public class DinosaurMetadata {
         this.spawnBiomes = spawnBiomes.toArray(new Biome[0]);
         return this;
     }
-    public DinosaurMetadata setSpawn(int chance, BiomeDictionary.Type... types) {
+    public DinosaurMetadata setSpawn(final int chance, final BiomeDictionary.Type... types) {
         ArrayList<Biome> biomeList = new ArrayList<>();
         for (BiomeDictionary.Type type : types) {
             biomeList.addAll(BiomeDictionary.getBiomes(type));
@@ -264,15 +271,12 @@ public class DinosaurMetadata {
         this.setSpawn(chance, biomeList.toArray(new Biome[0]));
         return this;
     }
-    public DinosaurMetadata setDinosaurType(Dinosaur.DinosaurType dinosaurType) {
+    public DinosaurMetadata setDinosaurType(final Dinosaur.DinosaurType dinosaurType) {
         this.dinosaurType = dinosaurType;
         return this;
     }
     public MovementType getMovementType() {
         return this.movementType;
-    }
-    public Class<? extends DinosaurEntity> getDinosaurClass() {
-        return this.entityClass;
     }
     public int getEggPrimaryColorMale() {
         return this.primaryEggColorMale;
@@ -309,6 +313,9 @@ public class DinosaurMetadata {
     }
     public float getBabySizeX() {
         return this.babySizeX;
+    }
+    public Class<? extends DinosaurEntity> getDinosaurClass() {
+        return (Class<? extends DinosaurEntity>) this.entityClass;
     }
     public float getBabySizeY() {
         return this.babySizeY;
@@ -452,7 +459,7 @@ public class DinosaurMetadata {
     public String[][] getRecipe() {
         return this.recipe;
     }
-    public DinosaurEntity construct(World world) {
-        return this.entityConstructor.apply(world);
+    public DinosaurEntity construct(final World world) {
+        return (DinosaurEntity) this.entityConstructor.apply(world);
     }
 }

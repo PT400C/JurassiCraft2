@@ -48,7 +48,6 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.jurassicraft.server.world.structure.StructureGenerationHandler;
 
 public class ServerProxy implements IGuiHandler {
-	public static ServerEventHandler commonEvents;
     public static final int GUI_CLEANING_STATION_ID = 0;
     public static final int GUI_FOSSIL_GRINDER_ID = 1;
     public static final int GUI_DNA_SEQUENCER_ID = 2;
@@ -80,10 +79,8 @@ public class ServerProxy implements IGuiHandler {
         GameRegistry.registerWorldGenerator(WorldGenerator.INSTANCE, 0);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(JurassiCraft.INSTANCE, this);
-
-        commonEvents = new ServerEventHandler();
-        MinecraftForge.EVENT_BUS.register(new RegistryHandler());
-        MinecraftForge.EVENT_BUS.register(commonEvents);
+        MinecraftForge.EVENT_BUS.register(RegistryHandler.class);
+        MinecraftForge.EVENT_BUS.register(ServerEventHandler.class);
     }
 
     public void onPostInit(FMLPostInitializationEvent event) {
@@ -103,7 +100,7 @@ public class ServerProxy implements IGuiHandler {
         Blocks.FIRE.setFireInfo(BlockHandler.VINES, 15, 100);
     }
     
-    private void addSpawn(List<SpawnListEntry> list) {
+    private static void addSpawn(List<SpawnListEntry> list) {
     	 boolean shouldAddGoat = false;
     	 for(Biome.SpawnListEntry entry : list) {
              if(entry.entityClass == EntityPig.class) {

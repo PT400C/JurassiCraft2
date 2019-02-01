@@ -1,5 +1,6 @@
 package org.jurassicraft.client.render.block;
 
+import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.block.OrientedBlock;
 import org.jurassicraft.server.block.entity.AncientItemHoldingBlockEntity;
@@ -22,10 +23,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class AncientItemHoldingBlockRenderer extends TileEntitySpecialRenderer<AncientItemHoldingBlockEntity> {
-	private Minecraft mc = Minecraft.getMinecraft();
 
 	@Override
-	public void render(AncientItemHoldingBlockEntity te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+	public void render(final AncientItemHoldingBlockEntity te, final double x, final double y, final double z, final float partialTicks, final int destroyStage, final float alpha) {
 
 		if (te.getDisplayItemStack() != null) {
 			GlStateManager.pushMatrix();
@@ -39,7 +39,7 @@ public class AncientItemHoldingBlockRenderer extends TileEntitySpecialRenderer<A
 			GlStateManager.pushAttrib();
 
 			RenderHelper.enableStandardItemLighting();
-			Minecraft.getMinecraft().getRenderItem().renderItem(te.getDisplayItemStack(), ItemCameraTransforms.TransformType.FIXED);
+			ClientEventHandler.MC.getRenderItem().renderItem(te.getDisplayItemStack(), ItemCameraTransforms.TransformType.FIXED);
 			RenderHelper.disableStandardItemLighting();
 
 			GlStateManager.popAttrib();

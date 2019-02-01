@@ -6,6 +6,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.client.render.RenderingHandler;
 import org.jurassicraft.client.render.entity.dinosaur.DinosaurRenderInfo;
 import org.jurassicraft.server.block.BlockHandler;
@@ -13,13 +15,12 @@ import org.jurassicraft.server.block.entity.IncubatorBlockEntity;
 import org.jurassicraft.server.entity.EntityHandler;
 
 public class IncubatorRenderer extends TileEntitySpecialRenderer<IncubatorBlockEntity> {
-    private Minecraft mc = Minecraft.getMinecraft();
 
     @Override
-    public void render(IncubatorBlockEntity tileEntity, double x, double y, double z, float p_180535_8_, int p_180535_9_, float alpha) {
-        World world = tileEntity.getWorld();
+    public void render(final IncubatorBlockEntity tileEntity, final double x, final double y, final double z, final float p_180535_8_, final int p_180535_9_, final float alpha) {
+    	final World world = tileEntity.getWorld();
 
-        IBlockState state = world.getBlockState(tileEntity.getPos());
+    	final IBlockState state = world.getBlockState(tileEntity.getPos());
 
         if (state.getBlock() == BlockHandler.INCUBATOR) {
             GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
@@ -36,14 +37,14 @@ public class IncubatorRenderer extends TileEntitySpecialRenderer<IncubatorBlockE
         }
     }
 
-    private void renderEgg(ItemStack stack, double x, double y, double z, double xOffset, double zOffset) {
+    private void renderEgg(final ItemStack stack, final double x, final double y, final double z, final double xOffset, final double zOffset) {
         if (!stack.isEmpty()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(x, y + 0.05, z);
             GlStateManager.translate(xOffset, 1.2, zOffset);
             GlStateManager.scale(-0.5F, -0.5F, -0.5F);
-            DinosaurRenderInfo renderDef = RenderingHandler.INSTANCE.getRenderInfo(EntityHandler.getDinosaurById(stack.getItemDamage()));
-            this.mc.getTextureManager().bindTexture(renderDef.getEggTexture());
+            final DinosaurRenderInfo renderDef = RenderingHandler.INSTANCE.getRenderInfo(EntityHandler.getDinosaurById(stack.getItemDamage()));
+            ClientEventHandler.MC.getTextureManager().bindTexture(renderDef.getEggTexture());
             renderDef.getEggModel().render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
             GlStateManager.popMatrix();
         }

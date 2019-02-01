@@ -104,9 +104,25 @@ public class DNACombinatorHybridizerBlockEntity extends MachineBaseBlockEntity {
         if (this.hybridizerMode) {
             return this.slots.get(10).isEmpty() && this.getHybrid() != null;
         } else {
-            if (!this.slots.get(8).isEmpty() && this.slots.get(8).getItem() == ItemHandler.STORAGE_DISC && !this.slots.get(9).isEmpty() && this.slots.get(9).getItem() == ItemHandler.STORAGE_DISC) {
-                if (this.slots.get(8).getTagCompound() != null && this.slots.get(9).getTagCompound() != null && this.slots.get(11).isEmpty() && this.slots.get(8).getItemDamage() == this.slots.get(9).getItemDamage() && this.slots.get(8).getTagCompound().getString("StorageId").equals(this.slots.get(9).getTagCompound().getString("StorageId"))) {
-                    return true;
+        	final ItemStack left = this.slots.get(8);
+        	final ItemStack right = this.slots.get(9);
+            if (!left.isEmpty() && left.getItem() == ItemHandler.STORAGE_DISC && !right.isEmpty() && right.getItem() == ItemHandler.STORAGE_DISC) {
+            	final String leftID = left.getTagCompound().getString("StorageId");
+            	final String rightID = right.getTagCompound().getString("StorageId");
+                if (left.getTagCompound() != null && right.getTagCompound() != null && this.slots.get(11).isEmpty() && left.getItemDamage() == right.getItemDamage() && leftID.equals(rightID)) {
+                    if(leftID.equals("DinoDNA")) {
+                    	DinoDNA dna1 = DinoDNA.readFromNBT(left.getTagCompound());
+                        DinoDNA dna2 = DinoDNA.readFromNBT(right.getTagCompound());
+                        if(dna1.getDinosaur() == dna2.getDinosaur())
+                        	return true;
+                        
+                    }else if(leftID.equals("PlantDNA")) {
+                    	PlantDNA dna1 = PlantDNA.readFromNBT(left.getTagCompound());
+                        PlantDNA dna2 = PlantDNA.readFromNBT(right.getTagCompound());
+                        if(dna1.getPlant() == dna2.getPlant())
+                        	return true;
+                    }
+                	return false;
                 }
             }
 
@@ -142,33 +158,32 @@ public class DNACombinatorHybridizerBlockEntity extends MachineBaseBlockEntity {
                 if (storageId.equals("DinoDNA")) {
                     DinoDNA dna1 = DinoDNA.readFromNBT(this.slots.get(8).getTagCompound());
                     DinoDNA dna2 = DinoDNA.readFromNBT(this.slots.get(9).getTagCompound());
+					int newQuality = dna1.getDNAQuality() + dna2.getDNAQuality();
 
-                    int newQuality = dna1.getDNAQuality() + dna2.getDNAQuality();
+					if (newQuality > 100) {
+						newQuality = 100;
+					}
 
-                    if (newQuality > 100) {
-                        newQuality = 100;
-                    }
+					DinoDNA newDNA = new DinoDNA(dna1.getDinosaur(), newQuality, dna1.getGenetics());
 
-                    DinoDNA newDNA = new DinoDNA(dna1.getDinosaur(), newQuality, dna1.getGenetics());
-
-                    NBTTagCompound outputTag = new NBTTagCompound();
-                    newDNA.writeToNBT(outputTag);
-                    output.setTagCompound(outputTag);
+					NBTTagCompound outputTag = new NBTTagCompound();
+					newDNA.writeToNBT(outputTag);
+					output.setTagCompound(outputTag);
+					
                 } else if (storageId.equals("PlantDNA")) {
                     PlantDNA dna1 = PlantDNA.readFromNBT(this.slots.get(8).getTagCompound());
                     PlantDNA dna2 = PlantDNA.readFromNBT(this.slots.get(9).getTagCompound());
+					int newQuality = dna1.getDNAQuality() + dna2.getDNAQuality();
 
-                    int newQuality = dna1.getDNAQuality() + dna2.getDNAQuality();
+					if (newQuality > 100) {
+						newQuality = 100;
+					}
 
-                    if (newQuality > 100) {
-                        newQuality = 100;
-                    }
+					PlantDNA newDNA = new PlantDNA(dna1.getPlant(), newQuality);
 
-                    PlantDNA newDNA = new PlantDNA(dna1.getPlant(), newQuality);
-
-                    NBTTagCompound outputTag = new NBTTagCompound();
-                    newDNA.writeToNBT(outputTag);
-                    output.setTagCompound(outputTag);
+					NBTTagCompound outputTag = new NBTTagCompound();
+					newDNA.writeToNBT(outputTag);
+					output.setTagCompound(outputTag);
                 }
 
                 this.mergeStack(11, output);

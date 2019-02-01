@@ -2,6 +2,7 @@ package org.jurassicraft.server.util;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.block.BlockHandler;
+import org.jurassicraft.server.event.ServerEventHandler;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockShulkerBox;
@@ -45,7 +46,7 @@ public class JCBlockVine extends BlockVine {
 
     protected static boolean isExceptBlockForAttaching(Block p_193397_0_)
     {
-        return p_193397_0_ instanceof BlockShulkerBox || p_193397_0_ == Blocks.BEACON || p_193397_0_ == Blocks.CAULDRON || p_193397_0_ == Blocks.GLASS || p_193397_0_ == Blocks.STAINED_GLASS || p_193397_0_ == Blocks.PISTON || p_193397_0_ == Blocks.STICKY_PISTON || p_193397_0_ == Blocks.PISTON_HEAD || p_193397_0_ == Blocks.TRAPDOOR || JurassiCraft.PROXY.commonEvents.vinesException.contains(p_193397_0_);
+        return p_193397_0_ instanceof BlockShulkerBox || p_193397_0_ == Blocks.BEACON || p_193397_0_ == Blocks.CAULDRON || p_193397_0_ == Blocks.GLASS || p_193397_0_ == Blocks.STAINED_GLASS || p_193397_0_ == Blocks.PISTON || p_193397_0_ == Blocks.STICKY_PISTON || p_193397_0_ == Blocks.PISTON_HEAD || p_193397_0_ == Blocks.TRAPDOOR || ServerEventHandler.getVinesExceptions().contains(p_193397_0_);
     }
     
 }

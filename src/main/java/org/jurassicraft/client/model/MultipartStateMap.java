@@ -11,9 +11,10 @@ import java.util.Collections;
 
 @SideOnly(Side.CLIENT)
 public class MultipartStateMap extends StateMapperBase {
+	
     @Override
-    protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
-        String blockName = Block.REGISTRY.getNameForObject(state.getBlock()).toString();
+    protected ModelResourceLocation getModelResourceLocation(final IBlockState state) {
+    	final String blockName = Block.REGISTRY.getNameForObject(state.getBlock()).toString();
         return new ModelResourceLocation(blockName, this.getPropertyString(Collections.emptyMap()));
     }
 }

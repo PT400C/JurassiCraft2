@@ -3,9 +3,7 @@ package org.jurassicraft.server.dinosaur;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
-
-import java.util.ArrayList;
-
+import java.util.HashMap;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.entity.Diet;
 import org.jurassicraft.server.entity.OverlayType;
@@ -13,6 +11,17 @@ import org.jurassicraft.server.entity.dinosaur.ParasaurolophusEntity;
 import org.jurassicraft.server.period.TimePeriod;
 
 public class ParasaurolophusDinosaur extends Dinosaur {
+	
+	private static final HashMap<String, Float> offsets = new HashMap<String, Float>() {{
+		put("Calf", null);
+		put("Neck", null);
+		put("Tail", null);
+		put("Snout2", null);
+		put("Jaw2", null);
+		put("Body2", null);
+		put("Hip5(L)", null);
+		put("hip4(R)", null);
+	}};
 	
     @Override
     protected DinosaurMetadata buildMetadata() {
@@ -38,6 +47,7 @@ public class ParasaurolophusDinosaur extends Dinosaur {
                 .setImprintable(true)
                 .setFlockSpeed(1.5F)
                 .setAttackBias(-100.0)
+                .setOffsetCubes(offsets)
                 .setBreeding(false, 4, 6, 40, false, true)
                 .setRecipe(new String[][] {
                         { "tail_vertebrae", "pelvis", "ribcage", "neck_vertebrae", "skull" },

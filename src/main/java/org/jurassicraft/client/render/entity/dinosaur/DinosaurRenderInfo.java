@@ -45,19 +45,18 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
         }
     }
 
-    public DinosaurRenderInfo(Dinosaur dinosaur, EntityAnimator<?> animator, float shadowSize) {
-    	
+    public DinosaurRenderInfo(final Dinosaur dinosaur, final EntityAnimator<?> animator, final float shadowSize) {
         this.dinosaur = dinosaur;
         this.animator = animator;
         this.shadowSize = shadowSize;
         
-		for (GrowthStage stage : GrowthStage.values()) {
+		for (final GrowthStage stage : GrowthStage.values()) {
 			if (stage != GrowthStage.SKELETON) {
-				this.animatableModels.put(stage, new AnimatableModel(this.dinosaur.getModelContainer(stage), this.getModelAnimator(stage)));
+				this.animatableModels.put(stage, new AnimatableModel(this.dinosaur.getModelContainer(stage), this.getDinosaur().getMetadata(), this.getModelAnimator(stage)));
 			} else {
 				
 				for (int i = 0; i < dinosaur.getMetadata().skeletonPoses().length; i++) {
-					this.skeletonModels[i] = new AnimatableModel(this.dinosaur.getSkeletonModel().get(dinosaur.getMetadata().skeletonPoses()[i]), null);
+					this.skeletonModels[i] = new AnimatableModel(this.dinosaur.getSkeletonModel().get(dinosaur.getMetadata().skeletonPoses()[i]), this.getDinosaur().getMetadata(), null);
 				}
 
 			}
@@ -65,9 +64,9 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
 
         try {
         	
-            ResourceLocation identifier = dinosaur.getIdentifier();
-            String domain = identifier.getResourceDomain();
-            String path = identifier.getResourcePath();
+        	final ResourceLocation identifier = dinosaur.getIdentifier();
+        	final String domain = identifier.getResourceDomain();
+        	final String path = identifier.getResourcePath();
             this.eggModel = new TabulaModel(TabulaModelHelper.loadTabulaModel(new ResourceLocation(domain, "models/entities/egg/" + path)));
             this.eggTexture = new ResourceLocation(domain, "textures/entities/egg/" + path + ".png");
         } catch (NullPointerException | IllegalArgumentException | IOException e) {
@@ -76,7 +75,7 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
         }
     }
 
-    public ModelBase getModel(GrowthStage stage, byte variant) {
+    public ModelBase getModel(final GrowthStage stage, final byte variant) {
     	
     	if (!this.dinosaur.doesSupportGrowthStage(stage)) 
     		return this.getModelAdult();
@@ -94,7 +93,7 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
         return this.eggTexture;
     }
 
-    public EntityAnimator<?> getModelAnimator(GrowthStage stage) {
+    public EntityAnimator<?> getModelAnimator(final GrowthStage stage) {
         return this.animator;
     }
 
@@ -107,7 +106,7 @@ public class DinosaurRenderInfo implements IRenderFactory<DinosaurEntity> {
     }
 
     @Override
-    public Render<? super DinosaurEntity> createRenderFor(RenderManager manager) {
+    public Render<? super DinosaurEntity> createRenderFor(final RenderManager manager) {
         return new DinosaurRenderer(this, manager);
     }
 

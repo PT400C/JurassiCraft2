@@ -47,8 +47,10 @@ public class FeederEntityAI extends EntityAIBase {
             TileEntity tile = this.dinosaur.world.getTileEntity(this.feederPosition);
             if (tile instanceof FeederBlockEntity) {
                 FeederBlockEntity feeder = (FeederBlockEntity) tile;
-                feeder.setOpen(true);
-                feeder.setFeeding(this.dinosaur);
+				if (feeder.canFeedDinosaur(this.dinosaur)) {
+					feeder.setOpen(true);
+					feeder.setFeeding(this.dinosaur);
+				}
             }
             this.resetTask();
         }

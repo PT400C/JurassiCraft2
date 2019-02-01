@@ -10,6 +10,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.model.AnimatableModel;
 import org.jurassicraft.client.model.animation.entity.GoatAnimator;
+import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.entity.GoatEntity;
 import org.jurassicraft.server.tabula.TabulaModelHelper;
 
@@ -37,37 +38,37 @@ public class GoatRenderer extends RenderLiving<GoatEntity> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        KID_MODEL = new AnimatableModel(kid, new GoatAnimator());
-        BILLY_MODEL = new AnimatableModel(billy, new GoatAnimator());
-        NANNY_MODEL = new AnimatableModel(nanny, new GoatAnimator());
-        for (GoatEntity.Variant variant : GoatEntity.Variant.values()) {
-            String name = variant.name().toLowerCase(Locale.ENGLISH);
+        KID_MODEL = new AnimatableModel(kid, EntityHandler.GOAT.getMetadata(), new GoatAnimator());
+        BILLY_MODEL = new AnimatableModel(billy, EntityHandler.GOAT.getMetadata(), new GoatAnimator());
+        NANNY_MODEL = new AnimatableModel(nanny, EntityHandler.GOAT.getMetadata(), new GoatAnimator());
+        for (final GoatEntity.Variant variant : GoatEntity.Variant.values()) {
+        	final String name = variant.name().toLowerCase(Locale.ENGLISH);
             KID_TEXTURE.put(variant, new ResourceLocation(JurassiCraft.MODID, "textures/entities/goat/kid_" + name + ".png"));
             NANNY_TEXTURE.put(variant, new ResourceLocation(JurassiCraft.MODID, "textures/entities/goat/nanny_" + name + ".png"));
             BILLY_TEXTURE.put(variant, new ResourceLocation(JurassiCraft.MODID, "textures/entities/goat/billy_" + name + ".png"));
         }
     }
 
-    public GoatRenderer(RenderManager renderManager) {
+    public GoatRenderer(final RenderManager renderManager) {
         super(renderManager, BILLY_MODEL, 0.4F);
     }
 
     @Override
-    public void preRenderCallback(GoatEntity entity, float partialTick) {
+    public void preRenderCallback(final GoatEntity entity, final float partialTick) {
         float scale = entity.isChild() ? 0.2F : 0.47F;
         GlStateManager.scale(scale, scale, scale);
     }
 
     @Override
-    public void doRender(GoatEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        GoatEntity.Type type = entity.getType();
+    public void doRender(final GoatEntity entity, final double x, final double y, final double z, final float entityYaw, final float partialTicks) {
+    	final GoatEntity.Type type = entity.getType();
         this.mainModel = type == GoatEntity.Type.KID ? KID_MODEL : type == GoatEntity.Type.BILLY ? BILLY_MODEL : NANNY_MODEL;
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
     @Override
     public ResourceLocation getEntityTexture(GoatEntity entity) {
-        GoatEntity.Type type = entity.getType();
+    	final GoatEntity.Type type = entity.getType();
         if (type == GoatEntity.Type.KID) {
             return KID_TEXTURE.get(entity.getVariant());
         } else if (type == GoatEntity.Type.BILLY) {

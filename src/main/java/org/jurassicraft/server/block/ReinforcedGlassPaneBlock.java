@@ -13,6 +13,7 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.BlockShulkerBox;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -81,6 +82,7 @@ public class ReinforcedGlassPaneBlock extends Block {
 				.withProperty(BLOCK_WEST, Boolean.valueOf(false)).withProperty(UP, Boolean.valueOf(false)));
 		this.canDrop = true;
 		this.setCreativeTab(TabHandler.BLOCKS);
+		this.setSoundType(SoundType.STONE);
 		this.setHardness(10.0F);
 		this.setResistance(14.0F);
 	}
