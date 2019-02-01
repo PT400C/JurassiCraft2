@@ -6,10 +6,14 @@ import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeCategory;
+import net.minecraft.block.Block;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.plugin.jei.JurassiCraftJEIPlugin;
 
 public class IncubatorRecipeCategory implements IRecipeCategory<IncubatorRecipeWrapper> {
@@ -45,8 +49,8 @@ public class IncubatorRecipeCategory implements IRecipeCategory<IncubatorRecipeW
         IGuiItemStackGroup stackGroup = recipeLayout.getItemStacks();
         stackGroup.init(0, true, 47, 0);
         stackGroup.set(0, ingredients.getInputs(ItemStack.class).get(0));
-        stackGroup.init(1, false, 47, 35);
-        stackGroup.set(1, ingredients.getOutputs(ItemStack.class).get(0));
+        stackGroup.init(1, true, 47, 35);
+        stackGroup.set(1, new ItemStack(Item.getItemFromBlock(BlockHandler.PEAT_MOSS), 1));
     }
 
     @Override

@@ -18,7 +18,6 @@ public class AttemptMoveToSeatMessage extends AbstractMessage<AttemptMoveToSeatM
     private int toSeat;
     private int entityID;
 
-    @SuppressWarnings("unused")
     public AttemptMoveToSeatMessage(){}
 
     public AttemptMoveToSeatMessage(Entity entity, int fromSeat, int toSeat){

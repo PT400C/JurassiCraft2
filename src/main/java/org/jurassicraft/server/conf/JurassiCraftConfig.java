@@ -111,6 +111,9 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
 
         @Config.Name("Enable Tour Rail Blocks")
         public boolean tourRailBlockEnabled = true;
+        
+        @Config.Name("Vehicles destroying blocks")
+        public boolean destroyBlocks = true;
     }
     
     @SubscribeEvent

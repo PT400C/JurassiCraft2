@@ -3,7 +3,13 @@ package org.jurassicraft.server.plugin.jei.category.incubator;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeWrapper;
 import mezz.jei.api.recipe.IRecipeWrapper;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.item.ItemHandler;
@@ -18,9 +24,11 @@ public class IncubatorRecipeWrapper implements IRecipeWrapper {
 
     @Override
     public void getIngredients(IIngredients ingredients) {
-        int meta = EntityHandler.getDinosaurId(this.dinosaur);
-        ingredients.setInput(ItemStack.class, new ItemStack(ItemHandler.EGG, 1, meta));
-        ingredients.setOutput(ItemStack.class, new ItemStack(ItemHandler.HATCHED_EGG, 1, meta));
+    	List<ItemStack> inputs = new ArrayList<>();
+    	int meta = EntityHandler.getDinosaurId(this.dinosaur);
+    	inputs.add(new ItemStack(ItemHandler.EGG, 1, meta));
+    	inputs.add(new ItemStack(Item.getItemFromBlock(BlockHandler.PEAT_MOSS), 1));
+        ingredients.setInputs(ItemStack.class, inputs);
     }
 
     public Dinosaur getDinosaur() {

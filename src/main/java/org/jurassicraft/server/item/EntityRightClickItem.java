@@ -21,7 +21,7 @@ public class EntityRightClickItem extends Item {
 
     @Override
     public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer player, EntityLivingBase target, EnumHand hand) {
-	return func.apply(new Interaction(stack, player, target, hand));
+    	return func.apply(new Interaction(stack, player, target, hand));
     }
     
     public class Interaction {
