@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DinosaurMeatItem extends ItemFood{
+public class DinosaurMeatItem extends ItemFood {
     public DinosaurMeatItem() {
         super(3, 0.3F, true);
         this.setHasSubtypes(true);
