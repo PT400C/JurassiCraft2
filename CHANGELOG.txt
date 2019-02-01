@@ -1,1 +1,5 @@
 *Fixed not properly compressed textures
+*Fixed feeder trying to feed dinosaur when empty
+*Fixed rare glitched items in the digsite's chest
+*First step of attempting to fix the rarely despawning vehicles
++Added config option to control whether vehicles can destroy blocks or not

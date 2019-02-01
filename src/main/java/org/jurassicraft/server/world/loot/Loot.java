@@ -145,12 +145,9 @@ public class Loot {
 				LootEntry waterBottle = Loot.entry(Items.POTIONITEM).count(0, 1).function(POTION_DATA).build();
 				table.addPool(Loot.pool("items").rolls(3, 4).entries(waterBottle).build());
 			} else if (name.getResourcePath().equals(Loot.FOSSIL_DIGSITE_LOOT.getResourcePath())) {
-				ArrayList<LootEntry> fossilParts = new ArrayList<LootEntry>();
-				for (String fossilType : ItemHandler.FOSSILS.keySet()) {
-					LootEntry fossilPart = Loot.entry(ItemHandler.FOSSILS.get(fossilType)).weight(1).function(DINOSAUR_DATA).count(1, 3).build();
-					fossilParts.add(fossilPart);
-				}
-				table.addPool(Loot.pool("items").rolls(1, 2).entries(fossilParts.toArray(new LootEntry[fossilParts.size()])).build());
+				LootEntry fossilPart = Loot.entry(ItemHandler.FOSSIL_DUMMY).weight(1).function(DINOSAUR_DATA).count(1, 1).build();
+				LootEntry fossilPart2 = Loot.entry(ItemHandler.FOSSIL_DUMMY).weight(2).function(DINOSAUR_DATA).count(1, 2).build();
+				table.addPool(Loot.pool("items").rolls(6, 9).entries(fossilPart, fossilPart2).build());
 			}
 
 		}
@@ -301,14 +298,11 @@ public class Loot {
 		@Override
 		public ItemStack apply(ItemStack stack, Random rand, LootContext context) {
 			List<Dinosaur> dinosaurs = EntityHandler.getRegisteredDinosaurs();
-			for (int value = 0; value < dinosaurs.size(); value++) {
 				Dinosaur dinosaur = dinosaurs.get(rand.nextInt(dinosaurs.size()));
 				if (stack.getItem() instanceof FossilItem) {
-					FossilItem s = (FossilItem) stack.getItem();
-					if (Arrays.asList(dinosaur.getMetadata().getBones()).contains(s.getBoneType())) {
-						stack.setItemDamage(EntityHandler.getDinosaurId(dinosaur));
-						return stack;
-					}
+					String boneName = dinosaur.getMetadata().getBones()[rand.nextInt(dinosaur.getMetadata().getBones().length)];
+					stack = new ItemStack(ItemHandler.FOSSILS.get(boneName), 1, EntityHandler.getDinosaurId(dinosaur));
+					return stack;
 				} else if (stack.getItem() instanceof DisplayBlockItem) {
 					DisplayBlockItem s = (DisplayBlockItem) stack.getItem();
 					stack.setItemDamage(s.getMetadata(EntityHandler.getDinosaurId(dinosaur), false, false));
@@ -317,8 +311,6 @@ public class Loot {
 					stack.setItemDamage(EntityHandler.getDinosaurId(dinosaur));
 					return stack;
 				}
-			}
-			return stack;
 
 		}
 	}
