@@ -136,7 +136,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
     private static final DataParameter<Integer> WATCHER_AGE = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> WATCHER_IS_SLEEPING = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> WATCHER_HAS_TRACKER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<String> WATCHER_OWNER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.STRING);
+    private static final DataParameter<String> WATCHER_OWNER_IDENTIFIER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.STRING);
     private static final DataParameter<Byte> WATCHER_CURRENT_ORDER = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BYTE);
     private static final DataParameter<Boolean> WATCHER_IS_RUNNING = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> WATCHER_WAS_MOVED = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
@@ -613,7 +613,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
         this.dataManager.register(WATCHER_AGE, this.dinosaurAge);
         this.dataManager.register(WATCHER_IS_SLEEPING, this.isSleeping);
         this.dataManager.register(WATCHER_HAS_TRACKER, this.hasTracker);
-        this.dataManager.register(WATCHER_OWNER, "");
+        this.dataManager.register(WATCHER_OWNER_IDENTIFIER, "");
         this.dataManager.register(WATCHER_CURRENT_ORDER, (byte) 0);
         this.dataManager.register(WATCHER_IS_RUNNING, false);
         this.dataManager.register(WATCHER_WAS_MOVED, this.wasMoved);
@@ -1077,7 +1077,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             this.dataManager.set(WATCHER_IS_CARCASS, this.isCarcass);
             this.dataManager.set(WATCHER_HAS_TRACKER, this.hasTracker);
             this.dataManager.set(WATCHER_CURRENT_ORDER, (byte) this.order.ordinal());
-            this.dataManager.set(WATCHER_OWNER, this.owner != null ? this.owner.toString() : "");
+            this.dataManager.set(WATCHER_OWNER_IDENTIFIER, this.owner != null ? this.owner.toString() : "");
             this.dataManager.set(WATCHER_IS_RUNNING, this.getAIMoveSpeed() > this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
         } else {
             this.updateTailBuffer();
@@ -1086,7 +1086,7 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             this.isSleeping = this.dataManager.get(WATCHER_IS_SLEEPING);
             this.isCarcass = this.dataManager.get(WATCHER_IS_CARCASS);
             this.hasTracker = this.dataManager.get(WATCHER_HAS_TRACKER);
-            String owner = this.dataManager.get(WATCHER_OWNER);
+            String owner = this.dataManager.get(WATCHER_OWNER_IDENTIFIER);
             this.order = Order.values()[this.dataManager.get(WATCHER_CURRENT_ORDER)];
 
             if (owner.length() > 0 && (this.owner == null || !owner.equals(this.owner.toString()))) {
