@@ -100,7 +100,8 @@ public class ClientEventHandler {
 					if (tile != null && tile instanceof SkullDisplayEntity && ((SkullDisplayEntity) tile).hasData())
 						GlStateManager.rotate(((SkullDisplayEntity) tile).getAngle(), 0.0F, 1.0F, 0.0F);
 
-					RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).offset(-0.5, 0, -0.5).grow(0.002D), 0.0f, 0.0f, 0.0f, 0.4f);
+					GL11.glTranslated(-0.5, 0, -0.5);
+					RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).grow(0.002D), 0.0f, 0.0f, 0.0f, 0.4f);
 					GL11.glPopMatrix();
 
 				}
