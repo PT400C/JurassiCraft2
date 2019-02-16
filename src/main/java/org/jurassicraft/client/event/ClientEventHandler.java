@@ -76,7 +76,6 @@ public class ClientEventHandler {
     public static void hightlightEvent(final DrawBlockHighlightEvent e) {
     	if (e.getTarget().typeOfHit == RayTraceResult.Type.BLOCK)
         {
-    		GlStateManager.enableAlpha();
     		final BlockPos blockpos = e.getTarget().getBlockPos();
             final IBlockState iblockstate = e.getPlayer().world.getBlockState(blockpos);
 			if (iblockstate.getBlock() instanceof SkullDisplay) {
@@ -109,7 +108,6 @@ public class ClientEventHandler {
 				GlStateManager.depthMask(true);
 				GlStateManager.enableTexture2D();
 				GlStateManager.disableBlend();
-				GlStateManager.disableAlpha();
 				e.setCanceled(true);
 			}
         }
