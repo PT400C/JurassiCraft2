@@ -91,7 +91,7 @@ public class ClientEventHandler {
 					final double y = e.getPlayer().lastTickPosY + (e.getPlayer().posY - e.getPlayer().lastTickPosY) * (double) e.getPartialTicks();
 					final double z = e.getPlayer().lastTickPosZ + (e.getPlayer().posZ - e.getPlayer().lastTickPosZ) * (double) e.getPartialTicks();
 
-					Vec3d pos = new Vec3d(blockpos.getX() + 0.5, blockpos.getY(), blockpos.getZ() + 0.5).subtract(new Vec3d(x, y, z));
+					Vec3d pos = new Vec3d(blockpos.getX() + 0.5D, blockpos.getY(), blockpos.getZ() + 0.5D).subtract(new Vec3d(x, y, z));
 					GL11.glPushMatrix();
 					GL11.glTranslated(pos.x, pos.y, pos.z);
 					final TileEntity tile = e.getPlayer().world.getTileEntity(blockpos);
@@ -99,7 +99,7 @@ public class ClientEventHandler {
 					if (tile != null && tile instanceof SkullDisplayEntity && ((SkullDisplayEntity) tile).hasData())
 						GlStateManager.rotate(((SkullDisplayEntity) tile).getAngle(), 0.0F, 1.0F, 0.0F);
 
-					GL11.glTranslated(-0.5, 0, -0.5);
+					GL11.glTranslated(-0.5D, 0D, -0.5D);
 					RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).grow(0.002D), 0.0f, 0.0f, 0.0f, 0.4f);
 					GL11.glPopMatrix();
 
