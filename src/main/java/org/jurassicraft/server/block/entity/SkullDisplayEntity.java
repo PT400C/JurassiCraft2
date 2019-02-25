@@ -32,9 +32,7 @@ public class SkullDisplayEntity extends TileEntity {
 	private int dinosaur = -1;
     private boolean isFossilized;
     private boolean hasStand;
-
 	public ResourceLocation texture = null;
-
 	public TabulaModel model = null;
 	
 	public void setModel(int dinosaurID, boolean isFossilized, boolean hasStand) {
@@ -59,6 +57,7 @@ public class SkullDisplayEntity extends TileEntity {
 		return EntityHandler.getDinosaurById(this.dinosaur);
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public boolean hasData() {
 		return this.dinosaur != -1 ? true : false;
 	}
@@ -78,7 +77,7 @@ public class SkullDisplayEntity extends TileEntity {
         compound = super.writeToNBT(compound);
         compound.setInteger("dinosaur", this.dinosaur);
         compound.setBoolean("isFossilized", this.isFossilized);
-        compound.setShort("angle", (short) this.angle);
+        compound.setShort("angle", this.angle);
         compound.setBoolean("type", this.hasStand);
         return compound;
     }

@@ -11,6 +11,9 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.model.ModelChest;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.culling.ICamera;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.KeyBinding;
@@ -24,24 +27,31 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.List;
-
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.client.model.obj.DisplayListCache;
+import org.jurassicraft.client.model.obj.OBJHandler;
 import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.server.block.SkullDisplay;
 import org.jurassicraft.server.block.entity.SkullDisplayEntity;
 import org.jurassicraft.server.entity.DinosaurEntity;
+import org.jurassicraft.server.entity.DummyEntity;
 import org.jurassicraft.server.entity.vehicle.MultiSeatedEntity;
 import org.jurassicraft.server.item.DartGun;
 import org.jurassicraft.server.item.ItemHandler;
@@ -52,12 +62,22 @@ import org.lwjgl.opengl.GL11;
 public class ClientEventHandler {
 	
     private static final ResourceLocation PATREON_BADGE = new ResourceLocation(JurassiCraft.MODID, "textures/items/patreon_badge.png");
-
+    private static ICamera camera = new Frustum();
     private static boolean isGUI;
+    private static DummyEntity renderEntity;
 
     @SubscribeEvent
     public static void tick(final TickEvent.ClientTickEvent event) {
         JurassiCraft.timerTicks++;
+        final EntityPlayer player = ClientProxy.MC.player;
+		World world = null;
+		if (player != null) 
+			world = player.world;
+		
+		if (world == null && DisplayListCache.values().size() > 0)
+			synchronized(DisplayListCache.lists) {
+				DisplayListCache.lists.keySet().forEach(list -> DisplayListCache.remove(list));
+			}
     }
 
     @SubscribeEvent
@@ -95,14 +115,14 @@ public class ClientEventHandler {
 
                 GL11.glPushMatrix();
                 GlStateManager.translate(-x, -y, -z);
-                GlStateManager.translate(blockpos.getX() + 0.5, blockpos.getY(), blockpos.getZ() + 0.5);
+                GlStateManager.translate(blockpos.getX() + 0.5, blockpos.getY() + 0.5, blockpos.getZ() + 0.5);
                 final TileEntity tile = e.getPlayer().world.getTileEntity(blockpos);
 
-                if(tile != null && tile instanceof SkullDisplayEntity && ((SkullDisplayEntity) tile).hasData()) {
+                if(tile != null && tile instanceof SkullDisplayEntity && ((SkullDisplayEntity) tile).hasData())
                 	GlStateManager.rotate(((SkullDisplayEntity) tile).getAngle(), 0.0F, 1.0F, 0.0F);
-                }
+                
 
-                RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).offset(-0.5, 0, -0.5).grow(0.0020000000949949026D), 0.0f, 0.0f, 0.0f, 0.4f);
+                RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).offset(-0.5, -0.5, -0.5).grow(0.0020000000949949026D), 0.0f, 0.0f, 0.0f, 0.4f);
                 GL11.glPopMatrix();
                 
            
@@ -220,24 +240,47 @@ public class ClientEventHandler {
             }
         }
     }
-    
+
 	@SubscribeEvent
 	public static void onRenderWorldLast(final RenderWorldLastEvent event) {
-
-		if (!ClientProxy.MC.isGuiEnabled())
-			return;
 		
-		final Entity cameraEntity = ClientProxy.MC.getRenderViewEntity();
-		Frustum frustrum = new Frustum();
-		final double viewX = cameraEntity.lastTickPosX + (cameraEntity.posX - cameraEntity.lastTickPosX) * event.getPartialTicks();
-		final double viewY = cameraEntity.lastTickPosY + (cameraEntity.posY - cameraEntity.lastTickPosY) * event.getPartialTicks();
-		final double viewZ = cameraEntity.lastTickPosZ + (cameraEntity.posZ - cameraEntity.lastTickPosZ) * event.getPartialTicks();
-		frustrum.setPosition(viewX, viewY, viewZ);
+		final EntityPlayer player = ClientProxy.MC.player;
+		if (player == null)
+			return;
+		final World world = player.world;
+		
+		if (world != null) {
+			//This ensures that our rendering entity is always any at any time present
+			if (renderEntity == null) {
+				renderEntity = new DummyEntity(world);
+				world.spawnEntity(renderEntity);
+			}
 
+			if (renderEntity != null) {
+				renderEntity.update(event.getPartialTicks());
+				if (JurassiCraft.timerTicks % 20 == 0) {
+				
+					if (!world.loadedEntityList.contains(renderEntity)) {
+
+						renderEntity.world.removeEntity(renderEntity);
+						renderEntity.isDead = false;
+						world.spawnEntity(renderEntity);
+					}
+				}
+			}
+		}
+		
+		OBJHandler.displayLists.update();
+		final float ticks = event.getPartialTicks();
+		final Entity cameraEntity = ClientProxy.MC.getRenderViewEntity();
+		final double viewX = cameraEntity.lastTickPosX + (cameraEntity.posX - cameraEntity.lastTickPosX) * ticks;
+		final double viewY = cameraEntity.lastTickPosY + (cameraEntity.posY - cameraEntity.lastTickPosY) * ticks;
+		final double viewZ = cameraEntity.lastTickPosZ + (cameraEntity.posZ - cameraEntity.lastTickPosZ) * ticks;
+		camera.setPosition(viewX, viewY, viewZ);
 		final List<Entity> loadedEntities = ClientProxy.MC.world.getLoadedEntityList();
 		for (final Entity entity : loadedEntities) {
 			if (entity != null && entity instanceof DinosaurEntity) {
-				if (entity.isInRangeToRender3d(cameraEntity.getPosition().getX(), cameraEntity.getPosition().getY(), cameraEntity.getPosition().getZ()) && (frustrum.isBoundingBoxInFrustum(entity.getRenderBoundingBox().grow(0.5D))) && entity.isEntityAlive()) {
+				if (entity.isInRangeToRender3d(cameraEntity.getPosition().getX(), cameraEntity.getPosition().getY(), cameraEntity.getPosition().getZ()) && (camera.isBoundingBoxInFrustum(entity.getRenderBoundingBox().grow(0.5D))) && entity.isEntityAlive()) {
 					((DinosaurEntity) entity).isRendered = true;
 				} else {
 					((DinosaurEntity) entity).isRendered = false;

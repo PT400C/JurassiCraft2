@@ -1,7 +1,10 @@
 package org.jurassicraft.server.proxy;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import javax.annotation.Nonnull;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.block.BlockHandler;
 import org.jurassicraft.server.block.entity.*;
@@ -32,6 +35,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -61,7 +65,7 @@ public class ServerProxy implements IGuiHandler {
     public static final int GUI_FEEDER_ID = 10;
     public static final int GUI_BUG_CRATE = 11;
     public static final int GUI_SKELETON_ASSEMBLER = 12;
-
+    
     public void onPreInit(FMLPreInitializationEvent event) {
         EntityHandler.init();
 

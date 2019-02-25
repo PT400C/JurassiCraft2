@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.client.model.obj.OBJHandler;
 import org.jurassicraft.server.block.entity.DisplayBlockEntity;
 import org.jurassicraft.server.block.entity.FeederBlockEntity;
 import org.jurassicraft.server.block.entity.SkullDisplayEntity;
@@ -121,6 +122,12 @@ public class SkullDisplay extends BlockContainer {
     	}else {
     		return world.getBlockState(pos.offset(mirror(facing))).isOpaqueCube();
     	}
+    }
+    
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    	super.breakBlock(worldIn, pos, state);
+    	OBJHandler.displayLists.remove(OBJHandler.locationIdentifier(pos));
     }
     
     @Override

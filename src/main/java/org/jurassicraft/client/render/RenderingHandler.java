@@ -32,6 +32,7 @@ import org.jurassicraft.server.block.tree.TreeType;
 import org.jurassicraft.server.conf.JurassiCraftConfig;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.dinosaur.DinosaurMetadata;
+import org.jurassicraft.server.entity.DummyEntity;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.entity.GoatEntity;
 import org.jurassicraft.server.entity.TranquilizerDartEntity;
@@ -464,6 +465,7 @@ public enum RenderingHandler {
         RenderingRegistry.registerEntityRenderingHandler(MuralEntity.class, MuralRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(GoatEntity.class, GoatRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(TranquilizerDartEntity.class, NullRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(DummyEntity.class, DummyEntityRender::new);
         
     }
 
@@ -514,7 +516,6 @@ public enum RenderingHandler {
         ClientRegistry.bindTileEntitySpecialRenderer(DNASequencerBlockEntity.class, new DNASequencerRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(IncubatorBlockEntity.class, new IncubatorRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(FeederBlockEntity.class, new FeederRenderer());
-        ClientRegistry.bindTileEntitySpecialRenderer(SkullDisplayEntity.class, new SkullDisplayRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(ElectricFencePoleBlockEntity.class, new ElectricFencePoleRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(CleaningStationBlockEntity.class, new CleaningStationRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(AncientItemHoldingBlockEntity.class, new AncientItemHoldingBlockRenderer());

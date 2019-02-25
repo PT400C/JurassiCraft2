@@ -5,6 +5,8 @@ import net.ilexiconn.llibrary.server.util.WebUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -15,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -24,8 +27,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.event.ClientEventHandler;
+import org.jurassicraft.client.event.ResourceReloadListener;
 import org.jurassicraft.client.gui.*;
 import org.jurassicraft.client.model.JurassicraftTabulaModelHandler;
+import org.jurassicraft.client.model.obj.OBJHandler;
 import org.jurassicraft.client.render.RenderingHandler;
 import org.jurassicraft.client.sound.SoundHandler;
 import org.jurassicraft.client.sound.VehicleSound;
@@ -38,22 +43,31 @@ import org.jurassicraft.server.event.KeyBindingHandler;
 import org.jurassicraft.server.item.JournalItem;
 import org.jurassicraft.server.proxy.ServerProxy;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends ServerProxy {
 	
 	public static final Minecraft MC = Minecraft.getMinecraft();
-	private static KeyBindingHandler keyHandler = new KeyBindingHandler();
+	private static ProgressManager.ProgressBar modelProgress;
+	
+	private static final KeyBindingHandler keyHandler = new KeyBindingHandler();
 	public static final List<UUID> PATRONS = new ArrayList<>();
 
 	@Override
 	public void onPreInit(FMLPreInitializationEvent event) {
 		super.onPreInit(event);
-
+		modelProgress = ProgressManager.push("Caching models", OBJHandler.modelRequests.size());
+		OBJHandler.init(modelProgress);
+		ProgressManager.pop(modelProgress);
 //		registerEntity(DummyCameraEntity.class, "DummyCameraEntity");
 		KeyBindingHandler.init();
 		try {
@@ -77,7 +91,6 @@ public class ClientProxy extends ServerProxy {
 	@Override
 	public void onPostInit(FMLPostInitializationEvent event) {
 		super.onPostInit(event);
-
 		RenderingHandler.INSTANCE.postInit();
 
 		new Thread(() -> {
@@ -88,6 +101,7 @@ public class ClientProxy extends ServerProxy {
 				}
 			}
 		}).start();
+		((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new ResourceReloadListener());
 	}
 
 	@Override
@@ -98,6 +112,11 @@ public class ClientProxy extends ServerProxy {
 	@Override
 	public EntityPlayer getPlayerEntityFromContext(MessageContext ctx) {
 		return (ctx.side.isClient() ? this.getPlayer() : super.getPlayerEntityFromContext(ctx));
+	}
+	
+	@Nonnull
+	public static InputStream getResourceStream(ResourceLocation location) throws IOException {
+		return ClientProxy.MC.getResourceManager().getResource(location).getInputStream();
 	}
 
 	@Override
@@ -192,8 +211,7 @@ public class ClientProxy extends ServerProxy {
 	private static void registerEntity(Class<? extends Entity> entity, String name) {
 		String formattedName = name.toLowerCase(Locale.ENGLISH).replaceAll(" ", "_");
 		ResourceLocation registryName = new ResourceLocation("jurassicraft:entities." + formattedName);
-		EntityRegistry.registerModEntity(registryName, entity, "jurassicraft." + formattedName, 2055,
-				JurassiCraft.INSTANCE, 1024, 1, true);
+		EntityRegistry.registerModEntity(registryName, entity, "jurassicraft." + formattedName, 2055, JurassiCraft.INSTANCE, 1024, 1, true);
 	}
 
 }
