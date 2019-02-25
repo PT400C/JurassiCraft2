@@ -19,8 +19,7 @@ public class TextureQuilt {
 
 	/**
      * Process the texture of an OBJ model
-     * @param model The corresponding OBJModel
-     * @param texture The texture location
+     * @param texture The texture location of the model
      */
 	public TextureQuilt(ResourceLocation texture) {
 		this.textureID = GL11.glGenTextures();
