@@ -11,7 +11,7 @@ public class DisplayListCache {
 	
 	private static HashMap<String, Long> listsTimes = new HashMap();
 	public static HashMap<String, Integer> lists = new HashMap<>();
-	private static ArrayList<Integer> queueRemove = new ArrayList<Integer>();
+	private static ArrayList<String> queueRemove = new ArrayList<String>();
 	private static long lastTime = CTM() / 1000L;
 	private static int nanoSeconds = 3 * 1000000;
 	
@@ -58,7 +58,7 @@ public class DisplayListCache {
      * @param key Identifier of the list
      */
 	public static synchronized void remove(String key) {
-		queueRemove.add(lists.get(key));
+		queueRemove.add(key);
 		
 	}
 	
@@ -67,10 +67,10 @@ public class DisplayListCache {
      * @param key Identifier of the list
      */
 	public static synchronized Integer get(String key) {
-		for(int i : queueRemove) {
-			removeDL(i);
-			lists.remove(key);
-			listsTimes.remove(key);
+		for(String i : queueRemove) {
+			removeDL(lists.get(i));
+			lists.remove(i);
+			listsTimes.remove(i);
 		}
 		queueRemove.clear();
 		if ((long)(lastTime + 3) < (long)(CTM() / 1000L)) {
@@ -107,8 +107,10 @@ public class DisplayListCache {
      * Retrieve and update all values in the cache
      */
 	public static synchronized Collection<Integer> values() {
-		for(int i : queueRemove) {
-			removeDL(i);
+		for(String i : queueRemove) {
+			removeDL(lists.get(i));
+			lists.remove(i);
+			listsTimes.remove(i);
 		}
 		queueRemove.clear();
 		if ((long)(lastTime + 3) < (long)(CTM() / 1000L)) {
