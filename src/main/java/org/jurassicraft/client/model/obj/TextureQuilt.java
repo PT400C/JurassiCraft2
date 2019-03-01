@@ -9,7 +9,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class TextureQuilt {
 	public int sourceWidth = 0;
 	public int sourceHeight = 0;

@@ -31,6 +31,7 @@ import org.jurassicraft.client.event.ResourceReloadListener;
 import org.jurassicraft.client.gui.*;
 import org.jurassicraft.client.model.JurassicraftTabulaModelHandler;
 import org.jurassicraft.client.model.obj.OBJHandler;
+import org.jurassicraft.client.model.obj.RenderRegistry;
 import org.jurassicraft.client.render.RenderingHandler;
 import org.jurassicraft.client.sound.SoundHandler;
 import org.jurassicraft.client.sound.VehicleSound;
@@ -57,16 +58,16 @@ import javax.annotation.Nonnull;
 public class ClientProxy extends ServerProxy {
 	
 	public static final Minecraft MC = Minecraft.getMinecraft();
-	private static ProgressManager.ProgressBar modelProgress;
-	
 	private static final KeyBindingHandler keyHandler = new KeyBindingHandler();
+	private static ProgressManager.ProgressBar modelProgress;
 	public static final List<UUID> PATRONS = new ArrayList<>();
 
 	@Override
 	public void onPreInit(FMLPreInitializationEvent event) {
 		super.onPreInit(event);
-		modelProgress = ProgressManager.push("Caching models", OBJHandler.modelRequests.size());
-		OBJHandler.init(modelProgress);
+		modelProgress = ProgressManager.push("Caching models", 1);
+		modelProgress.step("OBJ Models");
+		RenderRegistry.init();
 		ProgressManager.pop(modelProgress);
 //		registerEntity(DummyCameraEntity.class, "DummyCameraEntity");
 		KeyBindingHandler.init();

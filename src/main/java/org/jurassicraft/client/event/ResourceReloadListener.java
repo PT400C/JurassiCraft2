@@ -1,6 +1,9 @@
 package org.jurassicraft.client.event;
 
 import org.jurassicraft.client.model.obj.OBJHandler;
+import org.jurassicraft.client.model.obj.RenderRegistry;
+import org.jurassicraft.client.proxy.ClientProxy;
+
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 
@@ -19,8 +22,7 @@ public class ResourceReloadListener implements IResourceManagerReloadListener {
 			init = false;
 			return;
 		}
-		OBJHandler.renderer.forEach((k, v) -> v.purgeTextures());
-		OBJHandler.init(null);
+		RenderRegistry.reinit();
 		
 	}
 

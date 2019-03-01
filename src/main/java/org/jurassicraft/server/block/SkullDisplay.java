@@ -54,6 +54,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -127,7 +128,8 @@ public class SkullDisplay extends BlockContainer {
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
     	super.breakBlock(worldIn, pos, state);
-    	OBJHandler.displayLists.remove(OBJHandler.locationIdentifier(pos));
+    	if(FMLCommonHandler.instance().getSide() == Side.CLIENT)
+    		OBJHandler.displayLists.remove(OBJHandler.locationIdentifier(pos));
     }
     
     @Override

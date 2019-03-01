@@ -7,6 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class DisplayListCache {
 	
 	private static HashMap<String, Long> listsTimes = new HashMap();

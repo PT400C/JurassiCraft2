@@ -13,7 +13,10 @@ import org.jurassicraft.server.util.Vec2f;
 import org.jurassicraft.server.util.Vec3f;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class OBJModel {
 	
 	public HashMap<String, int[]> groups = new HashMap<String, int[]>();
