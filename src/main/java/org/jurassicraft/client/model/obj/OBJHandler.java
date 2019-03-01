@@ -62,7 +62,7 @@ public class OBJHandler {
 
 						Vec3f pos = new Vec3f(mbp.getX() + 0.5F, mbp.getY() + 0.75F, mbp.getZ() + 0.5F).subtract(cameraPos);
 						GL11.glTranslated(pos.x, pos.y, pos.z);
-		        		renderTile(entity, 0, entity.getVariantID(), locationIdentifier(mbp));
+		        		renderTile(entity, 0, entity.getVariantID(), mbp.toLong());
 	        		}
 	        		GL11.glPopMatrix();
 	        	}	
@@ -73,14 +73,6 @@ public class OBJHandler {
         Minecraft.getMinecraft().mcProfiler.endSection();
 	}
 	
-	/**
-     * Transform BlockPos into String to identify DisplayLists
-     * @param pos BlockPos for the identifier
-     */
-	public static String locationIdentifier(BlockPos pos) {
-		return pos.getX() + " " + pos.getY() + " " + pos.getZ();
-	}
-	
 	public static final DisplayListCache displayLists = new DisplayListCache();
 	
 	/**
@@ -88,8 +80,7 @@ public class OBJHandler {
      * @param te The specified TileEntity
      * @param identifier The unique identifier for the DisplayList
      */
-	public static void renderTile(IOBJTile te, int tileID, int variant, String identifier) {
-
+	public static void renderTile(IOBJTile te, int tileID, int variant, long identifier) {
 		Integer displayList = displayLists.get(identifier);
 		final OBJRender render = RenderRegistry.renderers.get(tileID).getBakedRenderer(variant);
 		if (displayList == null) {

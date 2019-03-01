@@ -129,7 +129,7 @@ public class SkullDisplay extends BlockContainer {
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
     	super.breakBlock(worldIn, pos, state);
     	if(FMLCommonHandler.instance().getSide() == Side.CLIENT)
-    		OBJHandler.displayLists.remove(OBJHandler.locationIdentifier(pos));
+    		OBJHandler.displayLists.remove(pos.toLong());
     }
     
     @Override
