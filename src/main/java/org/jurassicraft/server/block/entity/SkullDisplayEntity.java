@@ -49,7 +49,6 @@ public class SkullDisplayEntity extends TileEntity implements IOBJTile {
 	private short angle = 0;
 	private int dinosaur = -1;
     private boolean isFossilized;
-    private boolean hasStand;
     
     @SideOnly(Side.CLIENT)
     public int renderID;
@@ -60,8 +59,7 @@ public class SkullDisplayEntity extends TileEntity implements IOBJTile {
 	public void setModel(int dinosaurID, boolean isFossilized, boolean hasStand) {
         this.dinosaur = dinosaurID;
         this.isFossilized = isFossilized;
-        this.hasStand = hasStand;
-        this.state = (byte) (this.getWorld().getBlockState(this.getPos()).getValue(SkullDisplay.FACING).getAxis() == EnumFacing.Axis.Y ? this.hasStand() ? 0 : 2 : 1);
+        this.state = (byte) (this.getWorld().getBlockState(this.getPos()).getValue(SkullDisplay.FACING).getAxis() == EnumFacing.Axis.Y ? hasStand ? 0 : 2 : 1);
         this.markDirty();
     }
 	
@@ -74,11 +72,6 @@ public class SkullDisplayEntity extends TileEntity implements IOBJTile {
     public byte getState()
     {
 		return (byte) this.state;
-    }
-	
-    public boolean hasStand()
-    {
-        return this.hasStand;
     }
 	
 	public Dinosaur getDinosaur() {
@@ -106,7 +99,6 @@ public class SkullDisplayEntity extends TileEntity implements IOBJTile {
         compound.setInteger("dinosaur", this.dinosaur);
         compound.setBoolean("isFossilized", this.isFossilized);
         compound.setShort("angle", this.angle);
-        compound.setBoolean("type", this.hasStand);
         compound.setByte("state", this.state);
         return compound;
     }
@@ -140,7 +132,6 @@ public class SkullDisplayEntity extends TileEntity implements IOBJTile {
         this.dinosaur = compound.getInteger("dinosaur");
         this.isFossilized = compound.getBoolean("isFossilized");
         this.angle = compound.getShort("angle");
-        this.hasStand = compound.getBoolean("type");
         this.state = compound.getByte("state");
         if(FMLCommonHandler.instance().getSide() == Side.CLIENT)
         	this.renderID = compareList.get(new IDClass(this.isFossilized(), this.getState()));
