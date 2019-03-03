@@ -10,7 +10,9 @@ import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.server.util.Vec3f;
 import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -37,12 +39,10 @@ public class OBJHandler {
 		Minecraft.getMinecraft().mcProfiler.startSection("JC-TE");
 		boolean prevState = GL11.glGetBoolean(GL11.GL_BLEND);
 		boolean state = false;
-		if(prevState != state)
-			GL11.glDisable(GL11.GL_BLEND);
-
-		if (MinecraftForgeClient.getRenderPass() != 0) 
-        	return;
-		
+		if (!OBJRender.testMode) {	
+			if (prevState != state)
+				GL11.glDisable(GL11.GL_BLEND);
+		}
         List<TileEntity> entities = new ArrayList<TileEntity>(Minecraft.getMinecraft().player.getEntityWorld().loadedTileEntityList);
         for (TileEntity te : entities) {
         	if (te instanceof IOBJTile) {
@@ -58,7 +58,11 @@ public class OBJHandler {
 	        	        int i = te.getWorld().getCombinedLight(mbp, 0);
 	        	        int j = i % 65536;
 	        	        int k = i / 65536;
-	        	        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
+	        	        if(OBJRender.testMode) {
+	        	        	OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
+	        	        }else {
+	        	        	OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
+	        	        }
 
 						Vec3f pos = new Vec3f(mbp.getX() + 0.5F, mbp.getY() + 0.75F, mbp.getZ() + 0.5F).subtract(cameraPos);
 						GL11.glTranslated(pos.x, pos.y, pos.z);
@@ -68,8 +72,10 @@ public class OBJHandler {
 	        	}	
         	}
         }
-        if(prevState != state) 
-			GL11.glEnable(GL11.GL_BLEND);
+		if (!OBJRender.testMode) {
+			if (prevState != state)
+				GL11.glEnable(GL11.GL_BLEND);
+		}
         Minecraft.getMinecraft().mcProfiler.endSection();
 	}
 	

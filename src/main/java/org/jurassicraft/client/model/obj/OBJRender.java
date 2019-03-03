@@ -7,13 +7,17 @@ import org.jurassicraft.server.util.Vec3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class OBJRender {
 
-	private static final boolean testMode = false;
+	public static final boolean testMode = true;
 	public final OBJModel model;
 	public TextureQuilt texture;
 	private int prevTexture = -1;
@@ -43,7 +47,16 @@ public class OBJRender {
      * Draw the model with the default scale (1)
      */
 	public void drawModel() {
+		if(testMode) {
+			GlStateManager.enableBlend();
+			GlStateManager.blendFunc(GL11.GL_ONE, GL11.GL_ONE);
+			RenderHelper.enableStandardItemLighting();
+		}
 		this.drawModel(1);
+		if(testMode) {
+			RenderHelper.disableStandardItemLighting();
+        	GlStateManager.disableBlend();
+		}
 	}
 	
 	/**
@@ -78,11 +91,6 @@ public class OBJRender {
 				texBuffer.put(-vertexTex.y);
 			}
 		}
-		if(testMode) {
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			GL11.glColor4f(0.6f, 0.6f, 1, 0.7F);
-		}
 		GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
 		GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 		GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
@@ -96,8 +104,6 @@ public class OBJRender {
 		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 		GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
-		if(testMode)
-			GL11.glDisable(GL11.GL_BLEND);
 		
 		GL11.glColor4f(1, 1, 1, 1);
 	}

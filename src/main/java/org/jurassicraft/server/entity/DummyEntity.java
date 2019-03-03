@@ -1,5 +1,6 @@
 package org.jurassicraft.server.entity;
 
+import org.jurassicraft.client.model.obj.OBJRender;
 import org.jurassicraft.client.proxy.ClientProxy;
 
 import net.minecraft.block.Block;
@@ -35,6 +36,11 @@ public class DummyEntity extends Entity {
 			return;
 		eyePos = player.getPositionEyes(pT).add(player.getLookVec().scale(4));
 		this.setPosition(eyePos.x, eyePos.y, eyePos.z);
+	}
+	
+	@Override
+	public boolean shouldRenderInPass(int pass) {
+		return OBJRender.testMode && pass == 1 || !OBJRender.testMode && pass == 0 ? true : false;
 	}
 	
 	@Override
