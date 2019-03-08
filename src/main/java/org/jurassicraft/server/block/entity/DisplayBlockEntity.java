@@ -1,5 +1,12 @@
 package org.jurassicraft.server.block.entity;
 
+import java.util.List;
+import org.jurassicraft.client.model.animation.EntityAnimation;
+import org.jurassicraft.server.dinosaur.Dinosaur;
+import org.jurassicraft.server.entity.DinosaurEntity;
+import org.jurassicraft.server.entity.EntityHandler;
+import org.jurassicraft.server.plugin.waila.IWailaProvider;
+import org.jurassicraft.server.util.LangUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.nbt.NBTTagCompound;
@@ -7,15 +14,12 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jurassicraft.client.model.animation.EntityAnimation;
-import org.jurassicraft.server.dinosaur.Dinosaur;
-import org.jurassicraft.server.entity.DinosaurEntity;
-import org.jurassicraft.server.entity.EntityHandler;
 
-public class DisplayBlockEntity extends TileEntity {
+public class DisplayBlockEntity extends TileEntity implements IWailaProvider {
 	
     private DinosaurEntity entity;
     private int rotation;
@@ -219,4 +223,14 @@ public class DisplayBlockEntity extends TileEntity {
             this.dinosaurId = EntityHandler.getDinosaurId(EntityHandler.VELOCIRAPTOR);
         }
     }
+
+	@Override
+	public List<String> getWailaData(List<String> list) {
+		list.add(TextFormatting.GOLD + LangUtils.translate("gender.name") + ": " + TextFormatting.WHITE + LangUtils.getGenderMode(this.isMale() == true ? 1 : 2));
+		if (this.isSkeleton() && this.entity.getMetadata().skeletonPoses().length > 1) {
+			list.add(TextFormatting.YELLOW + LangUtils.translate("pose.name") + ": " + TextFormatting.WHITE + LangUtils.getSkeletonMode(this.entity.getDinosaur(), this.getVariant()));
+		}
+		
+		return list;
+	}
 }

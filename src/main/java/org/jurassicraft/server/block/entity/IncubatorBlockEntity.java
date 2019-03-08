@@ -1,24 +1,23 @@
 package org.jurassicraft.server.block.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.jurassicraft.JurassiCraft;
-import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.api.IncubatorEnvironmentItem;
 import org.jurassicraft.server.container.IncubatorContainer;
 import org.jurassicraft.server.item.DinosaurEggItem;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.message.TileEntityFieldsMessage;
-
+import org.jurassicraft.server.plugin.waila.IWailaProvider;
 import com.google.common.primitives.Ints;
-
 import io.netty.buffer.ByteBuf;
+import mcp.mobius.waila.api.SpecialChars;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
@@ -26,14 +25,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
-public class IncubatorBlockEntity extends MachineBaseBlockEntity implements TemperatureControl {
+public class IncubatorBlockEntity extends MachineBaseBlockEntity implements TemperatureControl, IWailaProvider {
     private static final int[] INPUTS = new int[] { 0, 1, 2, 3, 4 };
     private static final int[] ENVIRONMENT = new int[] { 5 };
 
@@ -103,8 +104,7 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
             incubatedEgg.setTagCompound(compound);
 
             this.decreaseStackSize(5);
-
-            this.slots.set(process, incubatedEgg);
+            this.setInventorySlotContents(process, incubatedEgg);
         }
     }
 
@@ -214,6 +214,27 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 	}
 	
 	@Override
+	public void update() {
+		boolean send = false;
+		if (!world.isRemote && FMLCommonHandler.instance().getMinecraftServerInstance().getTickCounter() % 100 == 0) {
+
+			for (int i = 0; i < 5; i++) {
+				if (this.isProcessing(i)) {
+					send = true;
+					break;
+				}
+			}
+		}
+		super.update();
+
+		if (send && !world.isRemote) {
+			final BlockPos pos = this.getPos();
+			JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(this.getSyncFields(NonNullList.create()), this), new TargetPoint(this.world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 5));
+		}
+
+	}
+	
+	@Override
     @Nullable
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
@@ -256,7 +277,8 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 				ItemStack stackInSlot = inv.getStackInSlot(slot);
 				if (stackInSlot != null && stackInSlot.getItem() == ItemHandler.HATCHED_EGG) {
 					ItemStack extract = super.extractItem(slot, amount, simulate);
-					JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(this.getTile().getSyncFields(NonNullList.create()), this.getTile()));
+					final BlockPos pos = this.getTile().getPos();
+					JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(this.getTile().getSyncFields(NonNullList.create()), this.getTile()), new TargetPoint(this.getTile().world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 5));
 					return extract;
 				}
 
@@ -272,6 +294,9 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 			for (int slot = 0; slot < 5; slot++) {
 				this.setInventorySlotContents(slot, ByteBufUtils.readItemStack(fields));
 			}
+			for (int field = 0; field < 10; field++) {
+				this.setField(field, fields.readInt());
+			}
 		}
 	}
 	
@@ -284,7 +309,8 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 		super.setInventorySlotContents(index, stack);
 
 		if (send) {
-			JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+			final BlockPos pos = this.getPos();
+			JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(this.getSyncFields(NonNullList.create()), this), new TargetPoint(this.world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 5));
 		}
 	}
 	
@@ -292,6 +318,10 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 	public NonNullList getSyncFields(NonNullList fields) {
 		for (int slot = 0; slot < 5; slot++) {
 			fields.add(this.slots.get(slot));
+		}
+		
+		for (int field = 0; field < 10; field++) {
+			fields.add(this.getField(field));
 		}
 		return fields;
 	}
@@ -310,4 +340,25 @@ public class IncubatorBlockEntity extends MachineBaseBlockEntity implements Temp
 		}
 		
 	}
+
+	@Override
+	public List<String> getWailaData(List<String> list) {
+		List<String> content = new ArrayList<String>();
+		for(int input = 0; input < INPUTS.length; input++) {
+			ItemStack stack = this.getStackInSlot(input);
+			if(stack != null && !stack.isEmpty()) {
+				content.add(input + ";" + stack.getItem().getRegistryName().toString() + ";" + stack.getMetadata() + ";" + getProgress(input) + ";" + (this.temperature[input] > 50) + ";" + (stack.hasTagCompound() ? stack.getTagCompound().toString() : "{}"));
+			}
+		}
+		if(content.size() > 0)
+			list.add(SpecialChars.getRenderString("jurassicraft.incubator", content.toArray(new String[0])));
+		return list;
+	}
+
+    
+	private int getProgress(int slot) {
+        int j = this.getField(slot);
+        int k = this.getField(slot + 5);
+        return k != 0 && j != 0 ? j * 14 / k : 0;
+    }
 }

@@ -24,6 +24,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -129,7 +130,7 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 			this.markDirty();
 		}
 		if(send)
-			JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+			JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this), new TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 5));
 	}
 
 	@Override
@@ -274,7 +275,7 @@ public class CleaningStationBlockEntity extends TileEntityLockable implements IT
 
 			if (this.isCleaning != prevIsCleaning) {
 				prevIsCleaning = this.isCleaning;
-				JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+				JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this), new TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 5));
 			}
 		}else {
 			updateRotation();

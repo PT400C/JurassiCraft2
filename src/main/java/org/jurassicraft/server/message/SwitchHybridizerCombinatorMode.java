@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.event.ClientEventHandler;
@@ -19,13 +20,15 @@ import org.jurassicraft.server.container.DNACombinatorHybridizerContainer;
 public class SwitchHybridizerCombinatorMode extends AbstractMessage<SwitchHybridizerCombinatorMode> {
     private BlockPos pos;
     private boolean hybridizer;
+    private int dimension;
 
     public SwitchHybridizerCombinatorMode() {
     }
 
-    public SwitchHybridizerCombinatorMode(BlockPos pos, boolean hybridizer) {
+    public SwitchHybridizerCombinatorMode(BlockPos pos, boolean hybridizer, int dimension) {
         this.hybridizer = hybridizer;
         this.pos = pos;
+        this.dimension = dimension;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class SwitchHybridizerCombinatorMode extends AbstractMessage<SwitchHybrid
         DNACombinatorHybridizerBlockEntity tile = (DNACombinatorHybridizerBlockEntity) player.world.getTileEntity(pos);
 
         tile.setMode(mode);
-        JurassiCraft.NETWORK_WRAPPER.sendToAll(new SwitchHybridizerCombinatorMode(pos, mode));
+        JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new SwitchHybridizerCombinatorMode(pos, mode, message.dimension), new TargetPoint(message.dimension, pos.getX(), pos.getY(), pos.getZ(), 5));
 
         Container openContainer = player.openContainer;
 
@@ -61,11 +64,13 @@ public class SwitchHybridizerCombinatorMode extends AbstractMessage<SwitchHybrid
     public void toBytes(ByteBuf buffer) {
         buffer.writeBoolean(this.hybridizer);
         buffer.writeLong(this.pos.toLong());
+        buffer.writeInt(this.dimension);
     }
 
     @Override
     public void fromBytes(ByteBuf buffer) {
         this.hybridizer = buffer.readBoolean();
         this.pos = BlockPos.fromLong(buffer.readLong());
+        this.dimension = buffer.readInt();
     }
 }

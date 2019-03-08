@@ -9,6 +9,8 @@ import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -16,10 +18,16 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ChatType;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -32,12 +40,21 @@ import org.jurassicraft.server.dinosaur.DinosaurMetadata;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.food.FoodHelper;
 import org.jurassicraft.server.food.FoodType;
+import org.jurassicraft.server.message.TileEntityFieldsMessage;
+import org.jurassicraft.server.plugin.waila.IWailaProvider;
+
 import com.google.common.primitives.Ints;
+
+import io.netty.buffer.ByteBuf;
+import mcp.mobius.waila.api.IWailaDataAccessor;
+import mcp.mobius.waila.api.SpecialChars;
+
+import java.util.List;
 import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class FeederBlockEntity extends TileEntityLockable implements ITickable, ISidedInventory {
+public class FeederBlockEntity extends TileEntityLockable implements ITickable, ISyncable, ISidedInventory, IWailaProvider {
     private static final int[] CARNIVOROUS_SLOTS = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
     private static final int[] HERBIVOROUS_SLOTS = new int[] { 9, 10, 11, 12, 13, 14, 15, 16, 17 };
     public int prevOpenAnimation;
@@ -81,10 +98,19 @@ public class FeederBlockEntity extends TileEntityLockable implements ITickable, 
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
+    	boolean send = false;
+    	if (!this.world.isRemote) 
+			send = true;
+		
+    
         this.slots.set(index, stack);
+
         if (stack != ItemStack.EMPTY && stack.getCount() > this.getInventoryStackLimit()) {
             stack.setCount(this.getInventoryStackLimit());
         }
+        if (send) 
+        	JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this), new TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 5));
+        
     }
 
     @Override
@@ -358,7 +384,7 @@ public class FeederBlockEntity extends TileEntityLockable implements ITickable, 
     @Nullable
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
-        if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (facing != null && facing == EnumFacing.DOWN && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 return (T) handlerPull;
         return super.getCapability(capability, facing);
     }
@@ -379,12 +405,7 @@ public class FeederBlockEntity extends TileEntityLockable implements ITickable, 
 		return false;
 	}
 	
-	IItemHandler handlerPull = new IItemHandler() {
-
-		@Override
-		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			return null;
-		}
+	IItemHandler handlerPull = new SidedInvWrapper(this, null) {
 
 		@Override
 		public ItemStack getStackInSlot(int slot) {
@@ -406,6 +427,64 @@ public class FeederBlockEntity extends TileEntityLockable implements ITickable, 
 		public ItemStack extractItem(int slot, int amount, boolean simulate) {
 			return ItemStack.EMPTY;
 		}
+		
+		@Override
+		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+			return super.insertItem(slot, stack, simulate);
+			
+		};
 	};
+	
+	@Override
+	public NonNullList getSyncFields(NonNullList fields) {
+		for (int slot = 0; slot < 18; slot++) {
+			fields.add(this.slots.get(slot));
+		}
+		return fields;
+	}
+	
+	@Override
+	public void packetDataHandler(ByteBuf fields) {
+		if (FMLCommonHandler.instance().getSide().isClient()) {
+			for (int slot = 0; slot < 18; slot++) {
+				this.setInventorySlotContents(slot, ByteBufUtils.readItemStack(fields));
+			}
+		}
+	}
+	
+	@Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(this.pos, 0, this.getUpdateTag());
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        return this.writeToNBT(new NBTTagCompound());
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager networkManager, SPacketUpdateTileEntity packet) {
+        this.readFromNBT(packet.getNbtCompound());
+    }
+
+	@Override
+	public List<String> getWailaData(List<String> list) {
+		float herbivore = 0;
+		for(int slot = 0; slot < 9; slot++) {
+			int slotCount = this.getStackInSlot(slot).getCount();
+			herbivore += slotCount;
+		}
+		float carnivore = 0;
+		for(int slot = 9; slot < 18; slot++) {
+			int slotCount = this.getStackInSlot(slot).getCount();
+			carnivore += slotCount;
+		}
+		list.add(TextFormatting.GOLD + "Fullness:");
+		list.add(SpecialChars.getRenderString("jurassicraft.feeder", String.valueOf((herbivore / (9F * 64F)) * 10F), String.valueOf((carnivore / (9F * 64F)) * 10F)));
+		
+	//	list.add(TextFormatting.WHITE + "  Herbivore: " + TextFormatting.GREEN + (int)((herbivore / (9F * 64F)) * 100F) + "%");
+	//	list.add(TextFormatting.WHITE + "  Carnivore: " + TextFormatting.GREEN + (int)((carnivore / (9F * 64F)) * 100F) + "%");
+		return list;
+	}
 	
 }

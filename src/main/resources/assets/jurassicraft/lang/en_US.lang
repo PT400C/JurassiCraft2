@@ -584,6 +584,7 @@ key.vehicle_helicopter.down=Descend
 //Other =============
 message.tame.name=You have tamed a {dinosaur}
 message.not_owned.name=You do not own this dinosaur!
+message.not_imprinted.name=Not imprinted
 message.too_young.name=This dinosaur is too young to hold items!
 message.set_order.name=You have commanded your dinosaur to {order}.
 
@@ -595,7 +596,9 @@ growth_stage.adult.name=Adult
 order.wander.name=Wander
 order.sit.name=Sit
 order.follow.name=Follow
-
+status.owner.name=Owner
+order.name=Order
+slot.name=Slot
 gui.select_order.name=Select Order
 
 gui.dinosaur_statistics.name=Dinosaur Statistics:

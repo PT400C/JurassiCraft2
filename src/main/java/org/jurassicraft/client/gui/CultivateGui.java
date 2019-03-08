@@ -119,7 +119,7 @@ public class CultivateGui extends GuiContainer {
             int mouseTemperature = (mouseX - x + 1) * 4;
             if (mouseTemperature != this.cultivator.getTemperature(0)) {
                 this.cultivator.setTemperature(0, mouseTemperature);
-                JurassiCraft.NETWORK_WRAPPER.sendToServer(new ChangeTemperatureMessage(this.cultivator.getPos(), 0, mouseTemperature));
+                JurassiCraft.NETWORK_WRAPPER.sendToServer(new ChangeTemperatureMessage(this.cultivator.getPos(), 0, mouseTemperature, this.cultivator.getWorld().provider.getDimension()));
             }
         }
     }

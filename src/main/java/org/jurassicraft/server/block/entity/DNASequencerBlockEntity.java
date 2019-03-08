@@ -9,8 +9,10 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.api.GrindableItem;
@@ -72,7 +74,8 @@ public class DNASequencerBlockEntity extends MachineBaseBlockEntity {
 
         this.decreaseStackSize(tissue);
         this.decreaseStackSize(tissue + 1);
-        JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+        BlockPos pos = this.pos;
+        JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this), new TargetPoint(this.world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 5));
     }
 
     @Override
@@ -180,7 +183,7 @@ public class DNASequencerBlockEntity extends MachineBaseBlockEntity {
 		super.setInventorySlotContents(index, stack);
 
 		if (send)
-			JurassiCraft.NETWORK_WRAPPER.sendToAll(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this));
+			JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new TileEntityFieldsMessage(getSyncFields(NonNullList.create()), this), new TargetPoint(this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 5));
 	}
 	
 	@Override

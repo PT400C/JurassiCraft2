@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.block.entity.IncubatorBlockEntity;
 import org.jurassicraft.server.container.IncubatorContainer;
 import org.jurassicraft.server.message.ChangeTemperatureMessage;
 
@@ -18,9 +19,9 @@ import java.io.IOException;
 public class IncubatorGui extends GuiContainer {
     private static final ResourceLocation TEXTURE = new ResourceLocation("jurassicraft:textures/gui/incubator.png");
     private final InventoryPlayer playerInventory;
-    private IInventory incubator;
+    private IncubatorBlockEntity incubator;
 
-    public IncubatorGui(InventoryPlayer playerInv, IInventory incubator) {
+    public IncubatorGui(InventoryPlayer playerInv, IncubatorBlockEntity incubator) {
         super(new IncubatorContainer(playerInv, (TileEntity) incubator));
         this.playerInventory = playerInv;
         this.incubator = incubator;
@@ -77,7 +78,7 @@ public class IncubatorGui extends GuiContainer {
 
                 if (temp != this.incubator.getField(i + 10)) {
                     this.incubator.setField(i + 10, temp);
-                    JurassiCraft.NETWORK_WRAPPER.sendToServer(new ChangeTemperatureMessage(((TileEntity) this.incubator).getPos(), i, temp));
+                    JurassiCraft.NETWORK_WRAPPER.sendToServer(new ChangeTemperatureMessage(((TileEntity) this.incubator).getPos(), i, temp, this.incubator.getWorld().provider.getDimension()));
                 }
 
                 break;

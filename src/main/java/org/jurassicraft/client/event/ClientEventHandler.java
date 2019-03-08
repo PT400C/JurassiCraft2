@@ -32,11 +32,9 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.List;
-
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.client.proxy.ClientProxy;
 import org.jurassicraft.server.block.SkullDisplay;

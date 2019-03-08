@@ -3,9 +3,7 @@ package org.jurassicraft.server.entity;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import mcp.MethodsReturnNonnullByDefault;
-import net.ilexiconn.llibrary.client.model.tools.ChainBuffer;
 import net.ilexiconn.llibrary.server.animation.Animation;
-import net.ilexiconn.llibrary.server.animation.AnimationHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -49,7 +47,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
@@ -60,11 +57,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jurassicraft.JurassiCraft;
-import org.jurassicraft.client.event.ClientEventHandler;
 import org.jurassicraft.client.model.animation.EntityAnimation;
 import org.jurassicraft.client.model.animation.PoseHandler;
 import org.jurassicraft.client.model.animation.entity.FixedChainBuffer;
 import org.jurassicraft.client.proxy.ClientProxy;
+import org.jurassicraft.client.proxy.UsernameCache;
 import org.jurassicraft.server.api.Animatable;
 import org.jurassicraft.server.block.entity.FeederBlockEntity;
 import org.jurassicraft.server.block.machine.FeederBlock;
@@ -114,9 +111,9 @@ import org.jurassicraft.server.genetics.GeneticsHelper;
 import org.jurassicraft.server.item.ItemHandler;
 import org.jurassicraft.server.message.BiPacketOrder;
 import org.jurassicraft.server.message.SetOrderMessage;
+import org.jurassicraft.server.plugin.waila.IWailaProvider;
 import org.jurassicraft.server.util.GameRuleHandler;
 import org.jurassicraft.server.util.LangUtils;
-
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.vecmath.Vector3f;
@@ -132,7 +129,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class DinosaurEntity extends EntityCreature implements IEntityAdditionalSpawnData, Animatable {
+public abstract class DinosaurEntity extends EntityCreature implements IEntityAdditionalSpawnData, Animatable, IWailaProvider {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final DataParameter<Boolean> WATCHER_IS_CARCASS = EntityDataManager.createKey(DinosaurEntity.class, DataSerializers.BOOLEAN);
@@ -1867,6 +1864,23 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
             }
         }
     }
+    
+    @Override
+	public List<String> getWailaData(List<String> list) {
+    	list.add(TextFormatting.GOLD + LangUtils.translate("gender.name") + ": " + TextFormatting.WHITE + LangUtils.getGenderMode(this.isMale() == true ? 1 : 2));
+    	String name = "<MALFORMED>";
+    	if(this.getOwner() == null) {
+    		name = LangUtils.translate("message.not_imprinted.name");
+    	}else {
+    		String temp = UsernameCache.getPlayerName(this.getOwner());
+    		if(temp != null && !temp.equals(""))
+    			name = temp;
+    		
+    	}
+    	list.add(TextFormatting.GOLD + LangUtils.translate("status.owner.name") + ": " + TextFormatting.WHITE + name);
+    	list.add(TextFormatting.GOLD + LangUtils.translate("order.name") + ": " + TextFormatting.WHITE + LangUtils.translate("order." + this.getOrder().name().toLowerCase(Locale.ENGLISH) + ".name"));
+		return list;
+	}
 
     public Order getOrder() {
         return this.order;

@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -71,6 +72,8 @@ public class ClientProxy extends ServerProxy {
 	@Override
 	public void onInit(FMLInitializationEvent event) {
 		super.onInit(event);
+		FMLInterModComms.sendMessage("waila", "register", "org.jurassicraft.server.plugin.waila.BlockDataProvider.init");
+		FMLInterModComms.sendMessage("waila", "register", "org.jurassicraft.server.plugin.waila.EntityDataProvider.init");
 		RenderingHandler.INSTANCE.init();
 	}
 

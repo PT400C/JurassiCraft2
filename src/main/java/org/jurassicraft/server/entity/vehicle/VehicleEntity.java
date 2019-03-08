@@ -29,6 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jurassicraft.JurassiCraft;
@@ -683,7 +684,7 @@ public abstract class VehicleEntity extends Entity implements MultiSeatedEntity 
 					this.dataManager.set(RECORD_ITEM, stack);
 					player.setHeldItem(hand, currentStack);
 					if (!stack.isEmpty()) {
-						JurassiCraft.NETWORK_WRAPPER.sendToAll(new CarEntityPlayRecord(this, stack));
+						JurassiCraft.NETWORK_WRAPPER.sendToAllTracking(new CarEntityPlayRecord(this, stack), new TargetPoint(this.world.provider.getDimension(), this.posX, this.posY, this.posZ, 5));
 					}
 				}
 			} else if (!player.isSneaking()) {
