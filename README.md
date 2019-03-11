@@ -1,4 +1,6 @@
 # [![JurassiCraft2](http://i.imgur.com/3CXpCDv.png)](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2320045)
+[![JurassiCraft2](http://cf.way2muchnoise.eu/versions/jurassicraft.svg)](https://minecraft.curseforge.com/projects/jurassicraft)       [![JurassiCraft2](http://cf.way2muchnoise.eu/full_jurassicraft_downloads.svg)](https://minecraft.curseforge.com/projects/jurassicraft)
+
 JurassiCraft is a mod made to bring prehistoric creatures to the world of Minecraft, inspired by Jurassic Park, but is not limited to all JP canon: as many creatures and features as possible will be added! Creatures are made Jurassic Park style, by obtaining fossils or amber, using the fossils or amber to create DNA, inserting the DNA into eggs, and hatching the eggs.
 
 # Contributors
