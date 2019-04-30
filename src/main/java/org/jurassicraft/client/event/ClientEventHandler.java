@@ -76,41 +76,38 @@ public class ClientEventHandler {
         {
     		final BlockPos blockpos = e.getTarget().getBlockPos();
             final IBlockState iblockstate = e.getPlayer().world.getBlockState(blockpos);
-            if(iblockstate.getBlock() instanceof SkullDisplay) {
-    		e.setCanceled(true);
-            GlStateManager.enableBlend();
-            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-            GlStateManager.glLineWidth(2.0F);
-            GlStateManager.disableTexture2D();
-            GlStateManager.depthMask(false);
-            
+			if (iblockstate.getBlock() instanceof SkullDisplay) {
 
-            if (iblockstate.getMaterial() != Material.AIR && e.getPlayer().world.getWorldBorder().contains(blockpos))
-            {
-            	final double x = e.getPlayer().lastTickPosX + (e.getPlayer().posX - e.getPlayer().lastTickPosX) * (double) e.getPartialTicks();
-            	final double y = e.getPlayer().lastTickPosY + (e.getPlayer().posY - e.getPlayer().lastTickPosY) * (double) e.getPartialTicks();
-            	final double z = e.getPlayer().lastTickPosZ + (e.getPlayer().posZ - e.getPlayer().lastTickPosZ) * (double) e.getPartialTicks();
+				GlStateManager.enableBlend();
+				GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+				GlStateManager.glLineWidth(2.0F);
+				GlStateManager.disableTexture2D();
+				GlStateManager.depthMask(false);
 
-                GL11.glPushMatrix();
-                GlStateManager.translate(-x, -y, -z);
-                GlStateManager.translate(blockpos.getX() + 0.5, blockpos.getY(), blockpos.getZ() + 0.5);
-                final TileEntity tile = e.getPlayer().world.getTileEntity(blockpos);
+				if (iblockstate.getMaterial() != Material.AIR && e.getPlayer().world.getWorldBorder().contains(blockpos)) {
+					final double x = e.getPlayer().lastTickPosX + (e.getPlayer().posX - e.getPlayer().lastTickPosX) * (double) e.getPartialTicks();
+					final double y = e.getPlayer().lastTickPosY + (e.getPlayer().posY - e.getPlayer().lastTickPosY) * (double) e.getPartialTicks();
+					final double z = e.getPlayer().lastTickPosZ + (e.getPlayer().posZ - e.getPlayer().lastTickPosZ) * (double) e.getPartialTicks();
 
-                if(tile != null && tile instanceof SkullDisplayEntity && ((SkullDisplayEntity) tile).hasData()) {
-                	GlStateManager.rotate(((SkullDisplayEntity) tile).getAngle(), 0.0F, 1.0F, 0.0F);
-                }
+					Vec3d pos = new Vec3d(blockpos.getX() + 0.5D, blockpos.getY(), blockpos.getZ() + 0.5D).subtract(new Vec3d(x, y, z));
+					GL11.glPushMatrix();
+					GL11.glTranslated(pos.x, pos.y, pos.z);
+					final TileEntity tile = e.getPlayer().world.getTileEntity(blockpos);
 
-                RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).offset(-0.5, 0, -0.5).grow(0.0020000000949949026D), 0.0f, 0.0f, 0.0f, 0.4f);
-                GL11.glPopMatrix();
-                
-           
-            }
+					if (tile != null && tile instanceof SkullDisplayEntity && ((SkullDisplayEntity) tile).hasData())
+						GlStateManager.rotate(((SkullDisplayEntity) tile).getAngle(), 0.0F, 1.0F, 0.0F);
 
-            GlStateManager.depthMask(true);
-            GlStateManager.enableTexture2D();
-            GlStateManager.disableBlend();
-      
-            }
+					GL11.glTranslated(-0.5D, 0D, -0.5D);
+					RenderGlobal.drawSelectionBoundingBox(iblockstate.getCollisionBoundingBox(e.getPlayer().world, blockpos).grow(0.002D), 0.0f, 0.0f, 0.0f, 0.4f);
+					GL11.glPopMatrix();
+
+				}
+
+				GlStateManager.depthMask(true);
+				GlStateManager.enableTexture2D();
+				GlStateManager.disableBlend();
+				e.setCanceled(true);
+			}
         }
     }
 
