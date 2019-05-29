@@ -91,7 +91,7 @@ public class JournalGui extends GuiScreen {
             }
             lineOffsetY += lineHeight;
             if (lineOffsetY > 140 || nextPage) {
-                pages.add(currentPage.toArray(new String[currentPage.size()]));
+            	pages.add(currentPage.toArray(new String[0]));
                 currentPage.clear();
                 lineOffsetY = 0;
             }

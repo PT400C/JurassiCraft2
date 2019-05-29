@@ -131,13 +131,11 @@ public class EntityHandler {
         //registerEntity(GoatEntity.class, "Goat", 0xEFEDE7, 0x7B3E20);
 
         registerEntity(TranquilizerDartEntity.class, "Tranquilizer Dart");
-        
-        ArrayList<Biome> biomeHills = new ArrayList<Biome>();
-        	biomeHills.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.HILLS));
-        ArrayList<Biome> biomePlains = new ArrayList<Biome>();
-        	biomePlains.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.PLAINS));
-        ArrayList<Biome> biomeForest = new ArrayList<Biome>();
-        	biomeForest.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
+        /*
+        ArrayList<Biome> biomeHills=new ArrayList<Biome>(BiomeDictionary.getBiomes(BiomeDictionary.Type.HILLS));
+        ArrayList<Biome> biomePlains=new ArrayList<Biome>(BiomeDictionary.getBiomes(BiomeDictionary.Type.PLAINS));
+        ArrayList<Biome> biomeForest=new ArrayList<Biome>(BiomeDictionary.getBiomes(BiomeDictionary.Type.FOREST));
+         */
         
 //        EntityRegistry.addSpawn(GoatEntity.class, 10, 1, 3, EnumCreatureType.CREATURE, biomeHills.toArray(new Biome[biomeHills.size()]));
 //        EntityRegistry.addSpawn(GoatEntity.class, 15, 1, 3, EnumCreatureType.CREATURE, biomeHills.toArray(new Biome[biomePlains.size()]));

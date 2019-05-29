@@ -822,15 +822,15 @@ public abstract class DinosaurEntity extends EntityCreature implements IEntityAd
                                 child.setMale(this.rand.nextDouble() > 0.5);
                                 child.setDNAQuality(Math.min(100, this.getDNAQuality() + this.breeding.getDNAQuality()));
                                 DinosaurAttributes attributes = DinosaurAttributes.combine(this, this.getAttributes(), this.breeding.getAttributes());
-                                String genetics = "";
+                                StringBuilder genetics = new StringBuilder();
                                 for (int c = 0; c < this.genetics.length(); c++) {
                                     if (this.rand.nextBoolean()) {
-                                        genetics += this.genetics.charAt(i);
+                                    	genetics.append(this.genetics.charAt(i));
                                     } else {
-                                        genetics += this.breeding.genetics.charAt(i);
+                                    	genetics.append(this.breeding.genetics.charAt(i));
                                     }
                                 }
-                                child.setGenetics(genetics);
+                                child.setGenetics(genetics.toString());
                                 child.setAttributes(attributes);
                                 this.children.add(child);
                             } catch (Exception e) {

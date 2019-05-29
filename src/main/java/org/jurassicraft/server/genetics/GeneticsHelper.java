@@ -6,27 +6,27 @@ public class GeneticsHelper {
     public static final int GENETICS_LENGTH = 10;
 
     public static String randomGenetics(Random random) {
-        String genetics = "";
+    	StringBuilder genetics = new StringBuilder();
 
         for (int i = 0; i < GENETICS_LENGTH; i++) {
             int character = random.nextInt(4);
 
             switch (character) {
                 case 0:
-                    genetics += "A";
+                	genetics.append("A");
                     break;
                 case 1:
-                    genetics += "C";
+                	genetics.append("C");
                     break;
                 case 2:
-                    genetics += "G";
+                	genetics.append("G");
                     break;
                 case 3:
-                    genetics += "T";
+                	genetics.append("T");
                     break;
             }
         }
 
-        return genetics;
+        return genetics.toString();
     }
 }

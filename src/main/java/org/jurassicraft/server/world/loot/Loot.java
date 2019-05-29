@@ -202,8 +202,8 @@ public class Loot {
 		}
 
 		public LootPool build() {
-			LootEntry[] entries = this.entries.toArray(new LootEntry[this.entries.size()]);
-			LootCondition[] conditions = this.conditions.toArray(new LootCondition[this.conditions.size()]);
+			LootEntry[] entries = this.entries.toArray(new LootEntry[0]);
+			LootCondition[] conditions = this.conditions.toArray(new LootCondition[0]);
 			return new LootPool(entries, conditions, new RandomValueRange(this.minRolls, this.maxRolls),
 					new RandomValueRange(this.minBonusRolls, this.maxBonusRolls), this.name);
 		}
@@ -257,8 +257,8 @@ public class Loot {
 		}
 
 		public LootEntry build() {
-			LootCondition[] conditions = this.conditions.toArray(new LootCondition[this.conditions.size()]);
-			LootFunction[] functions = this.functions.toArray(new LootFunction[this.functions.size()]);
+			LootCondition[] conditions = this.conditions.toArray(new LootCondition[0]);
+			LootFunction[] functions = this.functions.toArray(new LootFunction[0]);
 			return new LootEntryItem(this.item, this.weight, this.quality, functions, conditions,
 					this.item.getUnlocalizedName() + "_" + tableID++);
 		}
@@ -273,8 +273,8 @@ public class Loot {
 		}
 
 		public LootEntry[] buildEntries() {
-			LootCondition[] conditions = this.conditions.toArray(new LootCondition[this.conditions.size()]);
-			LootFunction[] functions = this.functions.toArray(new LootFunction[this.functions.size()]);
+			LootCondition[] conditions = this.conditions.toArray(new LootCondition[0]);
+			LootFunction[] functions = this.functions.toArray(new LootFunction[0]);
 			LootEntry[] entries = new LootEntry[this.items.length];
 			for (int i = 0; i < this.items.length; i++) {
 				Item item = this.items[i];

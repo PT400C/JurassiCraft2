@@ -94,12 +94,12 @@ public class RegistryHandler
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().registerAll(blocksToReg.toArray(new Block[blocksToReg.size()]));
+    	event.getRegistry().registerAll(blocksToReg.toArray(new Block[0]));
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().registerAll(itemsToReg.toArray(new Item[itemsToReg.size()]));
+        event.getRegistry().registerAll(itemsToReg.toArray(new Item[0]));
     }
 
     @SubscribeEvent
@@ -112,7 +112,7 @@ public class RegistryHandler
     @SubscribeEvent
     public static void registerSounds(final RegistryEvent.Register<SoundEvent> event)
     {
-        event.getRegistry().registerAll(sounds.toArray(new SoundEvent[sounds.size()]));
+        event.getRegistry().registerAll(sounds.toArray(new SoundEvent[0]));
     }
 
     private static <K extends IForgeRegistryEntry<K>, T> void call(RegistryEvent.Register<K> event, T value) {
