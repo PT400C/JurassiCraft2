@@ -60,6 +60,6 @@ public class CoelacanthDinosaur extends Dinosaur {
                         { "caudal_fin", "spine", "pectoral_fin_bones", "skull" },
                         { "anal_fin", "", "pelvic_fin_bones", "teeth" }
                 })
-                .setSpawn(5, BiomeDictionary.Type.OCEAN);
+                .setSpawn(5, BiomeDictionary.Type.OCEAN, BiomeDictionary.Type.WATER, BiomeDictionary.Type.RIVER);
     }
 }

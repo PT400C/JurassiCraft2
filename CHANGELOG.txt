@@ -1,3 +1,4 @@
 *Improved data traffic on larger multiplayer servers
 +Added Hwyla (Waila) support for certain blocks and entities
 *Fixed T. Rex skull hitbox glitches
+*Coelacanths now successfully spawn in water biomes when autospawn is on
