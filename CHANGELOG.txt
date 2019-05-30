@@ -1,3 +1,5 @@
 *Improved data traffic on larger multiplayer servers
 +Added Hwyla (Waila) support for certain blocks and entities
 *Fixed T. Rex skull hitbox glitches
+*Fixed missing teeth on T. Rex skull
+*Fixed crash with Sponge Forge concerning tour rails
