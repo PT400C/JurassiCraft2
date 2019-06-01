@@ -26,6 +26,7 @@ import net.minecraft.world.storage.loot.functions.SetMetadata;
 import net.minecraft.world.storage.loot.functions.SetNBT;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.jurassicraft.JurassiCraft;
+import org.jurassicraft.server.conf.JurassiCraftConfig;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.entity.FlyingDinosaurEntity;
@@ -93,6 +94,7 @@ public class Loot {
 
 	public static void handleTable(LootTable table, ResourceLocation name) {
 		boolean frozen = false;
+
 		if (table.isFrozen()) {// Some mods like to replace the loot tables which ends up with the loot table
 								// being frozen.
 			frozen = true;
@@ -109,17 +111,20 @@ public class Loot {
 		} else if (name == LootTableList.CHESTS_VILLAGE_BLACKSMITH || name == LootTableList.CHESTS_NETHER_BRIDGE
 				|| name == LootTableList.CHESTS_SIMPLE_DUNGEON || name == LootTableList.CHESTS_STRONGHOLD_CORRIDOR
 				|| name == LootTableList.CHESTS_DESERT_PYRAMID || name == LootTableList.CHESTS_ABANDONED_MINESHAFT) {
-			LootEntry plantFossil = Loot.entry(ItemHandler.PLANT_FOSSIL).weight(5).count(1, 3).build();
-			LootEntry twig = Loot.entry(ItemHandler.TWIG_FOSSIL).weight(5).count(1, 3).build();
-			LootEntry amber = Loot.entry(ItemHandler.AMBER).weight(2).count(0, 1).data(0, 1).build();
-			LootEntry skull = Loot.entry(ItemHandler.FOSSILS.get("skull")).weight(2).function(DINOSAUR_DATA).count(1, 2)
+			float percentage = JurassiCraftConfig.ITEMS.lootSpawnrate / 100F;
+			
+			LootEntry plantFossil = Loot.entry(ItemHandler.PLANT_FOSSIL).weight(5).count((int) percentage, (int) (3 * percentage)).build();
+			LootEntry twig = Loot.entry(ItemHandler.TWIG_FOSSIL).weight(5).count((int) percentage, (int) (3 * percentage)).build();
+			LootEntry amber = Loot.entry(ItemHandler.AMBER).weight(2).count(0, (int) percentage).data(0, 1).build();
+			LootEntry skull = Loot.entry(ItemHandler.FOSSILS.get("skull")).weight(2).function(DINOSAUR_DATA).count((int) percentage, (int) (2 * percentage))
 					.build();
 
 			table.addPool(Loot.pool("fossils").rolls(1, 2).entries(plantFossil, twig, amber, skull).build());
 
 			LootEntry[] records = Loot.entries(ItemHandler.JURASSICRAFT_THEME_DISC, ItemHandler.DONT_MOVE_A_MUSCLE_DISC,
 					ItemHandler.TROODONS_AND_RAPTORS_DISC).buildEntries();
-			table.addPool(Loot.pool("records").rolls(0, 2).entries(records).build());
+
+			table.addPool(Loot.pool("records").rolls(0, (int) (2 * percentage)).entries(records).build());
 		}
 		if (name.getResourceDomain().equals(JurassiCraft.MODID)) {
 			if (name.getResourcePath().equals(Loot.VISITOR_GROUND_STORAGE.getResourcePath())) {
