@@ -3,3 +3,4 @@
 *Fixed T. Rex skull hitbox glitches
 *Fixed missing teeth on T. Rex skull
 *Fixed crash with Sponge Forge concerning tour rails
+*Fixed crashes on dedicated servers due to AI overloads (dinosaur autospawning should be harmless now)
