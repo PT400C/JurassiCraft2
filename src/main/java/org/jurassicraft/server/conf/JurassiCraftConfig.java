@@ -103,6 +103,10 @@ public class JurassiCraftConfig { //TODO: move all structures to same parent pac
     public static class Items {
         @Config.Name("Disable Growth Serum")
         public boolean disableGrowthSerum = false;
+        
+        @Config.Name("Loot Spawnrate (percentage)")
+        @Config.Comment("This represents the percentage of loot items in dungeons (restart required)")
+        public int lootSpawnrate = 100;
     }
 
     public static class Vehicles {

@@ -35,13 +35,6 @@ public class TourRailBlockEntity extends TileEntity {
     }
 
     @Override
-    public NBTTagCompound getTileData() {
-        NBTTagCompound nbt = new NBTTagCompound();
-        this.writeToNBT(nbt);
-        return nbt;
-    }
-
-    @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         checkNonNull();
         compound.setInteger("RailDirection", direction.ordinal());
