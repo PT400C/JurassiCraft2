@@ -108,7 +108,7 @@ public class DinosaurMeatItem extends ItemFood implements ExtractableItem {
 
         if (nbt == null) {
             nbt = new NBTTagCompound();
-            DinoDNA dna = new DinoDNA(EntityHandler.getDinosaurById(stack.getItemDamage()), -1, "", false);
+            DinoDNA dna = new DinoDNA(EntityHandler.getDinosaurById(stack.getItemDamage()), -1, "");
             dna.writeToNBT(nbt);
         } else if (!nbt.hasKey("Dinosaur")) {
             nbt.setInteger("Dinosaur", stack.getItemDamage());

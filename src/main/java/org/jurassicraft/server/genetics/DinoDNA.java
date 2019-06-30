@@ -14,7 +14,7 @@ public class/* Bingo! */ DinoDNA {
     private String genetics;
     private Dinosaur dinosaur;
 
-    public DinoDNA(Dinosaur dinosaur, int quality, String genetics, boolean simulate) {
+    public DinoDNA(Dinosaur dinosaur, int quality, String genetics) {
         this.quality = quality;
         this.genetics = genetics;
         this.dinosaur = dinosaur;
@@ -25,7 +25,7 @@ public class/* Bingo! */ DinoDNA {
     }
 
     public static DinoDNA readFromNBT(NBTTagCompound nbt) {
-        return nbt == null ? null : new DinoDNA(EntityHandler.getDinosaurById(nbt.getInteger("Dinosaur")), nbt.getInteger("DNAQuality"), nbt.getString("Genetics"), nbt.getBoolean("Simulate"));
+        return nbt == null ? null : new DinoDNA(EntityHandler.getDinosaurById(nbt.getInteger("Dinosaur")), nbt.getInteger("DNAQuality"), nbt.getString("Genetics"));
     }
 
     public void writeToNBT(NBTTagCompound nbt) {

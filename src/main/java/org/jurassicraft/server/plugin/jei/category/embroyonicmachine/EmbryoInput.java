@@ -45,7 +45,7 @@ public interface EmbryoInput {
 
         @Override
         public NBTTagCompound getTag() {
-            DinoDNA dna = new DinoDNA(this.dinosaur, 100, GeneticsHelper.randomGenetics(new Random()), false);
+            DinoDNA dna = new DinoDNA(this.dinosaur, 100, GeneticsHelper.randomGenetics(new Random()));
             NBTTagCompound tag = new NBTTagCompound();
             dna.writeToNBT(tag);
             return tag;

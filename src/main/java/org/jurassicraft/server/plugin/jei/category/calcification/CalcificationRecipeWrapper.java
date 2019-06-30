@@ -28,7 +28,7 @@ public class CalcificationRecipeWrapper implements IRecipeWrapper {
 
         int metadata = EntityHandler.getDinosaurId(this.input.dinosaur);
         NBTTagCompound tag = new NBTTagCompound();
-        DinoDNA dna = new DinoDNA(this.input.dinosaur, 100, GeneticsHelper.randomGenetics(new Random()), false);
+        DinoDNA dna = new DinoDNA(this.input.dinosaur, 100, GeneticsHelper.randomGenetics(new Random()));
         dna.writeToNBT(tag);
 
         ItemStack inputStack = new ItemStack(ItemHandler.SYRINGE, 1, metadata);

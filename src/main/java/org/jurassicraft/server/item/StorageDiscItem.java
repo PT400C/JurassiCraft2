@@ -73,7 +73,7 @@ public class StorageDiscItem extends Item implements SynthesizableItem {
         List<ItemStack> list = Lists.newArrayList();
 
         EntityHandler.getRegisteredDinosaurs().forEach(dino -> {
-            DinoDNA dna = new DinoDNA(dino, -1, "", false);
+            DinoDNA dna = new DinoDNA(dino, -1, "");
             ItemStack stack = new ItemStack(this);
             NBTTagCompound nbt = new NBTTagCompound();
             dna.writeToNBT(nbt);

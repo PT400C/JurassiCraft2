@@ -231,6 +231,8 @@ public class JurassiCraftJEIPlugin implements IModPlugin {
                 }
             }
         registry.addIngredientInfo(new ArrayList<ItemStack>(Arrays.asList(new ItemStack(ItemHandler.KRILL), new ItemStack(ItemHandler.PLANKTON))), ItemStack.class, "info.jei.krill_plankton");
+        registry.addIngredientInfo(new ItemStack(Item.getItemFromBlock(BlockHandler.DNA_COMBINATOR_HYBRIDIZER)), ItemStack.class, "info.jei.combinator_hybridizer");
+    
     }
 
     private static <T> List<T> getDinos(Function<Dinosaur,T> func) {

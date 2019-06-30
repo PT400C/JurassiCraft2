@@ -371,8 +371,7 @@ public class Loot {
 			if (this.full) {
 				quality = 100;
 			}
-			DinoDNA dna = new DinoDNA(EntityHandler.getDinosaurById(stack.getItemDamage()), quality,
-					GeneticsHelper.randomGenetics(rand), false);
+			DinoDNA dna = new DinoDNA(EntityHandler.getDinosaurById(stack.getItemDamage()), quality, GeneticsHelper.randomGenetics(rand));
 			NBTTagCompound compound = new NBTTagCompound();
 			dna.writeToNBT(compound);
 			stack.setTagCompound(compound);

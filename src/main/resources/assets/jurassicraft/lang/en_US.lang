@@ -673,6 +673,7 @@ info.jei.peat.name=Top-Down view on a<nl>moss farm; Moss will spread<nl>on peat,
 info.jei.krill_plankton=Food source for fish creatures (Place it on water source blocks)
 info.jei.peat_block.name=Peat
 info.jei.placables=Placable on solid surfaces - Attraction signs require a large area to be placed on
+info.jei.combinator_hybridizer=Used to combinate DNA Storage Disks of the same type to up to 100% quality
 
 #Commands
 commands.spawnjc.usuage=/spawnjc <structure> [rotation] [mirror] [seed]

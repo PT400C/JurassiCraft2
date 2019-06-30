@@ -138,7 +138,7 @@ public class DNACombinatorHybridizerBlockEntity extends MachineBaseBlockEntity {
 
                 NBTTagCompound nbt = new NBTTagCompound();
 
-                DinoDNA dna = new DinoDNA(hybrid, 100, this.slots.get(0).getTagCompound().getString("Genetics"), false);
+                DinoDNA dna = new DinoDNA(hybrid, 100, this.slots.get(0).getTagCompound().getString("Genetics"));
                 dna.writeToNBT(nbt);
 
                 ItemStack output = new ItemStack(ItemHandler.STORAGE_DISC);
@@ -164,7 +164,7 @@ public class DNACombinatorHybridizerBlockEntity extends MachineBaseBlockEntity {
 						newQuality = 100;
 					}
 
-					DinoDNA newDNA = new DinoDNA(dna1.getDinosaur(), newQuality, dna1.getGenetics(), false);
+					DinoDNA newDNA = new DinoDNA(dna1.getDinosaur(), newQuality, dna1.getGenetics());
 
 					NBTTagCompound outputTag = new NBTTagCompound();
 					newDNA.writeToNBT(outputTag);

@@ -65,7 +65,7 @@ public class AmberItem extends Item implements ExtractableItem {
         if (nbt == null) {
         	if(this.getMetadata(stack) == 0) {
         		nbt = new NBTTagCompound();
-                DinoDNA dna = new DinoDNA(EntityHandler.getDinosaurById(-1), -1, "", true);
+                DinoDNA dna = new DinoDNA(EntityHandler.getDinosaurById(-1), -1, "");
                 dna.writeToNBT(nbt);
         	}else if(this.getMetadata(stack) == 1) {
         		nbt = new NBTTagCompound();

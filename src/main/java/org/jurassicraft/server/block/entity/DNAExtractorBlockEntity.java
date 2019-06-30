@@ -99,7 +99,7 @@ public class DNAExtractorBlockEntity extends MachineBaseBlockEntity {
                         quality += 50;
                     }
 
-                    DinoDNA dna = new DinoDNA(dino, quality, GeneticsHelper.randomGenetics(rand), false);
+                    DinoDNA dna = new DinoDNA(dino, quality, GeneticsHelper.randomGenetics(rand));
 
                     NBTTagCompound nbt = new NBTTagCompound();
                     dna.writeToNBT(nbt);

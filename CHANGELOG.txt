@@ -1,3 +1,24 @@
 *Improved data traffic on larger multiplayer servers
 +Added Hwyla (Waila) support for certain blocks and entities
 *Fixed T. Rex skull hitbox glitches
++Added two new Creative Tabs for vehicles and JC spawneggs
++Added a detailed JEI integration for the Bug Farming Crate
++Added JEI support for the DNA Extractor, it now shows all possible recipes
++Added an JEI information (tutorial) for moss farms
+*Moss does no longer destroy any kind of block when spreading
+*Moving machine ingredients into every machine has been fixed (JEI)
++The dino scanner debug stick now copies it's finding into the clipboard
+*Storage disks no longer show misleading data when not created properly
++Added info to the Growth Serum (JEI)
++Added info to the Cultivator (JEI)
++Added info to the Murals, Paddock signs and Attraction signs (JEI)
++Added info to the pregnancy test (JEI)
++Added info to hatched eggs (JEI)
++Added info to krill and plankton (JEI)
++Added info to the DNA combinator-hybridizer (JEI)
+*Fixed incorrect JEI recipe in the DNA Synthesizer concerning the Coelacanth
+*Removed incorrect JEI recipe for IndianLilac and Heliconia DNA
+*Improved the functionality of the JEI Calcification machine GUI
+*Improved the functionality of the JEI DNA Synthesizer GUI
+*Improved the functionality of the JEI Embryonic machine GUI
+*Improved the functionality of the incubator GUI
