@@ -1,6 +1,7 @@
 package org.jurassicraft.server.entity.dinosaur;
 
 import net.ilexiconn.llibrary.server.animation.Animation;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.passive.EntitySquid;
 import net.minecraft.util.SoundEvent;
@@ -23,5 +24,27 @@ public class CoelacanthEntity extends SwimmingDinosaurEntity {
     @Override
     public SoundEvent getSoundForAnimation(Animation animation) {
         return null;
+    }
+    
+    @Override
+    public boolean isNotColliding()
+    {
+        return this.world.checkNoEntityCollision(this.getEntityBoundingBox(), this);
+    }
+    
+    @Override
+    public boolean isPushedByWater()
+    {
+        return false;
+    }
+    
+    @Override
+    public boolean getCanSpawnHere() {
+    	return true;
+    }
+    
+    @Override
+    public boolean isCreatureType(EnumCreatureType type, boolean forSpawnCount) {
+    	return type == EnumCreatureType.WATER_CREATURE;
     }
 }

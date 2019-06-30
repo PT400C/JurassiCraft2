@@ -6,3 +6,4 @@
 *Fixed crashes on dedicated servers due to AI overloads (dinosaur autospawning should be harmless now)
 *Fixed hitbox issues with small dinosaurs
 +Added config option for dungeon loot
+*Coelacanths now successfully spawn in water biomes when autospawn is on

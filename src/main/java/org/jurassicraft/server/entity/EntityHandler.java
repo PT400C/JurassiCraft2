@@ -40,7 +40,9 @@ import net.ilexiconn.llibrary.server.animation.Animation;
 import net.ilexiconn.llibrary.server.animation.IAnimatedEntity;
 import net.ilexiconn.llibrary.server.network.AnimationMessage;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving.SpawnPlacementType;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -182,7 +184,8 @@ public class EntityHandler {
     	if (canSpawn && JurassiCraftConfig.ENTITIES.naturalSpawning_D) {
             DinosaurMetadata metadata = dinosaur.getMetadata();
             EntityRegistry.addSpawn(clazz, metadata.getSpawnChance(), 1, Math.min(6, metadata.getMaxHerdSize() / 2), metadata.isMarineCreature() ? EnumCreatureType.WATER_CREATURE : EnumCreatureType.CREATURE, metadata.getSpawnBiomes());
-        }
+            EntitySpawnPlacementRegistry.setPlacementType(clazz, metadata.isMarineCreature() ? SpawnPlacementType.IN_WATER : SpawnPlacementType.ON_GROUND);
+    	}
     }
     
     public static void reinitSpawns() {
