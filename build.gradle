@@ -244,7 +244,7 @@ dependencies {
     deobfProvided "mezz.jei:jei_1.12.2:4.9.1.187:api"
     runtime "mezz.jei:jei_1.12.2:4.9.1.187"
     deobfCompile "net.ilexiconn:llibrary:${llibrary_version}-1.12.2"
-	deobfProvided "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+	deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 }
 
 processResources {
