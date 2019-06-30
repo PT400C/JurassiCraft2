@@ -246,7 +246,7 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
 
         return null;
     }
-    
+
     @Nonnull
     protected HashMap<String, TabulaModelContainer> getSkeletonModels() {
     	HashMap<String, TabulaModelContainer> models = new HashMap<>();
@@ -411,4 +411,5 @@ public abstract class Dinosaur implements Comparable<Dinosaur> {
         LIVE_BIRTH,
         EGG_LAYING
     }
+	
 }

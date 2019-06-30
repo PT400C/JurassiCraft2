@@ -1,6 +1,7 @@
 package org.jurassicraft.server.plugin.jei.category.dnasynthesizer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class DNASynthesizerRecipeWrapper implements IRecipeWrapper {
 //        ItemStack output = new ItemStack(this.input.getItem(), 1, metadata);
 //        ingredients.setOutput(ItemStack.class, output);
 
-        ingredients.setInput(ItemStack.class, input.stack);
+        ingredients.setInputs(ItemStack.class, new ArrayList<ItemStack>(Arrays.asList(input.stack, new ItemStack(ItemHandler.EMPTY_TEST_TUBE), new ItemStack(ItemHandler.DNA_NUCLEOTIDES))));
         List<ItemStack> list = Lists.newArrayList();
         input.item.getChancedOutputs(input.stack).forEach(pair -> {
             ItemStack stack = pair.getRight();

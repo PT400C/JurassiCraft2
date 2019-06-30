@@ -45,7 +45,7 @@ public class DinosaurSpawnEggItem extends Item {
     public DinosaurSpawnEggItem() {
         super();
         this.setHasSubtypes(true);
-        this.setCreativeTab(TabHandler.ITEMS);
+        this.setCreativeTab(TabHandler.EGGS);
     }
 
     @Override

@@ -2,12 +2,9 @@ package org.jurassicraft.server.block.entity;
 
 import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.api.BreedableBug;
-import org.jurassicraft.server.api.GrindableItem;
 import org.jurassicraft.server.container.BugCrateContainer;
 import org.jurassicraft.server.food.FoodHelper;
-
 import com.google.common.primitives.Ints;
-
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;

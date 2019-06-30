@@ -1,36 +1,32 @@
-package org.jurassicraft.server.plugin.jei.category.cleaningstation;
+package org.jurassicraft.server.plugin.jei.category.dnaextractor;
 
 import com.google.common.collect.Lists;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
-
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import org.jurassicraft.server.item.ItemHandler;
 
-public class CleaningStationRecipeWrapper implements IRecipeWrapper {
-    private final CleanableInput input;
+@SideOnly(Side.CLIENT)
+public class DNAExtractorRecipeWrapper implements IRecipeWrapper {
+    private final ExtractorInput input;
 
-    public CleaningStationRecipeWrapper(CleanableInput input) {
+    public DNAExtractorRecipeWrapper(ExtractorInput input) {
         this.input = input;
     }
 
     @Override
     public void getIngredients(IIngredients ingredients) {
-//        int metadata = EntityHandler.getDinosaurId(this.dinosaur);
-//        ingredients.setInputs(ItemStack.class, Lists.newArrayList(new ItemStack(BlockHandler.getEncasedFossil(metadata), 1, BlockHandler.getMetadata(metadata))));
-//        ItemStack output = new ItemStack(ItemHandler.FOSSILS.get(this.bone), 1, metadata);
-//        ingredients.setOutput(ItemStack.class, output);
-        ingredients.setInput(ItemStack.class, input.stack);
+    	
+        ingredients.setInputs(ItemStack.class, Lists.newArrayList(input.stack, new ItemStack(ItemHandler.STORAGE_DISC)));
         List<ItemStack> list = Lists.newArrayList();
-        input.clean.getChancedOutputs(input.stack).forEach(pair -> {
-            ItemStack stack = pair.getRight();
-            stack.getOrCreateSubCompound("jei_rendering_info").setFloat("Chance", Math.round(pair.getLeft() * 10F) / 10F);
-            list.add(stack);
-        });
-
+        list.add(input.extract.getExtractOutput(input.stack, new Random()));
         List<List<ItemStack>> outputs = new ArrayList<>();
         outputs.add(list);
         ingredients.setOutputLists(ItemStack.class, outputs);

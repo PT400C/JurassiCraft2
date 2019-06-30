@@ -39,7 +39,7 @@ public final class VehicleItem extends Item {
 	
     public VehicleItem() {
     	
-        this.setCreativeTab(TabHandler.ITEMS);
+        this.setCreativeTab(TabHandler.VEHICLES);
         this.setMaxStackSize(1);
         this.setHasSubtypes(true);
         //Caching the localized files, is that needed? Don't uncomment as changing the language at the runtime would break the cache

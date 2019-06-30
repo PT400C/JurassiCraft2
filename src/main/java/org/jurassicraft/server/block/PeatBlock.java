@@ -7,14 +7,19 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeSwamp;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.jurassicraft.server.plugin.jei.category.moss.PeatItem;
 import org.jurassicraft.server.tab.TabHandler;
 
+import java.util.List;
 import java.util.Random;
 
-public class PeatBlock extends Block {
+public class PeatBlock extends Block implements PeatItem {
     public static final PropertyInteger MOISTURE = PropertyInteger.create("moisture", 0, 7);
 
     public PeatBlock() {
@@ -65,4 +70,9 @@ public class PeatBlock extends Block {
     public BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, MOISTURE);
     }
+
+	@Override
+	public List<Pair<Float, ItemStack>> getChancedOutputs(ItemStack inputItem) {
+		return null;
+	}
 }

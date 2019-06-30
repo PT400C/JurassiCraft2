@@ -3,7 +3,6 @@ package org.jurassicraft.server.item;
 import com.google.common.collect.Lists;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,7 +12,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jurassicraft.server.api.SynthesizableItem;
-import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.genetics.DinoDNA;
 import org.jurassicraft.server.genetics.PlantDNA;
@@ -75,7 +73,7 @@ public class StorageDiscItem extends Item implements SynthesizableItem {
         List<ItemStack> list = Lists.newArrayList();
 
         EntityHandler.getRegisteredDinosaurs().forEach(dino -> {
-            DinoDNA dna = new DinoDNA(dino, -1, "");
+            DinoDNA dna = new DinoDNA(dino, -1, "", false);
             ItemStack stack = new ItemStack(this);
             NBTTagCompound nbt = new NBTTagCompound();
             dna.writeToNBT(nbt);
@@ -83,7 +81,8 @@ public class StorageDiscItem extends Item implements SynthesizableItem {
             list.add(stack);
         });
 
-        PlantHandler.getPlants().forEach(plant -> {
+        PlantHandler.getPlants().stream().filter(plant -> plant.isPrehistoric()).forEach(plant -> {
+        	
             PlantDNA dna = new PlantDNA(PlantHandler.getPlantId(plant), -1);
             ItemStack stack = new ItemStack(this);
             NBTTagCompound nbt = new NBTTagCompound();

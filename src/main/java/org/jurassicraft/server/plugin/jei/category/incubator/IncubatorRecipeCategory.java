@@ -50,7 +50,7 @@ public class IncubatorRecipeCategory implements IRecipeCategory<IncubatorRecipeW
         stackGroup.init(0, true, 47, 0);
         stackGroup.set(0, ingredients.getInputs(ItemStack.class).get(0));
         stackGroup.init(1, true, 47, 35);
-        stackGroup.set(1, new ItemStack(Item.getItemFromBlock(BlockHandler.PEAT_MOSS), 1));
+        stackGroup.set(1, ingredients.getInputs(ItemStack.class).get(1));
     }
 
     @Override

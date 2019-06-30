@@ -5,7 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public interface BreedableBug {
+public interface BreedableBug extends JurassicIngredientItem {
     static BreedableBug getBug(ItemStack stack) {
         if (stack != null) {
             Item item = stack.getItem();

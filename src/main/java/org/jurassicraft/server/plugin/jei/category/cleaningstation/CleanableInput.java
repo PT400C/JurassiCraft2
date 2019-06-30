@@ -7,15 +7,15 @@ import org.jurassicraft.server.api.CleanableItem;
 
 public class CleanableInput {
     public final ItemStack stack;
-    public final CleanableItem grind;
+    public final CleanableItem clean;
 
     public CleanableInput(ItemStack stack) {
         this.stack = stack;
         Item item = stack.getItem();
         if(item instanceof ItemBlock) {
-            this.grind = (CleanableItem)((ItemBlock)stack.getItem()).getBlock();
+            this.clean = (CleanableItem)((ItemBlock)stack.getItem()).getBlock();
         } else {
-            this.grind = (CleanableItem)stack.getItem();
+            this.clean = (CleanableItem)stack.getItem();
         }
     }
 }

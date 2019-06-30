@@ -6,8 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import org.jurassicraft.server.dinosaur.Dinosaur;
-import org.jurassicraft.server.entity.DinosaurEntity;
-import org.jurassicraft.server.entity.DinosaurStatus;
 import org.jurassicraft.server.entity.item.AttractionSignEntity;
 import org.jurassicraft.server.plant.Plant;
 import org.jurassicraft.server.plant.PlantHandler;
@@ -109,6 +107,8 @@ public final class LangUtils
     }
     
     public static String getPlantName(int plantId) {
+    	if(plantId == -1)
+    		return TextFormatting.OBFUSCATED + "aaa";
         return getPlantName(PlantHandler.getPlantById(plantId));
     }
 

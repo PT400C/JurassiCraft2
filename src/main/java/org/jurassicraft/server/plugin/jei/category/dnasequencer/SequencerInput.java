@@ -4,7 +4,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import org.jurassicraft.server.api.SequencableItem;
-import org.jurassicraft.server.api.SynthesizableItem;
 
 public class SequencerInput {
     public final ItemStack stack;

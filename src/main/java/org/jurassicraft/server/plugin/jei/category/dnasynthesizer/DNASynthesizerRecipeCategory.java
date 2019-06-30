@@ -73,9 +73,9 @@ public class DNASynthesizerRecipeCategory implements IRecipeCategory<DNASynthesi
         stackGroup.init(0, true, 15, 0);
         stackGroup.set(0, inputs.get(0));
         stackGroup.init(1, true, 1, 27);
-        stackGroup.set(1, new ItemStack(ItemHandler.EMPTY_TEST_TUBE));
+        stackGroup.set(1, inputs.get(1));
         stackGroup.init(2, true, 27, 27);
-        stackGroup.set(2, new ItemStack(ItemHandler.DNA_NUCLEOTIDES));
+        stackGroup.set(2, inputs.get(2));
         stackGroup.init(3, false, 96, 4);
         stackGroup.set(3, outputs.get(0));
     }

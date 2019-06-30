@@ -50,7 +50,7 @@ public class MossBlock extends Block {
                     placementAttempts--;
                 }
 
-                if (nextPos != null) {
+                if (nextPos != null && world.isAirBlock(nextPos)) {
                     for (BlockPos neighbourPos : BlockPos.getAllInBoxMutable(nextPos.add(-2, -3, -2), nextPos.add(2, 3, 2))) {
                         if (world.getBlockState(neighbourPos).getBlock() == this) {
                             allowedInArea--;

@@ -11,7 +11,7 @@ public class CultivatorRecipeWrapper implements IRecipeWrapper {
     private final Dinosaur dinosaur;
 
     public CultivatorRecipeWrapper(CultivateInput input) {
-        this.dinosaur = input.dino;
+        this.dinosaur = input.dinosaur;
     }
 
     @Override

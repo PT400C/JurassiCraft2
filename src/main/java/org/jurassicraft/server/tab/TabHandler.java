@@ -32,6 +32,8 @@ public class TabHandler {
 
     public static final JurassiCraftFossilTab FOSSILS = new JurassiCraftFossilTab("jurassicraft.fossils");
     public static final JurassiCraftDNATab DNA = new JurassiCraftDNATab("jurassicraft.dna");
+    public static final JurassiCraftVehiclesTab VEHICLES = new JurassiCraftVehiclesTab("jurassicraft.vehicles");
+    public static final JurassiCraftEggsTab EGGS = new JurassiCraftEggsTab("jurassicraft.eggs");
     public static final JurassiCraftFoodTab FOODS = new JurassiCraftFoodTab("jurassicraft.foods");
     public static final JurassiCraftDecorationsTab DECORATIONS = new JurassiCraftDecorationsTab("jurassicraft.decorations");
 }

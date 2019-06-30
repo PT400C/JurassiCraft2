@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jurassicraft.server.item.ItemHandler;
+
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
@@ -29,6 +31,7 @@ public class EmbryonicRecipeWrapper implements IRecipeWrapper {
 
         inputs.add(inputStack);
         inputs.add(new ItemStack(this.input.getPetriDishItem()));
+        inputs.add(new ItemStack(ItemHandler.EMPTY_SYRINGE));
         ingredients.setInputs(ItemStack.class, inputs);
 
         ItemStack outputStack = new ItemStack(this.input.getOutputItem(), 1, metadata);

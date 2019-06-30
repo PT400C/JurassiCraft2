@@ -6,6 +6,8 @@ itemGroup.jurassicraft.foods=JurassiCraft Foodstuffs
 itemGroup.jurassicraft.plants=JurassiCraft Plants
 itemGroup.jurassicraft.fossils=JurassiCraft Fossils
 itemGroup.jurassicraft.decorations=JurassiCraft Park Decorations
+itemGroup.jurassicraft.vehicles=JurassiCraft Vehicles
+itemGroup.jurassicraft.eggs=JurassiCraft Spawn Eggs
 
 //Entities ==================================================
 entity.jurassicraft.velociraptor.name=Velociraptor
@@ -257,6 +259,7 @@ tile.ice_shard.name=Ice Shard Ore
 tile.moss.name=Moss
 tile.peat.name=Peat
 tile.peat_moss.name=Peat Moss
+tile.moss_on_peat.name=Moss on Peat
 
 tile.cleaning_station.name=Cleaning Station
 tile.fossil_grinder.name=Fossil Grinder
@@ -660,6 +663,16 @@ crafting.skeleton.mismatched=Mismatched bones
 dinosaur.pregnancytest.male=Male dinos cant get pregnant :/
 dinosaur.pregnancytest.not_pregnant=Dinosaur is not pregnant
 dinosaur.pregnancytest.pregnant=Dinosaur is pregnant. Congratulations! \o/
+
+info.jei.serum=Used to instantly grow any dinosaur to maturity.
+info.jei.extractor=DNA may be extracted from certain matters (e.g. meat or amber)
+info.jei.cultivator=Used to nourish prehistoric embryos to a gestated state
+info.jei.pregnancy_test=Check whether your female prehistoric creatures are pregnant
+info.jei.hatched_egg=Shift + Right click to spawn an not imprinted dinosaur;\nNormal right click will spawn an imprinted one
+info.jei.peat.name=Top-Down view on a<nl>moss farm; Moss will spread<nl>on peat, if there is water in<nl>a 5-block radius
+info.jei.krill_plankton=Food source for fish creatures (Place it on water source blocks)
+info.jei.peat_block.name=Peat
+info.jei.placables=Placable on solid surfaces - Attraction signs require a large area to be placed on
 
 #Commands
 commands.spawnjc.usuage=/spawnjc <structure> [rotation] [mirror] [seed]

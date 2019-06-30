@@ -11,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import java.util.List;
-import org.jurassicraft.JurassiCraft;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.dinosaur.DinosaurMetadata;
 import org.jurassicraft.server.entity.DinosaurEntity;
@@ -33,7 +32,7 @@ public class HatchedEggItem extends DNAContainerItem {
     
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-    	tooltip.add(TextFormatting.GOLD +LangUtils.translate("gender.name") +": "+ getItemGender(stack));
+    	tooltip.add(TextFormatting.GOLD + LangUtils.translate("gender.name") +": "+ getItemGender(stack));
     }
 
     public static Dinosaur getDinosaur(ItemStack stack) {

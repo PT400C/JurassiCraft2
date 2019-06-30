@@ -16,7 +16,7 @@ public class DNAExtractorContainer extends MachineContainer {
     public DNAExtractorContainer(InventoryPlayer playerInventory, TileEntity tileEntity) {
         super((IInventory) tileEntity);
         this.extractor = (DNAExtractorBlockEntity) tileEntity;
-        this.addSlotToContainer(new StorageSlot(this.extractor, 1, 55, 47, false));
+        this.addSlotToContainer(new CustomSlot(this.extractor, 1, 55, 47, stack -> true));
         this.addSlotToContainer(new DNAExtractionSlot(this.extractor, 0, 55, 26));
         this.addSlotToContainer(new CustomSlot(this.extractor, 2, 108, 28, stack -> false));
         this.addSlotToContainer(new CustomSlot(this.extractor, 3, 126, 28, stack -> false));

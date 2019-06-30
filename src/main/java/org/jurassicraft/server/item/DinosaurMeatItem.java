@@ -3,6 +3,7 @@ package org.jurassicraft.server.item;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,6 +13,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.jurassicraft.server.api.ExtractableItem;
+import org.jurassicraft.server.api.SequencableItem;
 import org.jurassicraft.server.dinosaur.Dinosaur;
 import org.jurassicraft.server.entity.EntityHandler;
 import org.jurassicraft.server.genetics.DinoDNA;
@@ -22,8 +26,9 @@ import org.jurassicraft.server.util.LangUtils;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
-public class DinosaurMeatItem extends ItemFood {
+public class DinosaurMeatItem extends ItemFood implements ExtractableItem {
     public DinosaurMeatItem() {
         super(3, 0.3F, true);
         this.setHasSubtypes(true);
@@ -85,6 +90,35 @@ public class DinosaurMeatItem extends ItemFood {
             lore.add(TextFormatting.BLUE + LangUtils.translate(LangUtils.LORE.get("genetic_code")).replace("{code}", LangUtils.getFormattedGenetics(nbt.getString("Genetics"))));
         }
     }
+    
+    @Override
+	public List<ItemStack> getJEIRecipeTypes() {
+		List<ItemStack> list = this.getItemSubtypes(this);
+		return list;
+	}
+
+	@Override
+	public List<Pair<Float, ItemStack>> getChancedOutputs(ItemStack inputItem) {
+		return null;
+	}
+
+	@Override
+	public ItemStack getExtractOutput(ItemStack stack, Random random) {
+		NBTTagCompound nbt = stack.getTagCompound();
+
+        if (nbt == null) {
+            nbt = new NBTTagCompound();
+            DinoDNA dna = new DinoDNA(EntityHandler.getDinosaurById(stack.getItemDamage()), -1, "", false);
+            dna.writeToNBT(nbt);
+        } else if (!nbt.hasKey("Dinosaur")) {
+            nbt.setInteger("Dinosaur", stack.getItemDamage());
+        }
+
+        ItemStack output = new ItemStack(ItemHandler.STORAGE_DISC);
+        output.setTagCompound(nbt);
+
+        return output;
+	}
 
     //INFO: use DNAContainerItem.getDNAQuality()
 //    public int getDNAQuality(EntityPlayer player, ItemStack stack) {

@@ -213,6 +213,10 @@ public class FoodHelper {
             }
         }
     }
+    
+    public static List<FoodKey> getFoods() {
+        return FOODS;
+    }
 
     public static boolean isFood(Item item) {
         return FOODS.contains(new FoodKey(item));
@@ -228,7 +232,7 @@ public class FoodHelper {
         }
     }
 
-    private static class FoodKey {
+    public static class FoodKey {
         final Item item;
         final Block block;
 
@@ -246,6 +250,10 @@ public class FoodHelper {
         @Override
         public boolean equals(Object obj) {
             return this.hashCode() == obj.hashCode();
+        }
+        
+        public Item getItem() {
+        	return this.item;
         }
 
         @Override

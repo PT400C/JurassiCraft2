@@ -1,10 +1,12 @@
 package org.jurassicraft.server.item;
 
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jurassicraft.server.entity.DinosaurEntity;
@@ -26,11 +28,17 @@ public class DinoScannerItem extends Item {
             if (player.isSneaking()) {
                 int food = dinosaur.getMetabolism().getEnergy();
                 dinosaur.getMetabolism().setEnergy(food - 5000);
-                LOGGER.info("food: " + dinosaur.getMetabolism().getEnergy() + "/" + dinosaur.getMetabolism().getMaxEnergy() +
+                String infostring = "food: " + dinosaur.getMetabolism().getEnergy() + "/" + dinosaur.getMetabolism().getMaxEnergy() +
                         "(" + (dinosaur.getMetabolism().getMaxEnergy() * 0.875) + "/" +
-                        (dinosaur.getMetabolism().getMaxEnergy() * 0.25) + ")");
+                        (dinosaur.getMetabolism().getMaxEnergy() * 0.25) + ")";
+                LOGGER.info(infostring);
+                GuiScreen.setClipboardString(infostring);
+                player.sendMessage(new TextComponentString("Dumped data has beed stored in your clipboard"));
+                
             } else {
-                dinosaur.writeStatsToLog();
+            	dinosaur.writeStatsToLog();
+                GuiScreen.setClipboardString(dinosaur.toString());
+                player.sendMessage(new TextComponentString("Dumped data has beed stored in your clipboard"));
             }
 
             return true;

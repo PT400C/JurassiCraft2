@@ -1,17 +1,12 @@
 package org.jurassicraft.server.plugin.jei.category.incubator;
 
 import org.jurassicraft.server.dinosaur.Dinosaur;
+import org.jurassicraft.server.plugin.jei.DinosaurInput;
 
-public class IncubatorInput {
+public class IncubatorInput extends DinosaurInput {
 
-    private final Dinosaur dinosaur;
-
-    public IncubatorInput(Dinosaur dinosaur) {
-        this.dinosaur = dinosaur;
-    }
-
-    public Dinosaur getDinosaur() {
-        return this.dinosaur;
-    }
+	public IncubatorInput(Dinosaur dinosaur) {
+		super(dinosaur);
+	}
 
 }

@@ -63,7 +63,7 @@ public class EmbryonicRecipeCategory implements IRecipeCategory<EmbryonicRecipeW
         stackGroup.init(1, true, 26, 36);
         stackGroup.set(1, inputs.get(1));
         stackGroup.init(2, true, 26, 0);
-        stackGroup.set(2, new ItemStack(ItemHandler.EMPTY_SYRINGE));
+        stackGroup.set(2, inputs.get(2));
         stackGroup.init(3, false, 95, 13);
         stackGroup.set(3, outputs.get(0));
     }

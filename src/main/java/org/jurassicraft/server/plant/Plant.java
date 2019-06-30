@@ -26,7 +26,7 @@ public abstract class Plant implements Comparable<Plant> {
     public boolean isPrehistoric() {
         return true;
     }
-
+    
     public boolean isTree() {
         return false;
     }
