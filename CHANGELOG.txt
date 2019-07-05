@@ -34,3 +34,5 @@
 +Added a warning sound on low health to the helicopter
 +Made helicopter crashing when health is too low
 +Added HUD gauges to helicopter
+*Fixed corals destroying themselves when spreading
+*Changed dinosaurs drinking AI to rely more on their mental features

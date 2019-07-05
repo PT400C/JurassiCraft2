@@ -7,6 +7,8 @@ import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -39,87 +41,97 @@ public class GrazeEntityAI extends EntityAIBase {
         this.setMutexBits(Mutex.METABOLISM);
     }
 
-    @Override
-    public boolean shouldExecute() {
-        if (!(this.dinosaur.isDead || this.dinosaur.isCarcass() || !GameRuleHandler.DINO_METABOLISM.getBoolean(this.dinosaur.world)) && this.dinosaur.getMetabolism().isHungry()) {
-            if (!this.dinosaur.getMetabolism().isStarving() && feederExists()) {
-                return false;
-            }
+	@Override
+	public boolean shouldExecute() {
+		if (!(this.dinosaur.isDead || this.dinosaur.isCarcass() || !GameRuleHandler.DINO_METABOLISM.getBoolean(this.dinosaur.world)) && this.dinosaur.getMetabolism().isHungry()) {
+			if (!this.dinosaur.getMetabolism().isStarving() && feederExists()) {
+				return false;
+			}
 
-            // This gets called once to initiate.  Here's where we find the plant and start movement
-            Vec3d headPos = this.dinosaur.getHeadPos();
-            BlockPos head = new BlockPos(headPos.x, headPos.y, headPos.z);
+			// This gets called once to initiate. Here's where we find the plant and start
+			// movement
+			Vec3d headPos = this.dinosaur.getHeadPos();
+			BlockPos head = new BlockPos(headPos.x, headPos.y, headPos.z);
 
-            //world the animal currently inhabits
-            this.world = this.dinosaur.world;
+			// world the animal currently inhabits
+			this.world = this.dinosaur.world;
 
-            MetabolismContainer metabolism = this.dinosaur.getMetabolism();
+			MetabolismContainer metabolism = this.dinosaur.getMetabolism();
 
-            // Look in increasing layers (e.g. boxes) around the head. Traversers... are like ogres?
-            
+			// Look in increasing layers (e.g. boxes) around the head. Traversers... are
+			// like ogres?
+
 			if (this.searched == false && tpe.getActiveCount() < 2) {
 
 				this.searched = true;
-				tpe.execute(new ThreadRunnable(this, this.dinosaur) {
-					@Override
-					public void run() {
-						synchronized (world) {
-							OnionTraverser traverser = new OnionTraverser(head, LOOK_RADIUS);
-							this.ai.target = null;
+				try {
+					tpe.execute(new ThreadRunnable(this, this.dinosaur) {
+						@Override
+						public void run() {
+							synchronized (world) {
+								OnionTraverser traverser = new OnionTraverser(head, LOOK_RADIUS);
+								this.ai.target = null;
 
-							// scans all blocks around the LOOK_RADIUS
-							for (BlockPos pos : traverser) {
-								Block block = world.getBlockState(pos).getBlock();
-								if (FoodHelper.isEdible(this.entity, this.entity.getDinosaur().getMetadata().getDiet(), block) && pos != this.ai.previousTarget) {
-									this.ai.target = pos;
-									for (int i = 0; i < 16; i++) {
-										IBlockState state = world.getBlockState(pos);
-										if (!state.getBlock().isLeaves(state, world, pos) && !state.getBlock().isAir(state, world, pos)) {
-											break;
+								// scans all blocks around the LOOK_RADIUS
+								for (BlockPos pos : traverser) {
+									Block block = world.getBlockState(pos).getBlock();
+									if (FoodHelper.isEdible(this.entity, this.entity.getDinosaur().getMetadata().getDiet(), block) && pos != this.ai.previousTarget) {
+										this.ai.target = pos;
+										for (int i = 0; i < 16; i++) {
+											IBlockState state = world.getBlockState(pos);
+											if (!state.getBlock().isLeaves(state, world, pos) && !state.getBlock().isAir(state, world, pos)) {
+												break;
+											}
+											pos = pos.down();
 										}
-										pos = pos.down();
+										this.ai.moveTarget = pos;
+										this.ai.targetVec = new Vec3d(this.ai.target.getX(), this.ai.target.getY(), this.ai.target.getZ());
+										break;
 									}
-									this.ai.moveTarget = pos;
-									this.ai.targetVec = new Vec3d(this.ai.target.getX(), this.ai.target.getY(), this.ai.target.getZ());
-									break;
 								}
 							}
+							this.ai.searched = false;
 						}
-						this.ai.searched = false;
-					}
-				});
+					});
+				} catch (RejectedExecutionException e) {
+
+				}
 			}
 
-            if (this.moveTarget != null) {
-                if (metabolism.isStarving()) {
-                    this.dinosaur.getNavigator().tryMoveToXYZ(this.moveTarget.getX(), this.moveTarget.getY(), this.moveTarget.getZ(), 1.2);
-                } else {
-                    this.dinosaur.getNavigator().tryMoveToXYZ(this.moveTarget.getX(), this.moveTarget.getY(), this.moveTarget.getZ(), 0.7);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void startExecuting() {
-    }
+			if (this.moveTarget != null) {
+				try {
+				if (metabolism.isStarving()) {
+					this.dinosaur.getNavigator().tryMoveToXYZ(this.moveTarget.getX(), this.moveTarget.getY(), this.moveTarget.getZ(), 1.2);
+				} else {
+					this.dinosaur.getNavigator().tryMoveToXYZ(this.moveTarget.getX(), this.moveTarget.getY(), this.moveTarget.getZ(), 0.7);
+				}
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+				return true;
+			}
+		}
+		return false;
+	}
     
 	protected boolean feederExists() {
 
 		if (tpe.getActiveCount() < 2) {
 			World world = this.dinosaur.world;
-			tpe.execute(new ThreadRunnable(this, this.dinosaur) {
-				@Override
-				public void run() {
-					synchronized (world) {
-						synchronized (this.ai) {
-							this.ai.feederExists = this.entity.getClosestFeeder() != null;
+			try {
+				tpe.execute(new ThreadRunnable(this, this.dinosaur) {
+					@Override
+					public void run() {
+						synchronized (world) {
+							synchronized (this.ai) {
+								this.ai.feederExists = this.entity.getClosestFeeder() != null;
+							}
 						}
 					}
-				}
-			});
+				});
+			} catch (RejectedExecutionException e) {
+
+			}
 		}
 
 		return this.feederExists;
@@ -138,6 +150,7 @@ public class GrazeEntityAI extends EntityAIBase {
     @Override
     public void updateTask() {
         if (this.target != null) {
+        	try {
             Vec3d headPos = this.dinosaur.getHeadPos();
             Vec3d headVec = new Vec3d(headPos.x, this.target.getY(), headPos.z);
 
@@ -149,6 +162,9 @@ public class GrazeEntityAI extends EntityAIBase {
 
                 this.dinosaur.setAnimation(EntityAnimation.EATING.get());
 
+                if(this.target.getY() > 254)
+                	return;
+                
                 Item item = Item.getItemFromBlock(this.world.getBlockState(this.target).getBlock());
 
                 this.world.destroyBlock(this.target, false);
@@ -168,6 +184,9 @@ public class GrazeEntityAI extends EntityAIBase {
                     this.terminateTask();
                 }
             }
+        	}catch(NullPointerException e) {
+        		
+        	}
         }
     }
 

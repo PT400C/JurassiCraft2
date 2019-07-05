@@ -2,19 +2,24 @@ package org.jurassicraft.server.entity.ai;
 
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.pathfinding.Path;
-import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.math.BlockPos;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.jurassicraft.server.entity.DinosaurEntity;
 import org.jurassicraft.server.entity.ai.util.AIUtils;
 
 public class AdvancedSwimEntityAI extends EntityAIBase {
     private final DinosaurEntity entity;
-    private BlockPos shore;
-    private Path path;
-
+    private volatile BlockPos shore = null;
+    private static ThreadPoolExecutor tpeSwimming = new ThreadPoolExecutor(0, 10, 10, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+    private volatile Path path;
+    private volatile boolean seti;
+    private volatile boolean started = false;
+    
     public AdvancedSwimEntityAI(DinosaurEntity entity) {
         this.entity = entity;
-//        ((PathNavigateGround) entity.getNavigator()).setCanSwim(true);
         this.setMutexBits(0);
     }
 
@@ -23,21 +28,41 @@ public class AdvancedSwimEntityAI extends EntityAIBase {
         return this.entity.isSwimming() && this.entity.getNavigator().noPath() && (this.entity.getAttackTarget() == null || this.entity.getAttackTarget().isDead) && this.entity.canDinoSwim();
     }
 
-    @Override
-    public void startExecuting() {
-        BlockPos surface = AIUtils.findSurface(this.entity);
+	@Override
+	public void startExecuting() {
 
-        if (surface != null) {
-            this.shore = AIUtils.findShore(this.entity.getEntityWorld(), surface.down());
+		if (this.started == true)
+			return;
 
-            if (this.shore != null) {
-                this.path = this.entity.getNavigator().getPathToPos(this.shore.up());
-                if (!this.entity.getNavigator().setPath(this.path, 1.5)) {
-                    this.shore = null;
-                }
-            }
-        }
-    }
+		if (tpeSwimming.getActiveCount() < 9) {
+
+			try {
+				tpeSwimming.execute(new ThreadRunnable(this, this.entity) {
+
+					@Override
+					public void run() {
+						synchronized (this.entity.world) {
+							this.ai.started = true;
+
+							BlockPos surface = AIUtils.findSurface(this.entity);
+
+							if (surface != null) {
+								this.ai.shore = AIUtils.findShore(this.entity.getEntityWorld(), surface.down());
+
+								if (this.ai.shore != null) {
+
+									this.ai.seti = true;
+								}
+							}
+						}
+						this.ai.started = false;
+					}
+				});
+			} catch (RejectedExecutionException e) {
+
+			}
+		}
+	}
 
     @Override
     public boolean shouldContinueExecuting() {
@@ -45,15 +70,43 @@ public class AdvancedSwimEntityAI extends EntityAIBase {
         return this.shore != null && this.path != null && (currentPath == null || !currentPath.isFinished());
     }
 
-    @Override
-    public void updateTask() {
-        Path currentPath = this.entity.getNavigator().getPath();
-        if (this.shore != null && !this.path.isSamePath(currentPath)) {
-            Path path = this.entity.getNavigator().getPathToPos(this.shore);
-            if (path != null && !path.isSamePath(currentPath)) {
-                this.path = path;
-                this.entity.getNavigator().setPath(path, 1.5);
-            }
-        }
+	@Override
+	public void updateTask() {
+
+		try {
+			if (this.seti) {
+				this.path = this.entity.getNavigator().getPathToPos(this.shore.up());
+				if (!this.entity.getNavigator().setPath(this.path, 1.5)) {
+					this.shore = null;
+				}
+				this.seti = false;
+			}
+			Path currentPath = this.entity.getNavigator().getPath();
+
+			if (this.shore != null && this.path != null && !this.path.isSamePath(currentPath)) {
+				synchronized (this.path) {
+					synchronized (this.shore) {
+						Path path = this.entity.getNavigator().getPathToPos(this.shore);
+						if (path != null && !path.isSamePath(currentPath)) {
+							this.path = path;
+							this.entity.getNavigator().setPath(path, 1.5);
+						}
+					}
+				}
+			}
+		} catch (NullPointerException e) {
+		
+		}
+	}
+
+    abstract class ThreadRunnable implements Runnable {
+
+    	final DinosaurEntity entity;
+    	final AdvancedSwimEntityAI ai;
+
+    	ThreadRunnable(AdvancedSwimEntityAI wanderAI, DinosaurEntity entity) {
+    		this.ai = wanderAI;
+    		this.entity = entity;
+    	}
     }
 }
